@@ -57,7 +57,7 @@
             <div class="kicker">ROUTE MAP</div>
             <h2>本次路線地圖</h2>
           </div>
-          <p>這裡可放 Google Maps 多點路線嵌入。正式版可由後台填入「行程地圖網址」，讓每一篇行程都能人工指定路線。</p>
+          <p>這裡會依照後台填入的「行程地圖網址」顯示 Google Maps；若要更精準，也可以改放 Google My Maps 分享連結。</p>
         </div>
         <iframe id="mapEmbed" class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         <div style="margin-top:18px">
@@ -67,26 +67,22 @@
 
       <section class="route-related-panel">
         <div class="kicker">CONNECTED CONTENT</div>
-        <h2>這趟旅程可以搭配</h2>
+        <h2>這趟旅程會經過</h2>
         <div class="route-related-grid">
           <div class="route-related-box">
             <div class="meta">SPOTS</div>
             <h3>景點</h3>
-            <a class="route-related-item" href="spots.html"><strong>景點探索</strong>查看這趟旅程可安排的景點</a>
-            <a class="route-related-item" href="spot.html?id=spot_0001"><strong>地熱谷</strong>北投最經典的白色呼吸</a>
-            <a class="route-related-item" href="spot.html?id=spot_0002"><strong>北投溫泉博物館</strong>老建築裡的溫泉記憶</a>
+            <div id="relatedSpots"></div>
           </div>
           <div class="route-related-box food">
             <div class="meta">FOOD</div>
             <h3>美食</h3>
-            <a class="route-related-item" href="foods.html"><strong>美食目錄</strong>查看附近餐廳、小吃與咖啡</a>
-            <a class="route-related-item" href="food.html?id=food_0001"><strong>北投市場小吃</strong>適合早午餐散步</a>
+            <div id="relatedFoods"></div>
           </div>
           <div class="route-related-box offer">
             <div class="meta">OFFERS</div>
             <h3>優惠</h3>
-            <a class="route-related-item" href="coupons.html"><strong>優惠目錄</strong>查看合作優惠與推薦</a>
-            <a class="route-related-item" href="coupon.html?id=coupon_0001"><strong>北捷行旅官網訂房</strong>確認最新住宿專案</a>
+            <div id="relatedCoupons"></div>
           </div>
         </div>
       </section>
@@ -168,25 +164,125 @@
       if (el) el.textContent = value || fallback;
     }
 
+    function normalizeText(text) {
+      return String(text || '')
+        .replace(/\r/g, '\n')
+        .replace(/\s+(?=\d{1,2}:\d{2}｜)/g, '\n')
+        .replace(/\s+(?=\d{1,2}:\d{2}\s*\|)/g, '\n')
+        .trim();
+    }
+
     function parseSteps(content) {
-      return String(content || '')
-        .split('\n')
+      const text = normalizeText(content);
+      const rawLines = text.includes('\n') ? text.split('\n') : text.split(/(?=\d{1,2}:\d{2}[｜|])/g);
+
+      return rawLines
         .map(line => line.trim())
         .filter(Boolean)
         .map(line => {
-          const parts = line.split('｜');
+          const parts = line.split(/[｜|]/).map(p => p.trim());
           return {
             time: parts[0] || '',
             title: parts[1] || '',
-            text: parts[2] || line,
+            text: parts[2] || parts.slice(0, 3).join(' '),
             image: parts[3] || fallbackImage
           };
         });
     }
 
-    function mapEmbedUrl(trip) {
-      const query = trip.google_route || trip.title || '';
-      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+    function getRouteQuery(trip, steps) {
+      if (trip.google_route) {
+        try {
+          const url = new URL(trip.google_route);
+          const q = url.searchParams.get('query') || url.searchParams.get('q');
+          if (q) return q;
+        } catch (e) {}
+      }
+
+      const stepNames = steps.map(s => s.title).filter(Boolean).join(' ');
+      return stepNames || trip.title || '';
+    }
+
+    function getGoogleMapsUrl(trip, steps) {
+      if (trip.google_route && trip.google_route.startsWith('http')) return trip.google_route;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getRouteQuery(trip, steps))}`;
+    }
+
+    function getMapEmbedUrl(trip, steps) {
+      return `https://www.google.com/maps?q=${encodeURIComponent(getRouteQuery(trip, steps))}&output=embed`;
+    }
+
+    function getTripKeyword(trip) {
+      const text = `${trip.title || ''} ${trip.summary || ''} ${trip.content || ''}`;
+      if (text.includes('陽明山')) return '陽明山';
+      if (text.includes('淡水')) return '淡水';
+      if (text.includes('士林')) return '士林';
+      if (text.includes('北投') || text.includes('新北投')) return '北投';
+      return '';
+    }
+
+    async function fetchTable(table) {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/${table}?is_published=eq.true&select=*&order=id.asc`,
+        {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || `${table} 讀取失敗`);
+      return result;
+    }
+
+    function renderRelatedList(targetId, rows, type, keyword, maxCount) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const filtered = rows.filter(item => {
+        const text = `${item.title || ''} ${item.area || ''} ${item.category || ''} ${item.summary || ''} ${item.content || ''} ${item.tags || ''}`;
+        return !keyword || text.includes(keyword);
+      }).slice(0, maxCount);
+
+      const list = filtered.length ? filtered : rows.slice(0, maxCount);
+
+      if (!list.length) {
+        target.innerHTML = `<a class="route-related-item" href="${type}s.html"><strong>查看全部</strong>目前尚未建立相關內容</a>`;
+        return;
+      }
+
+      target.innerHTML = list.map(item => {
+        const href = type === 'spot'
+          ? `spot.html?id=${encodeURIComponent(item.id)}`
+          : type === 'food'
+            ? `food.html?id=${encodeURIComponent(item.id)}`
+            : `coupon.html?id=${encodeURIComponent(item.id)}`;
+
+        return `<a class="route-related-item" href="${href}"><strong>${item.title || '未命名'}</strong>${item.summary || '更多介紹即將補上。'}</a>`;
+      }).join('');
+    }
+
+    async function renderRelatedContent(trip) {
+      const keyword = getTripKeyword(trip);
+
+      try {
+        const [spots, foods, coupons] = await Promise.all([
+          fetchTable('spots'),
+          fetchTable('foods'),
+          fetchTable('coupons')
+        ]);
+
+        renderRelatedList('relatedSpots', spots, 'spot', keyword, 4);
+        renderRelatedList('relatedFoods', foods, 'food', keyword, 3);
+        renderRelatedList('relatedCoupons', coupons, 'coupon', keyword, 3);
+      } catch (error) {
+        console.error(error);
+        document.getElementById('relatedSpots').innerHTML = '<a class="route-related-item" href="spots.html"><strong>景點探索</strong>查看景點列表</a>';
+        document.getElementById('relatedFoods').innerHTML = '<a class="route-related-item" href="foods.html"><strong>美食目錄</strong>查看美食列表</a>';
+        document.getElementById('relatedCoupons').innerHTML = '<a class="route-related-item" href="coupons.html"><strong>優惠目錄</strong>查看優惠列表</a>';
+      }
     }
 
     async function loadTrip() {
@@ -209,11 +305,9 @@
         );
 
         const result = await response.json();
-
         if (!response.ok) throw new Error(result.message || 'Supabase 讀取失敗');
 
         const trip = result[0];
-
         if (!trip) {
           setText('heroSubtitle', '找不到這筆行程資料。');
           return;
@@ -244,14 +338,15 @@
         document.getElementById('storySections').innerHTML = steps.map((step, index) => `
           <section class="story numbered-story" id="s${index + 1}">
             <h2><span class="step-no">${String(index + 1).padStart(2, '0')}</span><span>${step.title}</span></h2>
-            <p>${step.text}</p>
+            <p>${step.time ? step.time + '｜' : ''}${step.text}</p>
             <div class="story-img"><img src="${step.image}" alt="${step.title}"></div>
           </section>
         `).join('');
 
-        const map = trip.google_route || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trip.title || '')}`;
-        document.getElementById('mapButton').href = map;
-        document.getElementById('mapEmbed').src = mapEmbedUrl(trip);
+        document.getElementById('mapButton').href = getGoogleMapsUrl(trip, steps);
+        document.getElementById('mapEmbed').src = getMapEmbedUrl(trip, steps);
+
+        renderRelatedContent(trip);
 
       } catch (error) {
         console.error(error);

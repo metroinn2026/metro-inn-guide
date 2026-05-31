@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+
+<body id="top">
+  <div id="header"></div>
+
+  <section class="hero">
+    <img id="heroImage" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85" alt="">
+    <div class="container">
+      <div class="hero-content">
+        <div id="heroKicker" class="kicker">FOOD DETAIL</div>
+        <h1 id="heroTitle">美食介紹</h1>
+        <p id="heroSubtitle">美食資料載入中...</p>
+        <div class="hero-icons">
+          <span id="heroCategory">美食類型</span>
+          <span id="heroHours">營業時間</span>
+          <span id="heroCost">平均消費</span>
+          <span id="heroTags">美食標籤</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="crumb">
+    <div class="container">
+      <div id="breadcrumb">首頁 〉 美食介紹</div>
+      <button class="share-icon" type="button" aria-label="分享此頁">⇪</button>
+    </div>
+  </section>
+
+  <main class="container article-wrap single-point">
+    <article>
+      <p id="leadText" class="lead">美食資料載入中...</p>
+
+      <div id="tagListTop" class="tag-list"></div>
+
+      <section class="story">
+        <div id="storyMeta" class="meta">FOOD STORY</div>
+        <h2 id="storyTitle">美食介紹</h2>
+        <p id="storyContent">美食資料載入中...</p>
+        <div class="story-img">
+          <img id="storyImage" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85" alt="">
+        </div>
+      </section>
+
+      <section id="info" class="info-card point-info">
+        <div class="info-head-row">
+          <div>
+            <div class="kicker">INFORMATION</div>
+            <h3 id="infoTitle">美食資訊</h3>
+          </div>
+          <button class="share-mini" type="button" aria-label="分享美食">⇪</button>
+        </div>
+
+        <div class="info-row"><span class="info-label">類型</span><span id="infoCategory">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">地址</span><span id="infoAddress">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">營業時間</span><span id="infoHours">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">電話</span><span id="infoPhone">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">平均消費</span><span id="infoCost">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">標籤</span><span id="infoTags">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">備註</span><span>實際營業時間、菜單與價格請以店家公告為準。</span></div>
+
+        <div class="info-actions multi">
+          <a id="mapButton" class="button" href="#" target="_blank" rel="noopener">Google Map</a>
+          <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
+        </div>
+
+        <iframe id="mapEmbed" class="map-embed small" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </section>
+    </article>
+
+    <aside class="sticky-panel">
+      <div class="sidebox compact">
+        <div class="kicker">FOOD INFO</div>
+        <h3 id="sideTitle">美食介紹</h3>
+        <div id="sideTags" class="tag-list small"></div>
+        <p id="sideHours">營業時間載入中</p>
+        <p id="sideCost">平均消費載入中</p>
+        <p id="sideAddress">地址載入中</p>
+      </div>
+
+      <div class="sidebox compact fill">
+        <div class="kicker">TRIP IDEA</div>
+        <h3>附近可以這樣玩</h3>
+        <p>可搭配景點頁與行程頁，安排半日或一日散步路線。</p>
+      </div>
+
+      <div class="sidebox compact dark">
+        <div class="kicker" style="color:white">STAY NEARBY</div>
+        <h3>入住北捷行旅</h3>
+        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
+        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
+      </div>
+    </aside>
+  </main>
+
+  <section id="related" class="section related">
+    <div class="container">
+      <div class="kicker">MORE STORIES</div>
+      <h2>延伸閱讀</h2>
+      <div class="rel-grid">
+        <a class="rel" href="spots.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt=""></div>
+          <div class="meta">BEITOU</div>
+          <h3>北投景點探索</h3>
+        </a>
+        <a class="rel" href="trips.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt=""></div>
+          <div class="meta">TRIP</div>
+          <h3>北投溫泉半日遊</h3>
+        </a>
+        <a class="rel" href="foods.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt=""></div>
+          <div class="meta">FOOD</div>
+          <h3>更多美食</h3>
+        </a>
+        <a class="rel" href="index.html">
+          <div class="rel-img"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=85" alt=""></div>
+          <div class="meta">GUIDE</div>
+          <h3>回首頁搜尋</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+  <script>
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
+
+    const fallbackImage = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85';
+
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    function normalizeTags(tags) {
+      if (!tags) return [];
+      if (Array.isArray(tags)) return tags;
+      return String(tags).split(/[、,，]/).map(tag => tag.trim()).filter(Boolean);
+    }
+
+    function setText(id, value, fallback = '尚未提供') {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || fallback;
+    }
+
+    function mapEmbedUrl(food) {
+      const query = food.address || food.title || '';
+      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+    }
+
+    async function loadFood() {
+      const id = getParam('id');
+
+      if (!id) {
+        setText('heroSubtitle', '找不到美食代碼，請回美食列表重新進入。');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/foods?id=eq.${encodeURIComponent(id)}&select=*`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Supabase 讀取失敗');
+        }
+
+        const food = result[0];
+
+        if (!food) {
+          setText('heroSubtitle', '找不到這筆美食資料。');
+          return;
+        }
+
+        const tags = normalizeTags(food.tags);
+        const image = food.cover_image || fallbackImage;
+        const title = food.title || '美食介紹';
+        const summary = food.summary || '更多介紹即將補上。';
+        const content = food.content || summary;
+        const cost = food.average_cost || food.price_range || '依店家公告為準';
+
+        document.title = `${title}｜Metro Inn Guide 北投旅圖`;
+
+        document.getElementById('heroImage').src = image;
+        document.getElementById('heroImage').alt = title;
+        document.getElementById('storyImage').src = image;
+        document.getElementById('storyImage').alt = title;
+
+        setText('heroKicker', `${food.category || 'FOOD'} · FOOD`);
+        setText('heroTitle', `${title}｜${summary.slice(0, 22)}`);
+        setText('heroSubtitle', summary);
+        setText('heroCategory', food.category || '美食');
+        setText('heroHours', food.business_hours || '營業時間依公告為準');
+        setText('heroCost', cost);
+        setText('heroTags', tags[0] || '美食');
+
+        setText('breadcrumb', `首頁 〉 美食介紹 〉 ${title}`);
+        setText('leadText', summary);
+        setText('storyMeta', (food.slug || 'food').replaceAll('-', ' ').toUpperCase());
+        setText('storyTitle', title);
+        setText('storyContent', content);
+
+        setText('infoTitle', `${title}美食資訊`);
+        setText('infoCategory', food.category);
+        setText('infoAddress', food.address);
+        setText('infoHours', food.business_hours || '依店家公告為準');
+        setText('infoPhone', food.phone);
+        setText('infoCost', cost);
+        setText('infoTags', tags.join('、'));
+
+        setText('sideTitle', title);
+        setText('sideHours', food.business_hours || '營業時間依公告為準');
+        setText('sideCost', `平均消費 ${cost}`);
+        setText('sideAddress', food.address || '地址請見 Google Map');
+
+        const tagHtml = tags.map((tag, index) =>
+          `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`
+        ).join('');
+
+        document.getElementById('tagListTop').innerHTML = tagHtml;
+        document.getElementById('sideTags').innerHTML = tags.slice(0, 3).map(tag =>
+          `<span class="tag">${tag}</span>`
+        ).join('');
+
+        const mapUrl = food.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
+        document.getElementById('mapButton').href = mapUrl;
+
+        if (food.official_website) {
+          document.getElementById('officialButton').href = food.official_website;
+          document.getElementById('officialButton').style.display = '';
+        } else {
+          document.getElementById('officialButton').style.display = 'none';
+        }
+
+        document.getElementById('mapEmbed').src = mapEmbedUrl(food);
+
+      } catch (error) {
+        console.error(error);
+        setText('heroSubtitle', '美食資料暫時無法載入，請稍後再試。');
+        setText('leadText', '美食資料暫時無法載入，請稍後再試。');
+      }
+    }
+
+    loadFood();
+  </script>
+</body>
+</html>

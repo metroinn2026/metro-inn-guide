@@ -1,402 +1,267 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
-
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="data.js"></script>
   <script src="supabase-config.js"></script>
-
-  <style>
-    .spot-detail-hero{
-      padding: 96px 0 56px;
-      background: #f8f6f1;
-      border-bottom: 1px solid rgba(0,0,0,.08);
-    }
-
-    .spot-detail-wrap{
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .spot-breadcrumb{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 28px;
-      color: #ef5b3f;
-      font-weight: 700;
-      text-decoration: none;
-      border-bottom: 1px solid #ef5b3f;
-      padding-bottom: 4px;
-    }
-
-    .spot-detail-kicker{
-      color: #2f6da5;
-      font-size: 13px;
-      letter-spacing: .28em;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-
-    .spot-detail-title{
-      color: #6f8369;
-      font-size: clamp(42px, 6vw, 72px);
-      line-height: 1.05;
-      margin: 0 0 18px;
-      letter-spacing: .02em;
-    }
-
-    .spot-detail-summary{
-      max-width: 760px;
-      color: #4d5c64;
-      font-size: 18px;
-      line-height: 2;
-      margin: 0;
-    }
-
-    .spot-detail-main{
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 56px 24px 96px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
-      gap: 44px;
-      align-items: start;
-    }
-
-    .spot-cover{
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      display: block;
-      border: 1px solid rgba(0,0,0,.08);
-      background: #eee;
-    }
-
-    .spot-content-card{
-      margin-top: 28px;
-      padding-top: 28px;
-      border-top: 4px solid #6f8369;
-    }
-
-    .spot-content-card h2,
-    .spot-info-card h2{
-      margin: 0 0 18px;
-      color: #006c93;
-      font-size: 24px;
-    }
-
-    .spot-content-text{
-      color: #28343b;
-      font-size: 17px;
-      line-height: 2;
-      white-space: pre-line;
-    }
-
-    .spot-info-card{
-      background: #fff;
-      border: 1px solid rgba(0,0,0,.12);
-      padding: 30px;
-      position: sticky;
-      top: 100px;
-    }
-
-    .spot-info-row{
-      display: grid;
-      grid-template-columns: 92px 1fr;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(0,0,0,.12);
-      color: #28343b;
-      line-height: 1.7;
-    }
-
-    .spot-info-row:last-child{
-      border-bottom: 0;
-    }
-
-    .spot-info-label{
-      color: #2f6da5;
-      font-weight: 800;
-    }
-
-    .spot-tag-list{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .spot-detail-actions{
-      display: grid;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .spot-action-btn{
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      padding: 14px 18px;
-      font-weight: 800;
-      border: 1px solid #1e2327;
-      color: #1e2327;
-      background: #fff;
-    }
-
-    .spot-action-btn.primary{
-      background: #ef5b3f;
-      border-color: #ef5b3f;
-      color: #fff;
-    }
-
-    .spot-action-btn.is-hidden{
-      display: none;
-    }
-
-    .spot-loading,
-    .spot-error{
-      max-width: 1080px;
-      margin: 80px auto;
-      padding: 0 24px;
-      color: #4d5c64;
-      font-size: 18px;
-    }
-
-    @media (max-width: 860px){
-      .spot-detail-main{
-        grid-template-columns: 1fr;
-      }
-
-      .spot-info-card{
-        position: static;
-      }
-
-      .spot-info-row{
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
-    }
-  </style>
 </head>
 
 <body id="top">
   <div id="header"></div>
 
-  <main>
-    <section class="spot-detail-hero">
-      <div class="spot-detail-wrap">
-        <a class="spot-breadcrumb" href="spots.html">← 回景點列表</a>
-        <div class="spot-detail-kicker">SPOT DETAIL</div>
-        <h1 id="spotTitle" class="spot-detail-title">景點介紹</h1>
-        <p id="spotSummary" class="spot-detail-summary">資料讀取中...</p>
+  <section class="hero">
+    <img id="heroImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="">
+    <div class="container">
+      <div class="hero-content">
+        <div id="heroKicker" class="kicker">SPOT DETAIL</div>
+        <h1 id="heroTitle">景點介紹</h1>
+        <p id="heroSubtitle">景點資料載入中...</p>
+        <div class="hero-icons">
+          <span id="heroStation">最近捷運站</span>
+          <span id="heroHours">營業時間</span>
+          <span id="heroTags">景點標籤</span>
+          <span id="heroStayTime">建議停留</span>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <div id="spotLoading" class="spot-loading">景點資料載入中...</div>
+  <section class="crumb">
+    <div class="container">
+      <div id="breadcrumb">首頁 〉 景點介紹</div>
+      <button class="share-icon" type="button" aria-label="分享此頁">⇪</button>
+    </div>
+  </section>
 
-    <section id="spotDetail" class="spot-detail-main" style="display:none;">
-      <div>
-        <img id="spotCover" class="spot-cover" src="" alt="">
+  <main class="container article-wrap single-point">
+    <article>
+      <p id="leadText" class="lead">景點資料載入中...</p>
 
-        <article class="spot-content-card">
-          <h2>景點介紹</h2>
-          <div id="spotContent" class="spot-content-text"></div>
-        </article>
+      <div id="tagListTop" class="tag-list"></div>
+
+      <section class="story">
+        <div id="storyMeta" class="meta">SPOT STORY</div>
+        <h2 id="storyTitle">景點介紹</h2>
+        <p id="storyContent">景點資料載入中...</p>
+        <div class="story-img">
+          <img id="storyImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="">
+        </div>
+      </section>
+
+      <section id="info" class="info-card point-info">
+        <div class="info-head-row">
+          <div>
+            <div class="kicker">INFORMATION</div>
+            <h3 id="infoTitle">景點資訊</h3>
+          </div>
+          <button class="share-mini" type="button" aria-label="分享景點">⇪</button>
+        </div>
+
+        <div class="info-row"><span class="info-label">地址</span><span id="infoAddress">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">營業時間</span><span id="infoHours">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">最近捷運站</span><span id="infoStation">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">建議停留</span><span id="infoStayTime">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">景點標籤</span><span id="infoTags">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">備註</span><span id="infoNote">實際開放時間、票價與活動資訊，請以官方公告為準。</span></div>
+
+        <div class="info-actions multi">
+          <a id="mapButton" class="button" href="#" target="_blank" rel="noopener">Google Map</a>
+          <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
+        </div>
+
+        <iframe id="mapEmbed" class="map-embed small" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </section>
+    </article>
+
+    <aside class="sticky-panel">
+      <div class="sidebox compact">
+        <div class="kicker">SPOT INFO</div>
+        <h3 id="sideTitle">景點介紹</h3>
+        <div id="sideTags" class="tag-list small"></div>
+        <p id="sideHours">營業時間載入中</p>
+        <p id="sideStayTime">建議停留載入中</p>
+        <p id="sideStation">捷運資訊載入中</p>
       </div>
 
-      <aside class="spot-info-card">
-        <h2>Information</h2>
+      <div class="sidebox compact fill">
+        <div class="kicker">NEARBY STATION</div>
+        <h3>附近捷運站</h3>
+        <p id="nearbyStation1">🚇 捷運站資訊載入中</p>
+        <p id="nearbyStation2"></p>
+      </div>
 
-        <div class="spot-info-row">
-          <div class="spot-info-label">區域</div>
-          <div id="spotArea"></div>
-        </div>
-
-        <div class="spot-info-row">
-          <div class="spot-info-label">最近捷運</div>
-          <div id="spotStation"></div>
-        </div>
-
-        <div class="spot-info-row">
-          <div class="spot-info-label">地址</div>
-          <div id="spotAddress"></div>
-        </div>
-
-        <div class="spot-info-row">
-          <div class="spot-info-label">營業時間</div>
-          <div id="spotHours"></div>
-        </div>
-
-        <div class="spot-info-row">
-          <div class="spot-info-label">建議停留</div>
-          <div id="spotStayTime"></div>
-        </div>
-
-        <div class="spot-tag-list" id="spotTags"></div>
-
-        <div class="spot-detail-actions">
-          <a id="googleMapBtn" class="spot-action-btn primary" target="_blank" rel="noopener">Google Map</a>
-          <a id="officialBtn" class="spot-action-btn" target="_blank" rel="noopener">官方網站</a>
-        </div>
-      </aside>
-    </section>
+      <div class="sidebox compact dark">
+        <div class="kicker" style="color:white">STAY NEARBY</div>
+        <h3>入住北捷行旅</h3>
+        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
+        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
+      </div>
+    </aside>
   </main>
+
+  <section id="related" class="section related">
+    <div class="container">
+      <div class="kicker">MORE STORIES</div>
+      <h2>延伸閱讀</h2>
+      <div class="rel-grid">
+        <a class="rel" href="trips.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt=""></div>
+          <div class="meta">BEITOU</div>
+          <h3>北投溫泉半日遊</h3>
+        </a>
+        <a class="rel" href="spots.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg" alt=""></div>
+          <div class="meta">YANGMINGSHAN</div>
+          <h3>山裡的一天，給想被風景接住的你</h3>
+        </a>
+        <a class="rel" href="spots.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2020%20Sunset%20of%20Tamsui%20Fisherman%27s%20Wharf.jpg" alt=""></div>
+          <div class="meta">TAMSUI</div>
+          <h3>把傍晚留給淡水</h3>
+        </a>
+        <a class="rel" href="foods.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt=""></div>
+          <div class="meta">SHILIN</div>
+          <h3>夜晚才開始熱鬧的城市散步</h3>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <div id="footer"></div>
 
   <script>
-    if (typeof header === 'function') {
-      document.getElementById('header').innerHTML = header();
-    }
-
-    if (typeof footer === 'function') {
-      document.getElementById('footer').innerHTML = footer();
-    }
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
 
     const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
 
-    const els = {
-      loading: document.getElementById('spotLoading'),
-      detail: document.getElementById('spotDetail'),
-      title: document.getElementById('spotTitle'),
-      summary: document.getElementById('spotSummary'),
-      cover: document.getElementById('spotCover'),
-      content: document.getElementById('spotContent'),
-      area: document.getElementById('spotArea'),
-      station: document.getElementById('spotStation'),
-      address: document.getElementById('spotAddress'),
-      hours: document.getElementById('spotHours'),
-      stayTime: document.getElementById('spotStayTime'),
-      tags: document.getElementById('spotTags'),
-      googleMapBtn: document.getElementById('googleMapBtn'),
-      officialBtn: document.getElementById('officialBtn')
-    };
-
     function getParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
+      return new URLSearchParams(location.search).get(name);
     }
 
     function normalizeTags(tags) {
       if (!tags) return [];
       if (Array.isArray(tags)) return tags;
-      return String(tags)
-        .split(/[、,，]/)
-        .map(tag => tag.trim())
-        .filter(Boolean);
+      return String(tags).split(/[、,，]/).map(tag => tag.trim()).filter(Boolean);
     }
 
-    function setText(el, value, fallback = '尚未提供') {
-      el.textContent = value || fallback;
+    function setText(id, value, fallback = '尚未提供') {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || fallback;
     }
 
-    function showError(message) {
-      els.loading.className = 'spot-error';
-      els.loading.textContent = message;
-      els.detail.style.display = 'none';
-    }
-
-    async function fetchSpotByRest(id) {
-      const url = `${SUPABASE_URL}/rest/v1/spots?id=eq.${encodeURIComponent(id)}&select=*`;
-
-      const response = await fetch(url, {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error('Supabase REST error:', result);
-        throw new Error(result.message || 'Supabase 讀取失敗');
-      }
-
-      return result && result.length ? result[0] : null;
-    }
-
-    async function fetchSpotByClient(id) {
-      const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data, error } = await client
-        .from('spots')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Supabase client error:', error);
-        throw error;
-      }
-
-      return data;
+    function mapEmbedUrl(spot) {
+      const query = spot.google_map && spot.google_map.includes('google')
+        ? spot.title
+        : (spot.address || spot.title || '');
+      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
     }
 
     async function loadSpot() {
       const id = getParam('id');
 
       if (!id) {
-        showError('找不到景點代碼，請回景點列表重新進入。');
+        setText('heroSubtitle', '找不到景點代碼，請回景點列表重新進入。');
         return;
       }
 
       try {
-        let spot = null;
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/spots?id=eq.${encodeURIComponent(id)}&select=*`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
 
-        if (window.supabase && typeof supabase.createClient === 'function') {
-          spot = await fetchSpotByClient(id);
-        } else {
-          spot = await fetchSpotByRest(id);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Supabase 讀取失敗');
         }
 
+        const spot = result[0];
+
         if (!spot) {
-          showError('找不到這筆景點資料。');
+          setText('heroSubtitle', '找不到這筆景點資料。');
           return;
         }
 
-        document.title = `${spot.title || '景點介紹'}｜Metro Inn Guide 北投旅圖`;
+        const tags = normalizeTags(spot.tags);
+        const image = spot.cover_image || fallbackImage;
+        const stationText = spot.station ? `${spot.station}附近` : '捷運資訊請見內文';
+        const title = spot.title || '景點介紹';
+        const summary = spot.summary || '更多介紹即將補上。';
+        const content = spot.content || summary;
+        const areaText = spot.area || 'BEITOU';
 
-        setText(els.title, spot.title, '景點介紹');
-        setText(els.summary, spot.summary, '更多介紹即將補上。');
+        document.title = `${title}｜Metro Inn Guide 北投旅圖`;
 
-        els.cover.src = spot.cover_image || fallbackImage;
-        els.cover.alt = spot.title || '景點圖片';
+        document.getElementById('heroImage').src = image;
+        document.getElementById('heroImage').alt = title;
+        document.getElementById('storyImage').src = image;
+        document.getElementById('storyImage').alt = title;
 
-        setText(els.content, spot.content || spot.summary, '更多介紹即將補上。');
-        setText(els.area, spot.area);
-        setText(els.station, spot.station);
-        setText(els.address, spot.address);
-        setText(els.hours, spot.business_hours);
-        setText(els.stayTime, spot.stay_time);
+        setText('heroKicker', `${areaText} · SPOT`);
+        setText('heroTitle', `${title}｜${summary.slice(0, 22)}`);
+        setText('heroSubtitle', summary);
+        setText('heroStation', stationText);
+        setText('heroHours', spot.business_hours || '營業時間依公告為準');
+        setText('heroTags', tags[0] || '景點');
+        setText('heroStayTime', spot.stay_time || '建議停留依行程安排');
 
-        els.tags.innerHTML = normalizeTags(spot.tags)
-          .map(tag => `<span class="tag">${tag}</span>`)
-          .join('');
+        setText('breadcrumb', `首頁 〉 景點介紹 〉 ${title}`);
+        setText('leadText', summary);
+        setText('storyMeta', (spot.slug || areaText).replaceAll('-', ' ').toUpperCase());
+        setText('storyTitle', title);
+        setText('storyContent', content);
 
-        if (spot.google_map) {
-          els.googleMapBtn.href = spot.google_map;
-          els.googleMapBtn.classList.remove('is-hidden');
-        } else {
-          els.googleMapBtn.classList.add('is-hidden');
-        }
+        setText('infoTitle', `${title}景點資訊`);
+        setText('infoAddress', spot.address);
+        setText('infoHours', spot.business_hours || '依官方公告為準');
+        setText('infoStation', spot.station ? `${spot.station}附近` : '');
+        setText('infoStayTime', spot.stay_time);
+        setText('infoTags', tags.join('、'));
+        setText('infoNote', '實際開放時間、票價與活動資訊，請以官方公告為準。');
+
+        setText('sideTitle', title);
+        setText('sideHours', spot.business_hours || '營業時間依公告為準');
+        setText('sideStayTime', spot.stay_time ? `建議停留 ${spot.stay_time}` : '建議停留依行程安排');
+        setText('sideStation', stationText);
+        setText('nearbyStation1', spot.station ? `🚇 ${spot.station}｜可依 Google Map 導航` : '🚇 捷運資訊請見 Google Map');
+        setText('nearbyStation2', spot.area ? `📍 ${spot.area}` : '');
+
+        const tagHtml = tags.map((tag, index) =>
+          `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`
+        ).join('');
+
+        document.getElementById('tagListTop').innerHTML = tagHtml;
+        document.getElementById('sideTags').innerHTML = tags.slice(0, 3).map(tag =>
+          `<span class="tag">${tag}</span>`
+        ).join('');
+
+        const mapUrl = spot.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
+        document.getElementById('mapButton').href = mapUrl;
 
         if (spot.official_website) {
-          els.officialBtn.href = spot.official_website;
-          els.officialBtn.classList.remove('is-hidden');
+          document.getElementById('officialButton').href = spot.official_website;
+          document.getElementById('officialButton').style.display = '';
         } else {
-          els.officialBtn.classList.add('is-hidden');
+          document.getElementById('officialButton').style.display = 'none';
         }
 
-        els.loading.style.display = 'none';
-        els.detail.style.display = 'grid';
+        document.getElementById('mapEmbed').src = mapEmbedUrl(spot);
 
       } catch (error) {
         console.error(error);
-        showError('景點資料暫時無法載入，請稍後再試。');
+        setText('heroSubtitle', '景點資料暫時無法載入，請稍後再試。');
+        setText('leadText', '景點資料暫時無法載入，請稍後再試。');
       }
     }
 

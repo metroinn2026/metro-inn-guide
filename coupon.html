@@ -3,143 +3,193 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>木暮喫茶優惠｜北捷行旅</title>
+  <title>優惠介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
 </head>
 <body id="top">
-<div id="header"></div>
+  <div id="header"></div>
 
-<section class="coupon-detail-hero">
-  <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1800&q=85" alt="午後咖啡店外觀">
-  <div class="container">
-    <div class="hero-content">
-      <div class="kicker">LOCAL OFFER · BEITOU</div>
-      <h1>午後留給一間有溫度的店，<br>與一份剛剛好的甜</h1>
-      <p>藏在北投巷弄裡的木暮喫茶，以手作甜點與溫柔咖啡香，替旅程留下一段安靜的空白。</p>
-      <div class="hero-icons">▦　⌖</div>
-    </div>
-  </div>
-</section>
-
-<div class="crumb">
-  <div class="container">
-    <div>首頁　›　優惠情報　›　<strong>木暮喫茶</strong></div>
-    <button class="share-icon" type="button" aria-label="分享此頁">⇪</button>
-  </div>
-</div>
-
-<main class="container coupon-article">
-  <article>
-    <p class="coupon-intro">有些店不靠喧鬧吸引人，而是讓你一走進去，就自然把聲音放輕。木暮喫茶就是這樣的地方。午後的陽光落在木桌和杯盤上，空氣裡有咖啡香，也有剛出爐甜點的溫度。</p>
-
-    <div class="love-card">
-      <div class="kicker">WHY WE LOVE IT</div>
-      <div class="love-grid">
-        <div><h3>靜靜待一下午</h3><p>座位不多，卻保有剛好的留白感，適合把旅程放慢。</p></div>
-        <div><h3>甜點每日少量出爐</h3><p>從布丁到塔類，都有手作的細緻感。</p></div>
-        <div><h3>平日下午最剛好</h3><p>人潮較少，更適合安靜聊天與閱讀。</p></div>
+  <section class="hero">
+    <img id="heroImage" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85" alt="">
+    <div class="container">
+      <div class="hero-content">
+        <div class="kicker">OFFER DETAIL</div>
+        <h1 id="heroTitle">優惠介紹</h1>
+        <p id="heroSubtitle">優惠資料載入中...</p>
+        <div class="hero-icons">
+          <span id="heroDate">活動期間</span>
+          <span>出示頁面確認</span>
+          <span>實際內容依公告為準</span>
+        </div>
       </div>
     </div>
+  </section>
 
-    <section class="story">
-      <div class="kicker">ABOUT THE SHOP</div>
-      <h2>在城市裡，留一點慢下來的時間</h2>
-      <p>木暮喫茶位在一條不太喧鬧的巷子裡，沒有過度裝飾的門面，也沒有特別張揚的招牌，只有溫暖的燈色與木質窗框，在傍晚時分安靜地把人留下來。</p>
-      <p>店裡的節奏和外頭很不一樣。咖啡慢慢煮、甜點慢慢上桌，連交談聲都像是被窗邊的光線收柔了一點。若你也喜歡那些不催促人的地方，這裡很值得排進北投午後路線。</p>
-      <div class="full-photo"><img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1600&q=85" alt="咖啡店室內窗邊座位"></div>
-    </section>
-
-    <div class="editor-cols">
-      <div><div class="meta">01</div><strong>招牌焦糖布丁</strong><p>口感綿密滑順，帶一點微苦焦糖香，是許多人第一次來就會點的經典。</p></div>
-      <div><div class="meta">02</div><strong>手沖單品咖啡</strong><p>風味乾淨，尾韻細緻，很適合搭配午後甜點一起慢慢喝。</p></div>
-      <div><div class="meta">03</div><strong>窗邊閱讀角落</strong><p>靠窗的位置採光很好，一個人來，也能自在地待上一段時間。</p></div>
+  <section class="crumb">
+    <div class="container">
+      <div id="breadcrumb">首頁 〉 優惠介紹</div>
+      <button class="share-icon" type="button" aria-label="分享此頁">⇪</button>
     </div>
+  </section>
 
-    <section class="story">
-      <div class="kicker">OUR FAVORITE MOMENT</div>
-      <h2>如果只選一個時段，請把午後留給這裡</h2>
-      <p>下午三點過後，陽光會慢慢斜進店裡。那時候的木暮喫茶最剛好，光線安靜、空氣柔軟，點一份甜點和一杯熱咖啡，連時間都像被放慢了一點。</p>
-      <div class="full-photo"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85" alt="溫暖餐桌與咖啡廳空間"></div>
-    </section>
+  <main class="container article-wrap single-point">
+    <article>
+      <p id="leadText" class="lead">優惠資料載入中...</p>
 
-    <p class="editor-note">編輯小語｜有些優惠讓人想立刻出門，有些店則讓人想慢慢走近。木暮喫茶剛好兩者都有。</p>
-  </article>
-
-  <aside class="coupon-side">
-    <div class="offer-panel">
-      <div class="kicker">SPECIAL OFFER</div>
-      <h3>平日下午限定</h3>
-      <p>出示本頁面即可享指定甜點與飲品優惠，無需登入或領券。</p>
-      <div class="rule">
-        <small>優惠內容</small>
-        <div class="offer-value">消費滿 NT$300<br>現折 NT$50</div>
-        <small>適用期間</small>
-        <div class="offer-value" style="font-size:18px">即日起至 2026.08.31</div>
+      <div class="tag-list">
+        <span class="tag dark">優惠資訊</span>
+        <span class="tag">旅遊推薦</span>
+        <span class="tag">北捷行旅</span>
       </div>
-      <a class="button" href="#coupon-ticket">查看優惠</a>
-    </div>
 
-    <div class="shop-panel">
-      <div class="kicker">SHOP INFO</div>
-      <h3>木暮喫茶</h3>
-      <div class="info-row">⌖　台北市北投區中山路 18 號</div>
-      <div class="info-row">◷　11:00–19:00・每週二公休</div>
-      <div class="info-row">☏　02 2891 2488</div>
-      <div class="info-actions multi"><a class="button" href="https://www.google.com/maps/search/%E5%8C%97%E6%8A%95+%E5%92%96%E5%95%A1" target="_blank">Google Map</a><a class="button outline" href="https://www.google.com/search?q=%E5%8C%97%E6%8A%95+%E5%92%96%E5%95%A1" target="_blank">官方網站</a></div>
-    </div>
+      <section class="story">
+        <div id="storyMeta" class="meta">OFFER STORY</div>
+        <h2 id="storyTitle">優惠說明</h2>
+        <p id="storyContent">優惠資料載入中...</p>
+        <div class="story-img">
+          <img id="storyImage" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85" alt="">
+        </div>
+      </section>
 
-    <div class="tips-panel">
-      <div class="kicker">EDITOR TIPS</div>
-      <h3>出發前的小提醒</h3>
-      <p>假日下午較容易客滿，建議避開尖峰時段，或提早抵達。若想吃到限定甜點，也可以先私訊店家確認當日品項。</p>
-    </div>
-  </aside>
-</main>
+      <section id="info" class="info-card point-info">
+        <div class="info-head-row">
+          <div>
+            <div class="kicker">INFORMATION</div>
+            <h3 id="infoTitle">優惠資訊</h3>
+          </div>
+          <button class="share-mini" type="button" aria-label="分享優惠">⇪</button>
+        </div>
 
-<section id="coupon-ticket" class="coupon-display">
-  <div class="container">
-    <div class="kicker">SHOW THIS SCREEN</div>
-    <h2 style="font-size:30px;margin:16px 0">出示此畫面，享平日下午限定優惠</h2>
-    <p>結帳時直接出示下方優惠畫面即可使用；實際優惠內容依店家現場公告為準。</p>
-    <div class="coupon-ticket">
-      <div class="ticket-main">
-        <div class="kicker">AFTERNOON OFFER</div>
-        <div class="ticket-discount">50 <span>元折抵</span></div>
-        <p>單筆消費滿 NT$300 即可使用，內用外帶皆適用。</p>
-        <div class="screen-pass"><small>使用方式</small><strong>出示本畫面即可使用</strong></div>
+        <div class="info-row"><span class="info-label">優惠名稱</span><span id="infoName">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">開始日期</span><span id="infoStart">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">結束日期</span><span id="infoEnd">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">使用說明</span><span id="infoSummary">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">備註</span><span>實際優惠內容、使用限制與活動期間，請以官方或合作店家公告為準。</span></div>
+
+        <div class="info-actions multi">
+          <a id="officialButton" class="button" href="#" target="_blank" rel="noopener">前往查看</a>
+          <a class="button outline" href="coupons.html">回優惠目錄</a>
+        </div>
+      </section>
+    </article>
+
+    <aside class="sticky-panel">
+      <div class="sidebox compact">
+        <div class="kicker">OFFER INFO</div>
+        <h3 id="sideTitle">優惠介紹</h3>
+        <p id="sideDate">活動期間載入中</p>
+        <p>使用前請確認最新公告。</p>
       </div>
-      <div class="ticket-side"><div><h3>限定使用</h3><p style="color:white">平日 14:00 後<br>出示本頁即可使用</p></div></div>
-    </div>
-    <p class="coupon-note-small">※ 每人每次限用一次，不與其他優惠併用，實際優惠內容依店家現場公告為準。</p>
-    <div class="coupon-action-row"><a class="button" href="https://www.google.com/maps/search/%E5%8C%97%E6%8A%95+%E5%92%96%E5%95%A1" target="_blank">Google Map</a><a class="button outline" href="https://www.google.com/search?q=%E5%8C%97%E6%8A%95+%E5%92%96%E5%95%A1" target="_blank">官方網站</a></div>
-  </div>
-</section>
 
-<section class="more-stories">
-  <div class="container">
-    <div class="kicker">MORE STORIES</div>
-    <h2 style="font-size:30px;margin:14px 0 34px">也許你也會喜歡</h2>
-    <div class="more-grid">
-      <a href="trip-beitou.html"><div class="more-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20in%20Beitou.jpg" alt="北投地熱谷"></div><div class="meta">BEITOU</div><h3>把午後留給北投，走進一座有溫度的山城</h3></a>
-      <a href="index.html#trips"><div class="more-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2020%20Sunset%20of%20Tamsui%20Fisherman%27s%20Wharf.jpg" alt="淡水夕陽"></div><div class="meta">TAMSUI</div><h3>把傍晚留給淡水，沿著河岸等一場夕陽</h3></a>
-      <a href="index.html#food"><div class="more-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt="士林夜市"></div><div class="meta">NIGHT WALK</div><h3>夜晚才開始熱鬧的城市散步</h3></a>
-    </div>
-  </div>
-</section>
+      <div class="sidebox compact fill">
+        <div class="kicker">PLAN YOUR TRIP</div>
+        <h3>搭配行程一起看</h3>
+        <p>可回到景點、美食或行程頁，安排更完整的北投旅程。</p>
+      </div>
 
-<div id="footer"></div>
-<div id="copyToast" class="copy-toast">優惠碼已複製</div>
-<script>
-  document.getElementById('header').innerHTML=header();
-  document.getElementById('footer').innerHTML=footer();
-  function copyCoupon(){
-    const code=document.getElementById('couponCode').textContent.trim();
-    if(navigator.clipboard){navigator.clipboard.writeText(code)}
-    const toast=document.getElementById('copyToast');
-    toast.classList.add('show');
-    setTimeout(()=>toast.classList.remove('show'),1600);
-  }
-</script>
+      <div class="sidebox compact dark">
+        <div class="kicker" style="color:white">STAY NEARBY</div>
+        <h3>入住北捷行旅</h3>
+        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
+        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
+      </div>
+    </aside>
+  </main>
+
+  <div id="footer"></div>
+
+  <script>
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
+
+    const fallbackImage = 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85';
+
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    function setText(id, value, fallback = '尚未提供') {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || fallback;
+    }
+
+    function dateRange(coupon) {
+      if (coupon.start_date && coupon.end_date) return `${coupon.start_date} - ${coupon.end_date}`;
+      return coupon.start_date || coupon.end_date || '依公告為準';
+    }
+
+    async function loadCoupon() {
+      const id = getParam('id');
+
+      if (!id) {
+        setText('heroSubtitle', '找不到優惠代碼，請回優惠目錄重新進入。');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/coupons?id=eq.${encodeURIComponent(id)}&select=*`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Supabase 讀取失敗');
+
+        const coupon = result[0];
+
+        if (!coupon) {
+          setText('heroSubtitle', '找不到這筆優惠資料。');
+          return;
+        }
+
+        const title = coupon.title || '優惠介紹';
+        const summary = coupon.summary || '更多優惠說明即將補上。';
+        const content = coupon.content || summary;
+        const image = coupon.cover_image || fallbackImage;
+        const range = dateRange(coupon);
+
+        document.title = `${title}｜Metro Inn Guide 北投旅圖`;
+
+        document.getElementById('heroImage').src = image;
+        document.getElementById('heroImage').alt = title;
+        document.getElementById('storyImage').src = image;
+        document.getElementById('storyImage').alt = title;
+
+        setText('heroTitle', title);
+        setText('heroSubtitle', summary);
+        setText('heroDate', `活動期間：${range}`);
+        setText('breadcrumb', `首頁 〉 優惠介紹 〉 ${title}`);
+        setText('leadText', summary);
+        setText('storyMeta', (coupon.slug || 'offer').replaceAll('-', ' ').toUpperCase());
+        setText('storyTitle', title);
+        setText('storyContent', content);
+
+        setText('infoTitle', `${title}優惠資訊`);
+        setText('infoName', title);
+        setText('infoStart', coupon.start_date);
+        setText('infoEnd', coupon.end_date);
+        setText('infoSummary', summary);
+
+        setText('sideTitle', title);
+        setText('sideDate', `活動期間：${range}`);
+
+        document.getElementById('officialButton').href = coupon.official_website || 'coupons.html';
+
+      } catch (error) {
+        console.error(error);
+        setText('heroSubtitle', '優惠資料暫時無法載入，請稍後再試。');
+        setText('leadText', '優惠資料暫時無法載入，請稍後再試。');
+      }
+    }
+
+    loadCoupon();
+  </script>
 </body>
 </html>

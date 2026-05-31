@@ -1,14 +1,153 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>景點探索｜Metro Inn Guide 北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script></head><body id="top"><div id="header"></div>
-<section class="directory-hero"><div class="container"><div class="kicker">SPOTS</div><h1>景點探索</h1><p>從北投、新北投、陽明山到淡水，先找到想停留的地方；營業時間、地址與導航資訊留到內頁慢慢看。</p></div></section>
-<section class="section"><div class="container"><div class="filter-row"><div class="filter-pills"><a class="pill active">全部</a><a class="pill">北投</a><a class="pill">新北投</a><a class="pill">陽明山</a><a class="pill">士林</a><a class="pill">淡水</a></div><a class="section-link" href="index.html">回首頁搜尋 →</a></div>
-<div class="directory-grid">
-<a class="directory-card" href="spot-thermal-valley.html"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="地熱谷"></div><div class="directory-body"><div class="meta">BEITOU</div><h3>地熱谷</h3><p>北投最經典的白色呼吸，第一次來北投很適合從這裡開始。</p><div class="tag-list"><span class="tag">免費景點</span><span class="tag">步行可達</span></div></div></a>
-<a class="directory-card" href="spot-thermal-valley.html"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Hot%20Spring%20Museum.jpg" alt="北投溫泉博物館"></div><div class="directory-body"><div class="meta">XINBEITOU</div><h3>溫泉博物館</h3><p>老建築裡的溫泉記憶，雨天也很適合慢慢看。</p><div class="tag-list"><span class="tag">文化景點</span><span class="tag">雨天適合</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg" alt="北投圖書館"></div><div class="directory-body"><div class="meta">BEITOU</div><h3>北投圖書館</h3><p>木構建築與綠意交疊，是北投很適合停下來的地方。</p><div class="tag-list"><span class="tag">建築景點</span><span class="tag">親子友善</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg" alt="陽明山"></div><div class="directory-body"><div class="meta">YANGMINGSHAN</div><h3>陽明山</h3><p>看山、看花、看雲，從北投出發也能安排一日慢旅行。</p><div class="tag-list"><span class="tag">自然景點</span><span class="tag">一日遊</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt="士林夜市"></div><div class="directory-body"><div class="meta">SHILIN</div><h3>士林夜市</h3><p>把晚餐留給夜市，是北台北最熱鬧的旅行收尾。</p><div class="tag-list"><span class="tag">夜市</span><span class="tag">晚餐推薦</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt="士林官邸"></div><div class="directory-body"><div class="meta">SHILIN</div><h3>士林官邸</h3><p>花園、老宅與展覽，白天散步很舒服。</p><div class="tag-list"><span class="tag">花園</span><span class="tag">散步</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2020%20Sunset%20of%20Tamsui%20Fisherman%27s%20Wharf.jpg" alt="淡水老街"></div><div class="directory-body"><div class="meta">TAMSUI</div><h3>淡水老街</h3><p>河岸、老街、夕陽，適合半日慢旅行。</p><div class="tag-list"><span class="tag">河岸</span><span class="tag">夕陽</span></div></div></a>
-<a class="directory-card" href="#"><div class="directory-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2020%20Sunset%20of%20Tamsui%20Fisherman%27s%20Wharf.jpg" alt="漁人碼頭"></div><div class="directory-body"><div class="meta">TAMSUI</div><h3>漁人碼頭</h3><p>把傍晚留給河岸與日落，是淡水最經典的收尾。</p><div class="tag-list"><span class="tag">拍照景點</span><span class="tag">夕陽</span></div></div></a>
-</div><div class="pagination"><span class="active">1</span><a>2</a><a>3</a><a>下一頁</a></div></div></section>
-<div id="footer"></div><script>document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();</script></body></html>
+<!doctype html>
+
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>景點探索｜Metro Inn Guide 北投旅圖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+
+<body id="top">
+  <div id="header"></div>
+
+  <section class="directory-hero">
+    <div class="container">
+      <div class="kicker">SPOTS</div>
+      <h1>景點探索</h1>
+      <p>從北投、新北投、陽明山到淡水，先找到想停留的地方；營業時間、地址與導航資訊留到內頁慢慢看。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-row">
+        <div class="filter-pills">
+          <a class="pill active" data-area="all">全部</a>
+          <a class="pill" data-area="北投區">北投</a>
+          <a class="pill" data-area="新北投">新北投</a>
+          <a class="pill" data-area="陽明山">陽明山</a>
+          <a class="pill" data-area="士林">士林</a>
+          <a class="pill" data-area="淡水">淡水</a>
+        </div>
+        <a class="section-link" href="index.html">回首頁搜尋 →</a>
+      </div>
+
+```
+  <div id="spotsStatus" class="empty-state">景點資料載入中...</div>
+  <div id="spotsGrid" class="directory-grid"></div>
+
+  <div class="pagination">
+    <span class="active">1</span>
+  </div>
+</div>
+```
+
+  </section>
+
+  <div id="footer"></div>
+
+  <script>
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
+
+    const statusEl = document.getElementById('spotsStatus');
+    const gridEl = document.getElementById('spotsGrid');
+    let allSpots = [];
+
+    const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
+
+    function normalizeTags(tags) {
+      if (!tags) return [];
+      if (Array.isArray(tags)) return tags;
+      return String(tags)
+        .split(/[、,，]/)
+        .map(tag => tag.trim())
+        .filter(Boolean);
+    }
+
+    function renderSpots(spots) {
+      gridEl.innerHTML = '';
+
+      if (!spots.length) {
+        statusEl.textContent = '目前沒有符合條件的景點。';
+        statusEl.style.display = 'block';
+        return;
+      }
+
+      statusEl.style.display = 'none';
+
+      spots.forEach(spot => {
+        const tags = normalizeTags(spot.tags).slice(0, 2);
+        const image = spot.cover_image || fallbackImage;
+        const summary = spot.summary || '更多介紹即將補上。';
+        const meta = spot.area || spot.station || 'BEITOU';
+        const href = `spot.html?id=${encodeURIComponent(spot.id)}`;
+
+        const card = document.createElement('a');
+        card.className = 'directory-card';
+        card.href = href;
+        card.innerHTML = `
+          <div class="directory-img">
+            <img src="${image}" alt="${spot.title || ''}">
+          </div>
+          <div class="directory-body">
+            <div class="meta">${meta}</div>
+            <h3>${spot.title || '未命名景點'}</h3>
+            <p>${summary}</p>
+            <div class="tag-list">
+              ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        gridEl.appendChild(card);
+      });
+    }
+
+    async function loadSpots() {
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/spots?is_published=eq.true&select=id,slug,title,area,station,summary,tags,cover_image&order=id.asc`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Supabase 讀取失敗');
+        }
+
+        allSpots = await response.json();
+        renderSpots(allSpots);
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = '景點資料暫時無法載入，請稍後再試。';
+      }
+    }
+
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
+        pill.classList.add('active');
+
+        const area = pill.dataset.area;
+        if (area === 'all') {
+          renderSpots(allSpots);
+        } else {
+          renderSpots(allSpots.filter(spot =>
+            spot.area === area || spot.station === area || String(spot.area || '').includes(area)
+          ));
+        }
+      });
+    });
+
+    loadSpots();
+  </script>
+
+</body>
+</html>

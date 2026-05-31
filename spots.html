@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
@@ -35,29 +34,40 @@
         <a class="section-link" href="index.html">回首頁搜尋 →</a>
       </div>
 
-```
-  <div id="spotsStatus" class="empty-state">景點資料載入中...</div>
-  <div id="spotsGrid" class="directory-grid"></div>
+      <div id="spotsStatus" class="empty-state">景點資料載入中...</div>
+      <div id="spotsGrid" class="directory-grid"></div>
 
-  <div class="pagination">
-    <span class="active">1</span>
-  </div>
-</div>
-```
-
+      <div class="pagination">
+        <span class="active">1</span>
+      </div>
+    </div>
   </section>
 
   <div id="footer"></div>
 
   <script>
-    document.getElementById('header').innerHTML = header();
-    document.getElementById('footer').innerHTML = footer();
+    if (typeof header === 'function') {
+      document.getElementById('header').innerHTML = header();
+    }
+
+    if (typeof footer === 'function') {
+      document.getElementById('footer').innerHTML = footer();
+    }
 
     const statusEl = document.getElementById('spotsStatus');
     const gridEl = document.getElementById('spotsGrid');
     let allSpots = [];
 
     const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
 
     function normalizeTags(tags) {
       if (!tags) return [];
@@ -91,14 +101,14 @@
         card.href = href;
         card.innerHTML = `
           <div class="directory-img">
-            <img src="${image}" alt="${spot.title || ''}">
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(spot.title)}">
           </div>
           <div class="directory-body">
-            <div class="meta">${meta}</div>
-            <h3>${spot.title || '未命名景點'}</h3>
-            <p>${summary}</p>
+            <div class="meta">${escapeHtml(meta)}</div>
+            <h3>${escapeHtml(spot.title || '未命名景點')}</h3>
+            <p>${escapeHtml(summary)}</p>
             <div class="tag-list">
-              ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+              ${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
             </div>
           </div>
         `;
@@ -108,21 +118,27 @@
 
     async function loadSpots() {
       try {
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/spots?is_published=eq.true&select=id,slug,title,area,station,summary,tags,cover_image&order=id.asc`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Supabase 讀取失敗');
+        if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+          throw new Error('找不到 Supabase 設定，請檢查 supabase-config.js');
         }
 
-        allSpots = await response.json();
+        const url = `${SUPABASE_URL}/rest/v1/spots?select=id,slug,title,area,station,summary,tags,cover_image,is_published&is_published=eq.true&order=id.asc`;
+
+        const response = await fetch(url, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          console.error('Supabase error:', result);
+          throw new Error(result.message || 'Supabase 讀取失敗');
+        }
+
+        allSpots = result;
         renderSpots(allSpots);
       } catch (error) {
         console.error(error);
@@ -140,7 +156,10 @@
           renderSpots(allSpots);
         } else {
           renderSpots(allSpots.filter(spot =>
-            spot.area === area || spot.station === area || String(spot.area || '').includes(area)
+            spot.area === area ||
+            spot.station === area ||
+            String(spot.area || '').includes(area) ||
+            String(spot.station || '').includes(area)
           ));
         }
       });
@@ -148,6 +167,5 @@
 
     loadSpots();
   </script>
-
 </body>
 </html>

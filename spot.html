@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    .spot-detail-hero{
+      padding: 96px 0 56px;
+      background: #f8f6f1;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+
+    .spot-detail-wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .spot-breadcrumb{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      color: #ef5b3f;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid #ef5b3f;
+      padding-bottom: 4px;
+    }
+
+    .spot-detail-kicker{
+      color: #2f6da5;
+      font-size: 13px;
+      letter-spacing: .28em;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .spot-detail-title{
+      color: #6f8369;
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.05;
+      margin: 0 0 18px;
+      letter-spacing: .02em;
+    }
+
+    .spot-detail-summary{
+      max-width: 760px;
+      color: #4d5c64;
+      font-size: 18px;
+      line-height: 2;
+      margin: 0;
+    }
+
+    .spot-detail-main{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 56px 24px 96px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+      gap: 44px;
+      align-items: start;
+    }
+
+    .spot-cover{
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(0,0,0,.08);
+      background: #eee;
+    }
+
+    .spot-content-card{
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 4px solid #6f8369;
+    }
+
+    .spot-content-card h2,
+    .spot-info-card h2{
+      margin: 0 0 18px;
+      color: #006c93;
+      font-size: 24px;
+    }
+
+    .spot-content-text{
+      color: #28343b;
+      font-size: 17px;
+      line-height: 2;
+      white-space: pre-line;
+    }
+
+    .spot-info-card{
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.12);
+      padding: 30px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .spot-info-row{
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(0,0,0,.12);
+      color: #28343b;
+      line-height: 1.7;
+    }
+
+    .spot-info-row:last-child{
+      border-bottom: 0;
+    }
+
+    .spot-info-label{
+      color: #2f6da5;
+      font-weight: 800;
+    }
+
+    .spot-tag-list{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .spot-detail-actions{
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .spot-action-btn{
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: 14px 18px;
+      font-weight: 800;
+      border: 1px solid #1e2327;
+      color: #1e2327;
+      background: #fff;
+    }
+
+    .spot-action-btn.primary{
+      background: #ef5b3f;
+      border-color: #ef5b3f;
+      color: #fff;
+    }
+
+    .spot-action-btn.is-hidden{
+      display: none;
+    }
+
+    .spot-loading,
+    .spot-error{
+      max-width: 1080px;
+      margin: 80px auto;
+      padding: 0 24px;
+      color: #4d5c64;
+      font-size: 18px;
+    }
+
+    @media (max-width: 860px){
+      .spot-detail-main{
+        grid-template-columns: 1fr;
+      }
+
+      .spot-info-card{
+        position: static;
+      }
+
+      .spot-info-row{
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+
+<body id="top">
+  <div id="header"></div>
+
+  <main>
+    <section class="spot-detail-hero">
+      <div class="spot-detail-wrap">
+        <a class="spot-breadcrumb" href="spots.html">← 回景點列表</a>
+        <div class="spot-detail-kicker">SPOT DETAIL</div>
+        <h1 id="spotTitle" class="spot-detail-title">景點介紹</h1>
+        <p id="spotSummary" class="spot-detail-summary">資料讀取中...</p>
+      </div>
+    </section>
+
+    <div id="spotLoading" class="spot-loading">景點資料載入中...</div>
+
+    <section id="spotDetail" class="spot-detail-main" style="display:none;">
+      <div>
+        <img id="spotCover" class="spot-cover" src="" alt="">
+
+        <article class="spot-content-card">
+          <h2>景點介紹</h2>
+          <div id="spotContent" class="spot-content-text"></div>
+        </article>
+      </div>
+
+      <aside class="spot-info-card">
+        <h2>Information</h2>
+
+        <div class="spot-info-row">
+          <div class="spot-info-label">區域</div>
+          <div id="spotArea"></div>
+        </div>
+
+        <div class="spot-info-row">
+          <div class="spot-info-label">最近捷運</div>
+          <div id="spotStation"></div>
+        </div>
+
+        <div class="spot-info-row">
+          <div class="spot-info-label">地址</div>
+          <div id="spotAddress"></div>
+        </div>
+
+        <div class="spot-info-row">
+          <div class="spot-info-label">營業時間</div>
+          <div id="spotHours"></div>
+        </div>
+
+        <div class="spot-info-row">
+          <div class="spot-info-label">建議停留</div>
+          <div id="spotStayTime"></div>
+        </div>
+
+        <div class="spot-tag-list" id="spotTags"></div>
+
+        <div class="spot-detail-actions">
+          <a id="googleMapBtn" class="spot-action-btn primary" target="_blank" rel="noopener">Google Map</a>
+          <a id="officialBtn" class="spot-action-btn" target="_blank" rel="noopener">官方網站</a>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script>
+    if (typeof header === 'function') {
+      document.getElementById('header').innerHTML = header();
+    }
+
+    if (typeof footer === 'function') {
+      document.getElementById('footer').innerHTML = footer();
+    }
+
+    const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
+
+    const els = {
+      loading: document.getElementById('spotLoading'),
+      detail: document.getElementById('spotDetail'),
+      title: document.getElementById('spotTitle'),
+      summary: document.getElementById('spotSummary'),
+      cover: document.getElementById('spotCover'),
+      content: document.getElementById('spotContent'),
+      area: document.getElementById('spotArea'),
+      station: document.getElementById('spotStation'),
+      address: document.getElementById('spotAddress'),
+      hours: document.getElementById('spotHours'),
+      stayTime: document.getElementById('spotStayTime'),
+      tags: document.getElementById('spotTags'),
+      googleMapBtn: document.getElementById('googleMapBtn'),
+      officialBtn: document.getElementById('officialBtn')
+    };
+
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function normalizeTags(tags) {
+      if (!tags) return [];
+      if (Array.isArray(tags)) return tags;
+      return String(tags)
+        .split(/[、,，]/)
+        .map(tag => tag.trim())
+        .filter(Boolean);
+    }
+
+    function setText(el, value, fallback = '尚未提供') {
+      el.textContent = value || fallback;
+    }
+
+    function showError(message) {
+      els.loading.className = 'spot-error';
+      els.loading.textContent = message;
+      els.detail.style.display = 'none';
+    }
+
+    async function fetchSpotByRest(id) {
+      const url = `${SUPABASE_URL}/rest/v1/spots?id=eq.${encodeURIComponent(id)}&select=*`;
+
+      const response = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('Supabase REST error:', result);
+        throw new Error(result.message || 'Supabase 讀取失敗');
+      }
+
+      return result && result.length ? result[0] : null;
+    }
+
+    async function fetchSpotByClient(id) {
+      const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data, error } = await client
+        .from('spots')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Supabase client error:', error);
+        throw error;
+      }
+
+      return data;
+    }
+
+    async function loadSpot() {
+      const id = getParam('id');
+
+      if (!id) {
+        showError('找不到景點代碼，請回景點列表重新進入。');
+        return;
+      }
+
+      try {
+        let spot = null;
+
+        if (window.supabase && typeof supabase.createClient === 'function') {
+          spot = await fetchSpotByClient(id);
+        } else {
+          spot = await fetchSpotByRest(id);
+        }
+
+        if (!spot) {
+          showError('找不到這筆景點資料。');
+          return;
+        }
+
+        document.title = `${spot.title || '景點介紹'}｜Metro Inn Guide 北投旅圖`;
+
+        setText(els.title, spot.title, '景點介紹');
+        setText(els.summary, spot.summary, '更多介紹即將補上。');
+
+        els.cover.src = spot.cover_image || fallbackImage;
+        els.cover.alt = spot.title || '景點圖片';
+
+        setText(els.content, spot.content || spot.summary, '更多介紹即將補上。');
+        setText(els.area, spot.area);
+        setText(els.station, spot.station);
+        setText(els.address, spot.address);
+        setText(els.hours, spot.business_hours);
+        setText(els.stayTime, spot.stay_time);
+
+        els.tags.innerHTML = normalizeTags(spot.tags)
+          .map(tag => `<span class="tag">${tag}</span>`)
+          .join('');
+
+        if (spot.google_map) {
+          els.googleMapBtn.href = spot.google_map;
+          els.googleMapBtn.classList.remove('is-hidden');
+        } else {
+          els.googleMapBtn.classList.add('is-hidden');
+        }
+
+        if (spot.official_website) {
+          els.officialBtn.href = spot.official_website;
+          els.officialBtn.classList.remove('is-hidden');
+        } else {
+          els.officialBtn.classList.add('is-hidden');
+        }
+
+        els.loading.style.display = 'none';
+        els.detail.style.display = 'grid';
+
+      } catch (error) {
+        console.error(error);
+        showError('景點資料暫時無法載入，請稍後再試。');
+      }
+    }
+
+    loadSpot();
+  </script>
+</body>
+</html>

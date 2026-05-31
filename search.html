@@ -1,0 +1,19 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>搜尋結果｜北捷行旅</title><link rel="stylesheet" href="style.css"><script src="data.js"></script></head><body id="top"><div id="header"></div>
+<section class="directory-hero"><div class="container"><div class="eyebrow">SEARCH</div><h1 id="resultTitle">搜尋結果</h1><p>這是本機展示版，先用示意資料呈現搜尋後的分類結果。未來正式版可串接資料庫，依關鍵字即時篩選景點、行程、美食與優惠。</p></div></section>
+<section class="section"><div class="container"><div class="search-box search-box-simple" style="margin-bottom:44px"><div class="field keyword-only"><label>KEYWORD SEARCH</label><div class="keyword-row"><input id="kw2" placeholder="搜尋景點、美食、行程，例如：地熱谷、泡湯、親子景點、拉麵"><a class="button" href="#" onclick="const q=document.getElementById('kw2').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div></div></div>
+<div class="filter-row"><h2 class="quick-search-title">依類型快速查看</h2><div class="filter-pills"><a class="pill active" href="spots.html">景點</a><a class="pill" href="trips.html">行程</a><a class="pill" href="foods.html">美食</a><a class="pill" href="coupons.html">優惠</a></div></div>
+<div class="directory-grid" id="results"></div></div></section><div id="footer"></div><script>
+const q=new URLSearchParams(location.search).get('q')||'';document.getElementById('resultTitle').textContent=q?`「${q}」的搜尋結果`:'搜尋景點、美食、行程';document.getElementById('kw2').value=q;
+const cards=[
+ {type:'景點',href:'spot-thermal-valley.html',img:'assets/valley.jpg',meta:'BEITOU · 新北投站',title:'地熱谷',text:'北投最經典的溫泉地景，白煙升起時很有旅行感。'},
+ {type:'行程',href:'trip-beitou.html',img:'assets/hero.jpg',meta:'BEITOU · HALF DAY',title:'北投溫泉半日遊',text:'把地熱谷、溫泉博物館與泡湯安排成剛剛好的午後。'},
+ {type:'美食',href:'food-beitou-dining.html',img:'assets/dining.jpg',meta:'BEITOU · 晚餐',title:'山城食堂',text:'適合作為散步後的收尾晚餐，安靜又舒服。'},
+ {type:'優惠',href:'coupon.html',img:'assets/coffee.jpg',meta:'SPECIAL OFFER',title:'平日下午限定優惠',text:'出示優惠畫面，即享合作店家限定折抵。'},
+ {type:'景點',href:'spots.html',img:'assets/museum.jpg',meta:'BEITOU · 新北投站',title:'北投溫泉博物館',text:'認識北投溫泉文化的經典景點。'},
+ {type:'美食',href:'foods.html',img:'assets/beef.jpg',meta:'BEITOU · 拉麵',title:'北投拉麵推薦',text:'把熱湯與溫泉旅行放在同一天。'},
+ {type:'行程',href:'trips.html',img:'assets/tamsui.jpg',meta:'TAMSUI · SUNSET',title:'淡水夕陽散策',text:'河岸、老街與夕陽，適合慢慢走。'},
+ {type:'景點',href:'spots.html',img:'assets/yang.jpg',meta:'YANGMINGSHAN',title:'陽明山小油坑',text:'山景、雲霧與自然地景。'}
+];
+const filtered=q?cards.filter(c=>(c.title+c.text+c.meta+c.type).includes(q)):cards;
+document.getElementById('results').innerHTML=(filtered.length?filtered:cards).map(c=>`<a class="directory-card" href="${c.href}"><div class="directory-img"><img src="${c.img}"></div><div class="directory-body"><div class="eyebrow">${c.type} · ${c.meta}</div><h3>${c.title}</h3><p>${c.text}</p><span class="section-link">查看內容</span></div></a>`).join('');
+</script></body></html>

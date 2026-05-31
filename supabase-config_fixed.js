@@ -1,0 +1,5 @@
+const SUPABASE_URL =
+'https://mxriylrdtpzwntlcpinn.supabase.co';
+
+const SUPABASE_ANON_KEY =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14cml5bHJkdHB6d250bGNwaW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjg4NjksImV4cCI6MjA5NTgwNDg2OX0._S74AV4jv1KKwZ9wKNTUuhDPxgWjrDezGk2OCMv-90E';

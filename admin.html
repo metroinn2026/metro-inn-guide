@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metro Inn Guide｜北投旅圖 CMS 管理後台</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-kicker">METRO INN GUIDE</div>
+        <div class="brand-title">北投旅圖 CMS</div>
+      </div>
+      <nav class="side-nav" aria-label="後台導覽">
+        <a class="active" href="#dashboard">Dashboard</a>
+        <a href="#home">首頁管理</a>
+        <a href="#news">最新消息</a>
+        <a href="#spots">景點管理</a>
+        <a href="#trips">行程管理</a>
+        <a href="#foods">美食管理</a>
+        <a href="#coupons">優惠管理</a>
+        <a href="#submissions">投稿審核</a>
+        <a href="#partners">合作店家</a>
+        <a href="#banners">Banner 管理</a>
+        <a href="#media">圖片素材庫</a>
+        <a href="#settings">網站設定</a>
+      </nav>
+      <a class="front-link" href="index.html" target="_blank">開啟前台預覽 ↗</a>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ADMIN MOCKUP</p>
+          <h1>Metro Inn Guide｜北投旅圖管理中心</h1>
+        </div>
+        <div class="admin-user">
+          <span>管理員</span>
+          <button>登出</button>
+        </div>
+      </header>
+
+      <section id="dashboard" class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">OVERVIEW</p>
+            <h2>儀表板</h2>
+          </div>
+          <button class="primary">新增內容</button>
+        </div>
+        <div class="metrics">
+          <div class="metric"><span>今日瀏覽</span><strong>1,286</strong><em>較昨日 +12%</em></div>
+          <div class="metric"><span>上架消息</span><strong>8</strong><em>首頁顯示 4 則</em></div>
+          <div class="metric"><span>上架優惠</span><strong>12</strong><em>本月點擊 348</em></div>
+          <div class="metric"><span>合作店家</span><strong>28</strong><em>新增 3 家洽談中</em></div>
+        </div>
+        <div class="grid two">
+          <div class="card">
+            <h3>待辦事項</h3>
+            <ul class="task-list">
+              <li><b>投稿審核</b><span>北投市場早餐推薦</span><button>查看</button></li>
+              <li><b>優惠審核</b><span>草山咖啡下午茶優惠</span><button>查看</button></li>
+              <li><b>Banner 排程</b><span>陽明山花季主視覺</span><button>查看</button></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>熱門內容</h3>
+            <table>
+              <tr><th>內容</th><th>類型</th><th>瀏覽</th></tr>
+              <tr><td>地熱谷</td><td>景點</td><td>3,421</td></tr>
+              <tr><td>北投溫泉半日遊</td><td>行程</td><td>2,184</td></tr>
+              <tr><td>滿來溫泉拉麵</td><td>美食</td><td>1,768</td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="home" class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">HOMEPAGE</p><h2>首頁管理</h2></div>
+          <button class="primary">儲存首頁排序</button>
+        </div>
+        <div class="grid two">
+          <div class="card">
+            <h3>首頁區塊排序</h3>
+            <ol class="sort-list">
+              <li>Hero 主視覺</li>
+              <li>關鍵字搜尋</li>
+              <li>最新消息</li>
+              <li>熱門景點</li>
+              <li>本週編輯推薦</li>
+              <li>熱門優惠</li>
+              <li>精選行程</li>
+              <li>在地美食</li>
+              <li>北投會館導流</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>熱門關鍵字</h3>
+            <div class="tags">
+              <span>地熱谷</span><span>北投溫泉</span><span>親子景點</span><span>陽明山</span><span>淡水夕陽</span><span>士林夜市</span><span>泡湯</span><span>咖啡廳</span><span>拉麵</span><span>優惠券</span>
+            </div>
+            <div class="form-row"><label>新增關鍵字</label><input value="雨天備案"></div>
+            <button>新增</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="news" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">NEWS</p><h2>最新消息管理</h2></div><button class="primary">新增最新消息</button></div>
+        <div class="notice">最新消息用於發布北投會館活動、住宿專案、季節推薦與合作資訊。首頁建議只顯示 4 則，避免搶走旅遊內容主軸。</div>
+        <div class="grid two">
+          <div class="card">
+            <h3>首頁最新消息設定</h3>
+            <ol class="sort-list">
+              <li>捷伴童行親子專案即將開賣</li>
+              <li>北投溫泉慢旅住房專案</li>
+              <li>陽明山季節散策推薦</li>
+              <li>合作店家優惠陸續上架</li>
+            </ol>
+            <button>調整排序</button>
+          </div>
+          <div class="card">
+            <h3>消息欄位</h3>
+            <div class="form-row"><label>標題</label><input value="捷伴童行親子專案即將開賣"></div>
+            <div class="form-row"><label>分類</label><select><option>活動</option><option>住宿專案</option><option>公告</option><option>合作活動</option></select></div>
+            <div class="form-row"><label>發布日期</label><input value="2026/06/11"></div>
+          </div>
+        </div>
+        <div class="table-card" style="margin-top:18px"><table>
+          <tr><th>標題</th><th>分類</th><th>發布日期</th><th>首頁推薦</th><th>狀態</th><th></th></tr>
+          <tr><td>捷伴童行親子專案即將開賣</td><td>活動</td><td>2026/06/11</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>北投溫泉慢旅住房專案</td><td>住宿專案</td><td>2026/06/01</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>陽明山季節散策推薦</td><td>季節</td><td>2026/05/20</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>合作店家優惠陸續上架</td><td>合作活動</td><td>2026/05/15</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+        </table></div>
+      </section>
+
+      <section id="spots" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">CONTENT</p><h2>景點管理</h2></div><button class="primary">新增景點</button></div>
+        <div class="toolbar"><input placeholder="搜尋景點名稱、捷運站、標籤"><select><option>全部狀態</option><option>已上架</option><option>草稿</option></select><select><option>全部地區</option><option>北投</option><option>新北投</option><option>陽明山</option></select></div>
+        <div class="table-card">
+          <table>
+            <tr><th>名稱</th><th>地區</th><th>最近捷運站</th><th>營業時間</th><th>標籤</th><th>狀態</th><th></th></tr>
+            <tr><td>地熱谷</td><td>新北投</td><td>新北投站</td><td>09:00–17:00</td><td>免費・拍照・步行</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+            <tr><td>北投圖書館</td><td>新北投</td><td>新北投站</td><td>依館方公告</td><td>雨天・親子</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+            <tr><td>小油坑</td><td>陽明山</td><td>劍潭轉公車</td><td>09:00–16:30</td><td>自然・健行</td><td><span class="status draft">草稿</span></td><td><button>編輯</button></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section id="trips" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">ITINERARY</p><h2>行程管理</h2></div><button class="primary">新增行程</button></div>
+        <div class="table-card"><table>
+          <tr><th>行程名稱</th><th>時間</th><th>適合對象</th><th>串接景點</th><th>狀態</th><th></th></tr>
+          <tr><td>北投溫泉半日遊</td><td>4–5 小時</td><td>親子・情侶・雨天</td><td>地熱谷、溫泉博物館、圖書館</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>淡水河岸慢旅行</td><td>半日</td><td>散步・夕陽</td><td>淡水老街、漁人碼頭</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+        </table></div>
+      </section>
+
+      <section id="foods" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">FOOD</p><h2>美食管理</h2></div><button class="primary">新增店家</button></div>
+        <div class="table-card"><table>
+          <tr><th>店名</th><th>地區</th><th>營業時間</th><th>平均消費</th><th>導流網址</th><th>狀態</th><th></th></tr>
+          <tr><td>滿來溫泉拉麵</td><td>新北投</td><td>11:30–21:00</td><td>$200–400</td><td>Google Map／官網</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>草山咖啡館</td><td>陽明山</td><td>10:00–18:00</td><td>$150–350</td><td>IG／訂位網址</td><td><span class="status draft">草稿</span></td><td><button>編輯</button></td></tr>
+        </table></div>
+      </section>
+
+      <section id="coupons" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">OFFERS</p><h2>優惠管理</h2></div><button class="primary">新增優惠</button></div>
+        <div class="notice">第一階段優惠採「出示本頁面即可使用」，不做會員領券與核銷。</div>
+        <div class="table-card"><table>
+          <tr><th>優惠名稱</th><th>店家</th><th>使用方式</th><th>期限</th><th>點擊使用</th><th>狀態</th><th></th></tr>
+          <tr><td>湯屋 95 折</td><td>山月湯屋</td><td>出示頁面</td><td>2026/12/31</td><td>128</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+          <tr><td>拉麵送小菜</td><td>滿來溫泉拉麵</td><td>出示頁面</td><td>2026/09/30</td><td>76</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
+        </table></div>
+      </section>
+
+      <section id="submissions" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">UGC</p><h2>投稿審核</h2></div></div>
+        <div class="review-card">
+          <div><span class="status pending">待審核</span><h3>北投市場早午餐散步路線</h3><p>投稿人：旅人小林｜分類：美食／行程｜地區：北投</p></div>
+          <div class="actions"><button>預覽</button><button>退件</button><button class="primary">通過上架</button></div>
+        </div>
+        <div class="review-card">
+          <div><span class="status pending">待審核</span><h3>淡水夕陽拍照點推薦</h3><p>投稿人：Mina｜分類：景點｜地區：淡水</p></div>
+          <div class="actions"><button>預覽</button><button>退件</button><button class="primary">通過上架</button></div>
+        </div>
+      </section>
+
+      <section id="partners" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">PARTNERS</p><h2>合作店家管理</h2></div><button class="primary">新增合作店家</button></div>
+        <div class="table-card"><table>
+          <tr><th>店家</th><th>類型</th><th>聯絡人</th><th>導流連結</th><th>合作狀態</th><th></th></tr>
+          <tr><td>山月湯屋</td><td>泡湯</td><td>王小姐</td><td>官網／Google Map</td><td><span class="status on">合作中</span></td><td><button>編輯</button></td></tr>
+          <tr><td>草山咖啡館</td><td>咖啡甜點</td><td>林先生</td><td>IG／訂位</td><td><span class="status pending">洽談中</span></td><td><button>編輯</button></td></tr>
+        </table></div>
+      </section>
+
+      <section id="banners" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">ADS</p><h2>Banner 管理</h2></div><button class="primary">新增 Banner</button></div>
+        <div class="grid three">
+          <div class="banner-card"><div></div><h3>首頁主視覺</h3><p>陽明山花季專題｜2026/03/01–04/30</p><button>編輯</button></div>
+          <div class="banner-card"><div></div><h3>熱門優惠區</h3><p>山月湯屋合作曝光｜2026/12/31止</p><button>編輯</button></div>
+          <div class="banner-card"><div></div><h3>文章側欄</h3><p>北投會館訂房導流｜常駐</p><button>編輯</button></div>
+        </div>
+      </section>
+
+      <section id="media" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">MEDIA</p><h2>圖片素材庫</h2></div><button class="primary">上傳圖片</button></div>
+        <div class="media-grid">
+          <img src="assets/valley.jpg" alt="地熱谷"><img src="assets/museum.jpg" alt="博物館"><img src="assets/yang.jpg" alt="陽明山"><img src="assets/shilin.jpg" alt="士林">
+        </div>
+      </section>
+
+      <section id="settings" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">SETTINGS</p><h2>網站設定</h2></div><button class="primary">儲存設定</button></div>
+        <div class="grid two">
+          <div class="card">
+            <h3>品牌設定</h3>
+            <div class="form-row"><label>網站英文名</label><input value="METRO INN GUIDE"></div>
+            <div class="form-row"><label>網站中文名</label><input value="北投旅圖"></div>
+            <div class="form-row"><label>首頁副標</label><input value="從北投出發，探索北台北最剛剛好的風景"></div>
+          </div>
+          <div class="card">
+            <h3>外部連結</h3>
+            <div class="form-row"><label>北投會館官網</label><input value="https://btresort.metro.taipei/"></div>
+            <div class="form-row"><label>立即訂房</label><input value="https://rwd.ezhotel.cloud/btresort/1"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const links = document.querySelectorAll('.side-nav a');
+    const sections = document.querySelectorAll('.panel');
+    links.forEach(link => link.addEventListener('click', () => {
+      links.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    }));
+  </script>
+</body>
+</html>

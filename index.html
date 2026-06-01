@@ -1,20 +1,44 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
 <main id="top">
-<section class="mag-hero home-banner-section" id="homeBannerSection">
-  <div class="home-banner-fallback">
-    <div class="container home-hero-grid">
-      <div class="hero-photo-stack">
-        <div class="hero-photo-main"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="北投地熱谷"></div>
-        <a class="hero-photo-small" href="spots.html"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg" alt="北投圖書館"></a>
-        <a class="hero-photo-mini" href="foods.html"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=85" alt="咖啡"></a>
-      </div>
-      <div class="mag-hero-copy">
+<section class="home-banner-section" id="homeBannerSection">
+  <div class="home-banner-carousel" id="homeBannerCarousel">
+    <article class="home-banner-slide active">
+      <picture>
+        <source media="(max-width:700px)" srcset="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="北投旅圖">
+      </picture>
+      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
         <div class="kicker">METRO INN GUIDE</div>
         <h1>北投旅圖</h1>
         <p>從北投會館出發，把溫泉、散步、咖啡、夜市與河岸風景，整理成一份好讀的在地旅遊手冊。</p>
         <a class="button" href="spots.html">開始探索</a>
-      </div>
-    </div>
+      </div></div></div>
+    </article>
+    <article class="home-banner-slide">
+      <picture>
+        <source media="(max-width:700px)" srcset="https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg" alt="北投散策">
+      </picture>
+      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
+        <div class="kicker">BEITOU WALK</div>
+        <h1>北投散策</h1>
+        <p>從新北投站一路散步，安排地熱谷、溫泉博物館、圖書館與在地美食。</p>
+        <a class="button" href="trips.html">查看行程</a>
+      </div></div></div>
+    </article>
+    <article class="home-banner-slide">
+      <picture>
+        <source media="(max-width:700px)" srcset="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=85">
+        <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1800&q=85" alt="北投美食">
+      </picture>
+      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
+        <div class="kicker">LOCAL TASTES</div>
+        <h1>在地美食</h1>
+        <p>泡湯後的熱湯、午後咖啡與市場小吃，讓旅程更剛剛好。</p>
+        <a class="button" href="foods.html">查看美食</a>
+      </div></div></div>
+    </article>
+    <div class="home-banner-dots"><button class="active" aria-label="第 1 張 Banner"></button><button aria-label="第 2 張 Banner"></button><button aria-label="第 3 張 Banner"></button></div>
   </div>
 </section>
 
@@ -32,39 +56,71 @@
 
 <section class="section"><div class="container mag-feature"><div class="mag-feature-copy"><div class="kicker">STAY A LITTLE LONGER</div><h2>入住北投會館，從旅店開始慢慢認識城市。</h2><p>旅圖是你的數位旅遊手冊；訂房則回到北投會館官方系統，保留清楚的旅遊內容與訂房流程。</p><a class="button" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2007-10-23%20Room%20%40%20Far%20East%20Plaza%20Hotel%2C%20Taipei%2001.jpg"></div></div></section>
 </main><div id="footer"></div><script>
+
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
 
+function renderHomeBanners(banners){
+  const section = document.getElementById('homeBannerSection');
+  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
+  if(!valid.length) return setupHomeBannerCarousel();
+
+  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${valid.slice(0,4).map((b,i)=>{
+    const pc = b.image_url || b.image_pc;
+    const mobile = b.mobile_image_url || b.image_mobile || pc;
+    const title = b.title || '北投旅圖';
+    const subtitle = b.subtitle || '';
+    const buttonText = b.button_text || '了解更多';
+    const buttonUrl = b.button_url || 'spots.html';
+    return `<article class="home-banner-slide ${i===0?'active':''}">
+      <picture>
+        <source media="(max-width:700px)" srcset="${mobile}">
+        <img src="${pc}" alt="${title}">
+      </picture>
+      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
+        <div class="kicker">METRO INN GUIDE</div>
+        <h1>${title}</h1>
+        <p>${subtitle}</p>
+        ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
+      </div></div></div>
+    </article>`;
+  }).join('')}<div class="home-banner-dots">${valid.slice(0,4).map((_,i)=>`<button class="${i===0?'active':''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('')}</div></div>`;
+  setupHomeBannerCarousel();
+}
+
+function setupHomeBannerCarousel(){
+  const section = document.getElementById('homeBannerSection');
+  const slides = [...section.querySelectorAll('.home-banner-slide')];
+  const dots = [...section.querySelectorAll('.home-banner-dots button')];
+  if(!slides.length) return;
+  let idx = slides.findIndex(s => s.classList.contains('active'));
+  if(idx < 0) idx = 0;
+  function show(n){
+    idx = n;
+    slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+    dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+  }
+  dots.forEach((d,i)=>d.addEventListener('click',()=>show(i)));
+  if(slides.length>1){
+    setInterval(()=>show((idx+1)%slides.length),5000);
+  }
+}
+
 async function loadHomeBanners(){
+  setupHomeBannerCarousel();
   if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') return;
   try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?is_published=eq.true&select=*&order=sort_order.asc&limit=4`, {headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?select=*&order=sort_order.asc&limit=4`, {
+      headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+    });
     if(!res.ok) return;
-    const banners = await res.json();
-    if(!banners || !banners.length) return;
-    const section = document.getElementById('homeBannerSection');
-    section.innerHTML = `<div class="home-banner-carousel">${banners.map((b,i)=>`
-      <article class="home-banner-slide ${i===0?'active':''}">
-        <picture>
-          ${b.mobile_image_url ? `<source media="(max-width:700px)" srcset="${b.mobile_image_url}">` : ''}
-          <img src="${b.image_url}" alt="${b.title || '首頁Banner'}">
-        </picture>
-        <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
-          <div class="kicker">METRO INN GUIDE</div>
-          <h1>${b.title || ''}</h1>
-          <p>${b.subtitle || ''}</p>
-          ${b.button_url ? `<a class="button" href="${b.button_url}">${b.button_text || '了解更多'}</a>` : ''}
-        </div></div></div>
-      </article>`).join('')}
-      <div class="home-banner-dots">${banners.map((_,i)=>`<button class="${i===0?'active':''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('')}</div>
-    </div>`;
-    const slides = [...section.querySelectorAll('.home-banner-slide')];
-    const dots = [...section.querySelectorAll('.home-banner-dots button')];
-    let idx = 0;
-    function show(n){idx=n;slides.forEach((s,i)=>s.classList.toggle('active',i===idx));dots.forEach((d,i)=>d.classList.toggle('active',i===idx));}
-    dots.forEach((d,i)=>d.addEventListener('click',()=>show(i)));
-    if(slides.length>1) setInterval(()=>show((idx+1)%slides.length),5000);
-  }catch(e){console.warn('banners not loaded', e);}
+    const raw = await res.json();
+    const banners = (raw || []).filter(b => (b.is_published !== false) && (b.is_active !== false));
+    renderHomeBanners(banners);
+  }catch(e){
+    console.warn('banners not loaded, use fallback carousel', e);
+  }
 }
 loadHomeBanners();
+
 </script></body></html>

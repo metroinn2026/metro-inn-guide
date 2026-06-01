@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <!-- NEW_ADMIN_CMS_V3_BANNER_SETTINGS_20260601 -->
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -15,13 +14,13 @@
         <div class="brand-title">北投旅圖 CMS</div>
       </div>
       <nav class="side-nav" id="sideNav">
-        <a class="active" data-table="news">最新消息</a>
+        <a class="active" data-table="banners">Banner 管理</a>
+        <a data-table="site_settings">頁首頁尾設定</a>
+        <a data-table="news">最新消息</a>
         <a data-table="spots">景點管理</a>
         <a data-table="foods">美食管理</a>
         <a data-table="trips">行程管理</a>
         <a data-table="coupons">優惠管理</a>
-        <a data-table="banners">Banner 管理</a>
-        <a data-table="site_settings">頁首／頁尾設定</a>
       </nav>
       <div class="side-bottom">
         <a class="button" href="index.html" target="_blank">開啟前台預覽 ↗</a>
@@ -35,63 +34,83 @@
           <p class="kicker">ADMIN CENTER</p>
           <h1>Metro Inn Guide｜內容管理中心</h1>
         </div>
-        <div>
+        <div class="top-actions">
           <span id="userEmail">檢查登入中...</span>
+          <button onclick="logout()">登出</button>
         </div>
       </header>
 
       <section class="notice">
-        後台已串接 Supabase。可管理最新消息、景點、美食、行程、優惠、首頁 Banner 及頁首／頁尾資訊。
-        Banner 最多建議 4 張輪播；圖片可先上傳到 images 資料夾或外部圖床，再把圖片網址貼入欄位。
+        已調整為「先看全部資料 → 點編輯進入下一層修改」。每個管理項目都有搜尋、狀態或分類篩選，較適合資料量增加後使用。
       </section>
 
-      <section id="editorPanel" class="panel active">
+      <section class="panel">
         <div class="panel-head">
           <div>
-            <p class="kicker" id="currentKicker">NEWS</p>
-            <h2 id="currentTitle">最新消息管理</h2>
+            <p class="kicker" id="currentKicker">BANNER</p>
+            <h2 id="currentTitle">Banner 管理</h2>
           </div>
           <div class="actions">
-            <button class="primary" onclick="newItem()">新增</button>
+            <button class="primary" id="newBtn" onclick="newItem()">新增</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
           </div>
         </div>
 
-        <div class="toolbar">
-          <input id="searchInput" placeholder="搜尋標題、摘要、內容..." oninput="renderList()">
-          <select id="statusFilter" onchange="renderList()">
-            <option value="all">全部狀態</option>
-            <option value="published">已上架</option>
-            <option value="draft">草稿 / 下架</option>
-          </select>
-        </div>
+        <div id="sectionHint" class="notice warning"></div>
 
-        <div class="grid two">
-          <div class="card">
-            <h3 id="formTitle">新增內容</h3>
-            <div id="formFields"></div>
-            <div class="actions">
-              <button class="primary" onclick="saveItem()">儲存</button>
-              <button onclick="clearForm()">清空</button>
-              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
-            </div>
-            <p id="formMsg" class="msg"></p>
+        <div id="listView" class="list-view">
+          <div class="toolbar">
+            <input id="searchInput" placeholder="搜尋標題、摘要、內容、標籤..." oninput="renderList()">
+            <select id="statusFilter" onchange="renderList()">
+              <option value="all">全部狀態</option>
+              <option value="published">已上架 / 啟用</option>
+              <option value="draft">草稿 / 停用</option>
+            </select>
+            <select id="typeFilter" onchange="renderList()">
+              <option value="all">全部類別</option>
+            </select>
+            <button onclick="clearFilters()">清除篩選</button>
           </div>
 
           <div class="table-card">
             <table>
-              <thead>
-                <tr>
-                  <th>標題</th>
-                  <th>日期 / 地區</th>
-                  <th>狀態</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
+              <thead id="tableHead"></thead>
               <tbody id="listBody">
-                <tr><td colspan="4">資料載入中...</td></tr>
+                <tr><td>資料載入中...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <div id="editorView" class="editor-view">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">EDIT</p>
+              <h2 id="formTitle">編輯內容</h2>
+            </div>
+            <div class="actions">
+              <button class="ghost" onclick="backToList()">← 回列表</button>
+              <button class="primary" onclick="saveItem()">儲存</button>
+              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
+            </div>
+          </div>
+
+          <div class="editor-grid">
+            <div class="card">
+              <div id="formFields"></div>
+              <div class="actions">
+                <button class="primary" onclick="saveItem()">儲存</button>
+                <button onclick="clearForm()">清空</button>
+                <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
+              </div>
+              <p id="formMsg" class="msg"></p>
+            </div>
+
+            <div class="card">
+              <h3>圖片與版面建議</h3>
+              <div id="imageTips"></div>
+              <div class="image-preview" id="imagePreview">圖片預覽</div>
+            </div>
           </div>
         </div>
       </section>
@@ -103,151 +122,250 @@
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    const imageTipsDefault = `
+      <ul class="tip-list">
+        <li>Banner 桌機建議：1920 × 720 px，JPG / WEBP，單張建議 500KB 以下。</li>
+        <li>Banner 手機建議：1080 × 1350 px，重要文字放中央安全區。</li>
+        <li>最新消息封面：1200 × 630 px。</li>
+        <li>景點／行程封面：1600 × 900 px。</li>
+        <li>美食封面：1200 × 900 px。</li>
+        <li>優惠券圖片：1080 × 1080 px。</li>
+        <li>Logo 建議：SVG 或透明 PNG，高度約 80px。</li>
+      </ul>`;
+
     const configs = {
-      news: {
-        label:'最新消息', kicker:'NEWS', preview:'news-detail.html?id=',
-        help:'最新消息封面建議 1200×630px（JPG/WEBP，單張 ≤ 500KB）。活動資訊卡會顯示於內頁。',
+      banners: {
+        label:'Banner 管理', kicker:'BANNER', table:'banners', preview:'index.html',
+        hint:'首頁上方 Banner 最多建議 4 張輪播。排序請填 1～4；若超過 4 張，前台只會優先顯示排序最前面的啟用項目。',
         fields:[
           ['id','ID','text','auto'],
-          ['slug','網址代稱 slug','text'],
-          ['title','標題','text','required'],
-          ['summary','摘要','textarea'],
-          ['content','內文','textarea'],
-          ['cover_image','封面圖網址｜建議 1200×630px','text'],
-          ['publish_date','發布日期','date'],
-          ['event_name','活動名稱','text'],
-          ['event_date','活動日期','text'],
-          ['event_address','活動地點（地址）','text'],
-          ['phone','電話','text'],
-          ['event_content','活動內容','textarea'],
-          ['remark','備註','textarea'],
-          ['is_published','狀態','boolean']
+          ['title','Banner 標題','text','required'],
+          ['subtitle','Banner 副標','textarea'],
+          ['image_pc','桌機 Banner 圖片網址（1920×720）','text'],
+          ['image_mobile','手機 Banner 圖片網址（1080×1350）','text'],
+          ['button_text','按鈕文字','text'],
+          ['button_url','按鈕連結','text'],
+          ['sort_order','排序（1～4）','number'],
+          ['is_active','狀態','booleanActive']
         ],
-        subtitle:(x)=>x.publish_date || x.event_date || '-'
+        columns:['title','sort_order','is_active'],
+        subtitle:(x)=>'排序：' + (x.sort_order ?? '-'),
+        statusKey:'is_active',
+        typeOptions:[['all','全部類別']],
+        order:'sort_order',
+        idMode:'uuid',
+        tips:`<ul class="tip-list">
+          <li><b>最多 4 張輪播</b>：排序 1～4，首頁只顯示啟用的 Banner。</li>
+          <li><b>桌機尺寸</b>：1920 × 720 px。</li>
+          <li><b>手機尺寸</b>：1080 × 1350 px。</li>
+          <li><b>格式</b>：JPG / WEBP，單張建議 500KB 以下。</li>
+          <li><b>安全區</b>：左右各預留約 250px 不放重要文字，避免手機或窄螢幕裁切。</li>
+        </ul>`
+      },
+      site_settings: {
+        label:'頁首頁尾設定', kicker:'SETTING', table:'site_settings', preview:'index.html',
+        hint:'這裡管理全站共用資訊，例如 Logo、訂房按鈕、頁尾地址、電話、社群連結。此資料表固定只有 1 筆。',
+        fields:[
+          ['id','ID','number','fixed1'],
+          ['logo_url','Logo 圖片網址（SVG或PNG）','text'],
+          ['booking_text','訂房按鈕文字','text'],
+          ['booking_url','訂房按鈕連結','text'],
+          ['footer_title','頁尾標題','text'],
+          ['footer_address','地址','textarea'],
+          ['footer_phone','電話','text'],
+          ['footer_email','Email','text'],
+          ['facebook_url','Facebook 連結','text'],
+          ['instagram_url','Instagram 連結','text'],
+          ['line_url','LINE 連結','text'],
+          ['map_iframe','Google Map iframe','textarea'],
+          ['copyright_text','版權文字','text']
+        ],
+        columns:['footer_title','booking_text','footer_phone'],
+        subtitle:(x)=>x.footer_phone || x.footer_email || '-',
+        statusKey:null,
+        typeOptions:[['all','全部類別']],
+        order:'id',
+        idMode:'fixed1',
+        tips:`<ul class="tip-list">
+          <li><b>Logo</b>：建議 SVG 或透明 PNG，高度約 80px。</li>
+          <li><b>頁首</b>：訂房按鈕文字建議 4～6 字，例如「立即訂房」。</li>
+          <li><b>頁尾</b>：地址、電話、Email 建議完整填寫，避免旅客找不到聯絡資訊。</li>
+          <li><b>Google Map</b>：可貼 iframe，但若不熟悉可先留空。</li>
+          <li><b>社群圖示</b>：若未來使用圖片，建議 64 × 64 px PNG。</li>
+        </ul>`
+      },
+      news: {
+        label:'最新消息', kicker:'NEWS', table:'news', preview:'news-detail.html?id=',
+        hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
+        fields:[
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
+          ['summary','摘要','textarea'],['content','內文','textarea'],['cover_image','封面圖網址（1200×630）','text'],
+          ['publish_date','發布日期','date'],['event_name','活動名稱','text'],['event_date','活動日期','text'],
+          ['event_address','活動地點（地址）','text'],['phone','電話','text'],['event_content','活動內容','textarea'],
+          ['remark','備註','textarea'],['is_published','狀態','boolean']
+        ],
+        columns:['title','publish_date','is_published'],
+        subtitle:(x)=>x.publish_date || x.event_date || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類別'],['親子','親子'],['住宿','住宿'],['北投','北投']],
+        order:'publish_date',
+        idPrefix:'news',
+        tips:`<ul class="tip-list"><li>最新消息封面建議：1200 × 630 px。</li><li>標題建議 18 字以內，摘要建議 40～70 字。</li></ul>`
       },
       spots: {
-        label:'景點管理', kicker:'SPOTS', preview:'spot.html?id=',
-        help:'景點照片建議 1600×900px；若是直式照片請保留主體在中央，避免列表裁切。',
+        label:'景點管理', kicker:'SPOTS', table:'spots', preview:'spot.html?id=',
+        hint:'可用地區、捷運站、標籤搜尋景點。建議景點封面採橫式照片。',
         fields:[
           ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
           ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
-          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖網址｜建議 1600×900px','text'],['is_published','狀態','boolean']
+          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖網址（1600×900）','text'],
+          ['is_published','狀態','boolean']
         ],
-        subtitle:(x)=>x.area || x.station || '-'
+        columns:['title','area','is_published'],
+        subtitle:(x)=>x.area || x.station || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部地區'],['北投','北投'],['新北投','新北投'],['陽明山','陽明山'],['士林','士林'],['淡水','淡水']],
+        order:'id',
+        idPrefix:'spot',
+        tips:`<ul class="tip-list"><li>景點封面建議：1600 × 900 px。</li><li>內容照也建議橫式，避免列表裁切。</li></ul>`
       },
       foods: {
-        label:'美食管理', kicker:'FOODS', preview:'food.html?id=',
-        help:'美食照片建議 1200×900px；店面環境可用 1600×900px，餐點特寫可用 4:3。',
+        label:'美食管理', kicker:'FOODS', table:'foods', preview:'food.html?id=',
+        hint:'可用店名、類型、價格、標籤搜尋。建議美食圖片保留餐點與店面主體。',
         fields:[
           ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
-          ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],['price_range','價格區間','text'],
-          ['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
-          ['cover_image','封面圖網址｜建議 1200×900px','text'],['is_published','狀態','boolean']
+          ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
+          ['price_range','價格區間','text'],['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
+          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖網址（1200×900）','text'],['is_published','狀態','boolean']
         ],
-        subtitle:(x)=>x.category || x.average_cost || '-'
+        columns:['title','category','is_published'],
+        subtitle:(x)=>x.category || x.average_cost || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['小吃','小吃'],['咖啡','咖啡'],['餐廳','餐廳'],['甜點','甜點']],
+        order:'id',
+        idPrefix:'food',
+        tips:`<ul class="tip-list"><li>美食封面建議：1200 × 900 px。</li><li>餐點照可用 4:3，店面照建議橫式。</li></ul>`
       },
       trips: {
-        label:'行程管理', kicker:'TRIPS', preview:'trip.html?id=',
-        help:'行程封面建議 1600×900px；內容可用「時間｜地點｜說明」分段，前台會以文章方式呈現。',
+        label:'行程管理', kicker:'TRIPS', table:'trips', preview:'trip.html?id=',
+        hint:'可用行程名稱、時間、內容搜尋。行程內容可輸入多段時間與說明。',
         fields:[
           ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
-          ['summary','摘要','textarea'],['content','行程內容（方案B格式）','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址｜建議 1600×900px','text'],['is_published','狀態','boolean']
+          ['summary','摘要','textarea'],['content','行程內容','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址（1600×900）','text'],
+          ['is_published','狀態','boolean']
         ],
-        subtitle:(x)=>x.duration || '-'
+        columns:['title','duration','is_published'],
+        subtitle:(x)=>x.duration || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['半日','半日'],['一日','一日'],['親子','親子'],['雨天','雨天']],
+        order:'id',
+        idPrefix:'trip',
+        tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>內容可用「13:00｜地熱谷｜說明」格式，方便閱讀。</li></ul>`
       },
       coupons: {
-        label:'優惠管理', kicker:'COUPONS', preview:'coupon.html?id=',
-        help:'優惠券圖片建議 1080×1080px；若需列表裁切，請把文字放在中央安全區。',
+        label:'優惠管理', kicker:'COUPONS', table:'coupons', preview:'coupon.html?id=',
+        hint:'可用優惠名稱、日期、內容搜尋。優惠圖建議方形，方便手機瀏覽。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],['summary','摘要','textarea'],['content','優惠內容','textarea'],
-          ['start_date','開始日期','date'],['end_date','結束日期','date'],['official_website','連結網址','text'],['cover_image','封面圖網址｜建議 1080×1080px','text'],['is_published','狀態','boolean']
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],
+          ['summary','摘要','textarea'],['content','優惠內容','textarea'],['start_date','開始日期','date'],['end_date','結束日期','date'],
+          ['official_website','連結網址','text'],['cover_image','封面圖網址（1080×1080）','text'],['is_published','狀態','boolean']
         ],
-        subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-')
-      },
-      banners: {
-        label:'Banner 管理', kicker:'BANNER', preview:'index.html',
-        help:'首頁上方 Banner 最多 4 張輪播。桌機建議 1920×720px；手機建議 1080×1350px；格式 JPG/WEBP；單張 ≤ 500KB；文字安全區左右各預留約 250px。',
-        fields:[
-          ['id','ID','text','auto'],['title','Banner 標題','text','required'],['subtitle','Banner 副標','textarea'],['image_url','桌機圖片網址｜建議 1920×720px','text','required'],
-          ['mobile_image_url','手機圖片網址｜建議 1080×1350px','text'],['button_text','按鈕文字','text'],['button_url','按鈕連結','text'],['sort_order','排序 1–4','number'],['is_published','狀態','boolean']
-        ],
-        subtitle:(x)=>'排序 ' + (x.sort_order || '-')
-      },
-      site_settings: {
-        label:'頁首／頁尾設定', kicker:'SETTINGS', preview:'index.html',
-        help:'這裡控制全站頁首與頁尾。Logo 建議 SVG 或 PNG，高度約 80px；社群圖示若使用圖片建議 64×64px；Google Map 可貼網址。',
-        fields:[
-          ['id','ID','text','auto'],['site_title','網站名稱','text','required'],['site_subtitle','網站副標','text'],['logo_text','頁首 Logo 文字','text'],
-          ['booking_text','訂房按鈕文字','text'],['booking_url','訂房按鈕連結','text'],['hotel_url','北投會館連結','text'],
-          ['footer_description','頁尾簡介','textarea'],['footer_address','地址','text'],['footer_phone','電話','text'],['footer_email','Email','text'],
-          ['facebook_url','Facebook 連結','text'],['instagram_url','Instagram 連結','text'],['line_url','LINE 連結','text'],['google_map_url','Google Map 連結','text'],['footer_copyright','版權文字','text']
-        ],
-        subtitle:(x)=>x.site_title || '網站設定'
+        columns:['title','end_date','is_published'],
+        subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-'),
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['住宿','住宿'],['美食','美食'],['親子','親子'],['北捷行旅','北捷行旅']],
+        order:'end_date',
+        idPrefix:'coupon',
+        tips:`<ul class="tip-list"><li>優惠券圖片建議：1080 × 1080 px。</li><li>優惠文字請避免直接寫在圖片邊緣，手機會被裁切。</li></ul>`
       }
     };
 
-    let currentTable = 'news';
+    let currentTable = 'banners';
     let cache = [];
     let editingId = '';
 
     async function checkLogin(){
       const { data } = await db.auth.getSession();
-      if(!data.session){
-        location.href = 'admin-login.html';
-        return;
-      }
+      if(!data.session){ location.href = 'admin-login.html'; return; }
       document.getElementById('userEmail').textContent = data.session.user.email;
-      buildForm();
-      loadCurrentTable();
+      switchTable('banners');
     }
 
-    async function logout(){
-      await db.auth.signOut();
-      location.href='admin-login.html';
-    }
+    async function logout(){ await db.auth.signOut(); location.href='admin-login.html'; }
 
     document.querySelectorAll('#sideNav a').forEach(a=>{
       a.addEventListener('click',()=>{
         document.querySelectorAll('#sideNav a').forEach(x=>x.classList.remove('active'));
         a.classList.add('active');
-        currentTable = a.dataset.table;
-        document.getElementById('currentKicker').textContent = configs[currentTable].kicker;
-        document.getElementById('currentTitle').textContent = configs[currentTable].label;
-        editingId = '';
-        buildForm();
-        loadCurrentTable();
+        switchTable(a.dataset.table);
       });
     });
+
+    function switchTable(table){
+      currentTable = table;
+      const cfg = configs[currentTable];
+      document.getElementById('currentKicker').textContent = cfg.kicker;
+      document.getElementById('currentTitle').textContent = cfg.label;
+      document.getElementById('sectionHint').textContent = cfg.hint;
+      document.getElementById('newBtn').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
+      document.getElementById('imageTips').innerHTML = cfg.tips || imageTipsDefault;
+      buildForm();
+      setupFilters();
+      backToList(false);
+      loadCurrentTable();
+    }
+
+    function setupFilters(){
+      const type = document.getElementById('typeFilter');
+      type.innerHTML = configs[currentTable].typeOptions.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('statusFilter').style.display = configs[currentTable].statusKey ? 'block' : 'none';
+    }
+
+    function clearFilters(){
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('typeFilter').value = 'all';
+      renderList();
+    }
 
     function buildForm(){
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
-      wrap.innerHTML = `<div class="notice">${cfg.help || ''}</div>` + cfg.fields.map(([name,label,type,flag])=>{
-        if(type === 'textarea'){
-          return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5"></textarea></div>`;
-        }
-        if(type === 'boolean'){
-          return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
-        }
-        return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'?'readonly':''}></div>`;
+      wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
+        if(type === 'boolean') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
+        return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'||flag==='fixed1'?'readonly':''} oninput="updateImagePreview()"></div>`;
       }).join('');
       clearForm();
     }
 
+    function buildHead(){
+      const cfg = configs[currentTable];
+      let second = currentTable==='banners' ? '排序' :
+                   currentTable==='site_settings' ? '設定值' :
+                   currentTable==='spots' ? '地區 / 站點' :
+                   currentTable==='foods' ? '類型 / 價格' :
+                   currentTable==='trips' ? '建議時間' :
+                   currentTable==='coupons' ? '期限' : '日期';
+      document.getElementById('tableHead').innerHTML = `<tr><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
+    }
+
     function nextId(){
-      const prefixMap = {news:'news',spots:'spot',foods:'food',trips:'trip',coupons:'coupon',banners:'banner',site_settings:'site'};
-      const prefix = prefixMap[currentTable] || 'item';
-      if(currentTable === 'site_settings') return 'site_0001';
+      const cfg = configs[currentTable];
+      if(cfg.idMode === 'uuid') return crypto.randomUUID();
+      if(cfg.idMode === 'fixed1') return 1;
+      const prefix = cfg.idPrefix || currentTable;
       const nums = cache.map(x=>String(x.id||'').replace(prefix+'_','')).map(n=>parseInt(n,10)).filter(n=>!isNaN(n));
       const next = nums.length ? Math.max(...nums)+1 : 1;
       return `${prefix}_${String(next).padStart(4,'0')}`;
     }
 
     function slugify(text){
-      return String(text||'').trim().toLowerCase()
-        .replace(/[^\w\u4e00-\u9fa5]+/g,'-')
-        .replace(/^-+|-+$/g,'') || `${currentTable}-${Date.now()}`;
+      return String(text||'').trim().toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g,'-').replace(/^-+|-+$/g,'') || `${currentTable}-${Date.now()}`;
     }
 
     function clearForm(){
@@ -255,28 +373,39 @@
       document.getElementById('formTitle').textContent = '新增內容';
       document.getElementById('formMsg').textContent = '';
       document.getElementById('previewLink').style.display = 'none';
-      configs[currentTable].fields.forEach(([name,label,type])=>{
+      document.getElementById('deleteInEditor').style.display = 'none';
+      configs[currentTable].fields.forEach(([name,label,type,flag])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(name==='id') el.value = nextId();
-        else if(name==='is_published') el.value = 'true';
-        else if(type==='date' && (name==='publish_date')) el.value = new Date().toISOString().slice(0,10);
-        else if(name==='sort_order') el.value = String(Math.min(cache.length + 1, 4));
-        else if(name==='site_title') el.value = 'Metro Inn Guide｜北投旅圖';
-        else if(name==='logo_text') el.value = 'Metro Inn Guide｜北投旅圖';
-        else if(name==='booking_text') el.value = '立即訂房 ↗';
+        else if(name==='sort_order') el.value = '1';
+        else if(name==='is_published' || name==='is_active') el.value = 'true';
+        else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
         else el.value = '';
       });
+      updateImagePreview();
     }
 
-    function newItem(){ clearForm(); window.scrollTo({top:0,behavior:'smooth'}); }
+    function newItem(){
+      clearForm();
+      document.getElementById('listView').classList.add('hidden');
+      document.getElementById('editorView').classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function backToList(scroll=true){
+      document.getElementById('listView').classList.remove('hidden');
+      document.getElementById('editorView').classList.remove('active');
+      if(scroll) window.scrollTo({top:0,behavior:'smooth'});
+    }
 
     async function loadCurrentTable(){
+      buildHead();
       const tbody = document.getElementById('listBody');
       tbody.innerHTML = '<tr><td colspan="4">資料載入中...</td></tr>';
-
-      const orderCol = currentTable === 'news' ? 'publish_date' : (currentTable === 'banners' ? 'sort_order' : 'id');
-      const { data, error } = await db.from(currentTable).select('*').order(orderCol, { ascending: currentTable === 'banners' });
+      const cfg = configs[currentTable];
+      const orderCol = cfg.order || 'id';
+      const { data, error } = await db.from(cfg.table).select('*').order(orderCol, { ascending: currentTable==='banners' || currentTable==='site_settings' });
       if(error){
         console.error(error);
         tbody.innerHTML = `<tr><td colspan="4">讀取失敗：${error.message}</td></tr>`;
@@ -284,59 +413,69 @@
       }
       cache = data || [];
       renderList();
-      clearForm();
     }
 
     function renderList(){
       const keyword = document.getElementById('searchInput').value.trim();
       const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const cfg = configs[currentTable];
+
       let list = cache.filter(item=>{
         const text = JSON.stringify(item);
         const matchKeyword = !keyword || text.includes(keyword);
-        const matchStatus =
-          status==='all' ||
-          (status==='published' && item.is_published) ||
-          (status==='draft' && !item.is_published);
-        return matchKeyword && matchStatus;
+        const matchStatus = !cfg.statusKey || status==='all' ||
+          (status==='published' && item[cfg.statusKey]) ||
+          (status==='draft' && !item[cfg.statusKey]);
+        const matchType = type==='all' || text.includes(type);
+        return matchKeyword && matchStatus && matchType;
       });
 
       const tbody = document.getElementById('listBody');
-      if(!list.length){
-        tbody.innerHTML = '<tr><td colspan="4">沒有符合條件的資料。</td></tr>';
-        return;
-      }
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="4">沒有符合條件的資料。</td></tr>'; return; }
 
-      tbody.innerHTML = list.map(item=>`
-        <tr>
-          <td><strong>${item.title || item.site_title || item.id}</strong><br><small>${item.id}</small></td>
-          <td>${configs[currentTable].subtitle(item)}</td>
-          <td><span class="status ${item.is_published?'on':'draft'}">${item.is_published?'已上架':'草稿'}</span></td>
-          <td>
-            <div class="actions">
-              <button onclick="editItem('${item.id}')">編輯</button>
-              <button onclick="toggleItem('${item.id}')">${item.is_published?'下架':'上架'}</button>
-              <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
-              <a class="button" target="_blank" href="${currentTable === 'banners' || currentTable === 'site_settings' ? configs[currentTable].preview : configs[currentTable].preview + encodeURIComponent(item.id)}">預覽</a>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = list.map(item=>{
+        const title = item.title || item.footer_title || item.booking_text || item.id;
+        const statusHtml = cfg.statusKey
+          ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
+          : `<span class="badge">固定設定</span>`;
+        const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
+        return `
+          <tr>
+            <td><strong>${title || '未命名'}</strong><br><small>${item.id}</small></td>
+            <td>${cfg.subtitle(item)}</td>
+            <td>${statusHtml}</td>
+            <td>
+              <div class="actions">
+                <button onclick="editItem('${item.id}')">編輯</button>
+                ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
+                ${currentTable !== 'site_settings' ? `<button class="danger" onclick="deleteItem('${item.id}')">刪除</button>` : ''}
+                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
     }
 
     function editItem(id){
-      const item = cache.find(x=>x.id===id);
+      const item = cache.find(x=>String(x.id)===String(id));
       if(!item) return;
       editingId = id;
       document.getElementById('formTitle').textContent = '編輯內容';
       configs[currentTable].fields.forEach(([name,label,type])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
-        if(type==='boolean') el.value = item[name] ? 'true' : 'false';
+        if(type==='boolean' || type==='booleanActive') el.value = item[name] ? 'true' : 'false';
         else el.value = item[name] ?? '';
       });
       const link = document.getElementById('previewLink');
-      link.href = (currentTable === 'banners' || currentTable === 'site_settings') ? configs[currentTable].preview : configs[currentTable].preview + encodeURIComponent(id);
+      const cfg = configs[currentTable];
+      link.href = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(id) : cfg.preview;
       link.style.display = 'inline-flex';
+      document.getElementById('deleteInEditor').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
+      document.getElementById('listView').classList.add('hidden');
+      document.getElementById('editorView').classList.add('active');
+      updateImagePreview();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -345,9 +484,9 @@
       configs[currentTable].fields.forEach(([name,label,type])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
-        if(type==='boolean') payload[name] = el.value === 'true';
+        if(type==='boolean' || type==='booleanActive') payload[name] = el.value === 'true';
         else if(type==='number') payload[name] = el.value === '' ? null : Number(el.value);
-        else payload[name] = el.value.trim();
+        else payload[name] = String(el.value || '').trim();
       });
       if(!payload.id) payload.id = nextId();
       if('slug' in payload && !payload.slug && payload.title) payload.slug = slugify(payload.title);
@@ -358,41 +497,53 @@
     async function saveItem(){
       const msg = document.getElementById('formMsg');
       const payload = formPayload();
-      const required = configs[currentTable].fields.find(f => f[3] === 'required');
-      if(required && !payload[required[0]]){
-        msg.textContent = '請先輸入：' + required[1];
-        return;
-      }
-      if(currentTable === 'banners' && !editingId && cache.length >= 4){
-        msg.textContent = '首頁 Banner 最多 4 張，請先下架或刪除其中一張。';
+      if(configs[currentTable].fields.some(f=>f[3]==='required') && !payload.title){
+        msg.textContent = '請輸入標題 / 名稱。';
         return;
       }
       msg.textContent = '儲存中...';
-
-      const { error } = await db.from(currentTable).upsert(payload, { onConflict:'id' });
-      if(error){
-        console.error(error);
-        msg.textContent = '儲存失敗：' + error.message;
-        return;
-      }
+      const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
+      if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; return; }
       msg.textContent = '已儲存。';
       await loadCurrentTable();
       editItem(payload.id);
     }
 
     async function toggleItem(id){
-      const item = cache.find(x=>x.id===id);
+      const item = cache.find(x=>String(x.id)===String(id));
       if(!item) return;
-      const { error } = await db.from(currentTable).update({is_published:!item.is_published}).eq('id',id);
+      const key = configs[currentTable].statusKey;
+      const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
       if(error){ alert('更新失敗：' + error.message); return; }
       await loadCurrentTable();
     }
 
     async function deleteItem(id){
       if(!confirm('確定要刪除這筆資料嗎？')) return;
-      const { error } = await db.from(currentTable).delete().eq('id',id);
+      const { error } = await db.from(configs[currentTable].table).delete().eq('id',id);
       if(error){ alert('刪除失敗：' + error.message); return; }
       await loadCurrentTable();
+      backToList();
+    }
+
+    function deleteEditingItem(){
+      const id = document.getElementById('f_id')?.value;
+      if(id) deleteItem(id);
+    }
+
+    function updateImagePreview(){
+      const preview = document.getElementById('imagePreview');
+      const candidates = ['image_pc','cover_image','logo_url','image_mobile'];
+      let url = '';
+      for(const name of candidates){
+        const el = document.getElementById('f_'+name);
+        if(el && el.value.trim()){ url = el.value.trim(); break; }
+      }
+      if(url && /^https?:\/\//.test(url)){
+        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='圖片網址無法預覽，請確認網址是否公開可讀。'">`;
+      }else{
+        preview.textContent = '圖片預覽';
+      }
     }
 
     checkLogin();

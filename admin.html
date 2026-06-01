@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css?v=20260601-listfix">
+  <link rel="stylesheet" href="admin.css?v=20260601-drag-sort">
 
   <style>
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
@@ -13,6 +13,59 @@
     .list-view.hidden{display:none!important;}
     .editor-view{display:none!important;}
     .editor-view.active{display:block!important;}
+  </style>
+
+
+  <style>
+    /* DRAG SORT UPDATE 20260601 */
+    .drag-handle{
+      cursor:grab;
+      color:#2563EB;
+      font-weight:700;
+      user-select:none;
+      display:inline-flex;
+      width:28px;
+      height:28px;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #DBEAFE;
+      border-radius:8px;
+      background:#EFF6FF;
+    }
+    tr.dragging{
+      opacity:.45;
+      background:#EFF6FF;
+    }
+    tr.drag-over{
+      outline:2px dashed #2563EB;
+      outline-offset:-4px;
+      background:#F8FAFC;
+    }
+    .sort-save-bar{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      padding:12px 14px;
+      border:1px solid #BFDBFE;
+      background:#EFF6FF;
+      color:#1E3A8A;
+      border-radius:14px;
+      line-height:1.6;
+    }
+    .sort-save-bar.active{display:flex;}
+    .id-code{
+      font-family:Consolas,Monaco,monospace;
+      color:#1D4ED8;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .row-order{
+      color:#6B7280;
+      font-size:12px;
+      margin-left:6px;
+    }
   </style>
 
 </head>
@@ -51,7 +104,7 @@
       </header>
 
       <section class="notice">
-        已調整為「先看全部資料 → 點編輯進入下一層修改」。每個管理項目都有搜尋、狀態或分類篩選，較適合資料量增加後使用。
+        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；也可按住左側排序圖示拖曳調整顯示順序。
       </section>
 
       <section class="panel">
@@ -80,6 +133,14 @@
               <option value="all">全部類別</option>
             </select>
             <button onclick="clearFilters()">清除篩選</button>
+          </div>
+
+          <div id="sortSaveBar" class="sort-save-bar">
+            <span>排序已變更。請按「儲存排序」寫入資料庫，前台排序才會同步更新。</span>
+            <div class="actions">
+              <button class="primary" onclick="saveSortOrder()">儲存排序</button>
+              <button onclick="loadCurrentTable()">取消變更</button>
+            </div>
           </div>
 
           <div class="table-card">
@@ -208,7 +269,7 @@
         label:'最新消息', kicker:'NEWS', table:'news', preview:'news-detail.html?id=',
         hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
           ['summary','摘要','textarea'],['content','內文','textarea'],['cover_image','封面圖網址（1200×630）','text'],
           ['publish_date','發布日期','date'],['event_name','活動名稱','text'],['event_date','活動日期','text'],
           ['event_address','活動地點（地址）','text'],['phone','電話','text'],['event_content','活動內容','textarea'],
@@ -218,7 +279,7 @@
         subtitle:(x)=>x.publish_date || x.event_date || '-',
         statusKey:'is_published',
         typeOptions:[['all','全部類別'],['親子','親子'],['住宿','住宿'],['北投','北投']],
-        order:'publish_date',
+        order:'sort_order',
         idPrefix:'news',
         tips:`<ul class="tip-list"><li>最新消息封面建議：1200 × 630 px。</li><li>標題建議 18 字以內，摘要建議 40～70 字。</li></ul>`
       },
@@ -226,7 +287,7 @@
         label:'景點管理', kicker:'SPOTS', table:'spots', preview:'spot.html?id=',
         hint:'可用地區、捷運站、標籤搜尋景點。建議景點封面採橫式照片。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
           ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
           ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖網址（1600×900）','text'],
@@ -236,7 +297,7 @@
         subtitle:(x)=>x.area || x.station || '-',
         statusKey:'is_published',
         typeOptions:[['all','全部地區'],['北投','北投'],['新北投','新北投'],['陽明山','陽明山'],['士林','士林'],['淡水','淡水']],
-        order:'id',
+        order:'sort_order',
         idPrefix:'spot',
         tips:`<ul class="tip-list"><li>景點封面建議：1600 × 900 px。</li><li>內容照也建議橫式，避免列表裁切。</li></ul>`
       },
@@ -244,7 +305,7 @@
         label:'美食管理', kicker:'FOODS', table:'foods', preview:'food.html?id=',
         hint:'可用店名、類型、價格、標籤搜尋。建議美食圖片保留餐點與店面主體。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
           ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
           ['price_range','價格區間','text'],['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
           ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖網址（1200×900）','text'],['is_published','狀態','boolean']
@@ -253,7 +314,7 @@
         subtitle:(x)=>x.category || x.average_cost || '-',
         statusKey:'is_published',
         typeOptions:[['all','全部類型'],['小吃','小吃'],['咖啡','咖啡'],['餐廳','餐廳'],['甜點','甜點']],
-        order:'id',
+        order:'sort_order',
         idPrefix:'food',
         tips:`<ul class="tip-list"><li>美食封面建議：1200 × 900 px。</li><li>餐點照可用 4:3，店面照建議橫式。</li></ul>`
       },
@@ -261,7 +322,7 @@
         label:'行程管理', kicker:'TRIPS', table:'trips', preview:'trip.html?id=',
         hint:'可用行程名稱、時間、內容搜尋。行程內容可輸入多段時間與說明。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
           ['summary','摘要','textarea'],['content','行程內容','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址（1600×900）','text'],
           ['is_published','狀態','boolean']
         ],
@@ -269,7 +330,7 @@
         subtitle:(x)=>x.duration || '-',
         statusKey:'is_published',
         typeOptions:[['all','全部類型'],['半日','半日'],['一日','一日'],['親子','親子'],['雨天','雨天']],
-        order:'id',
+        order:'sort_order',
         idPrefix:'trip',
         tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>內容可用「13:00｜地熱谷｜說明」格式，方便閱讀。</li></ul>`
       },
@@ -277,7 +338,7 @@
         label:'優惠管理', kicker:'COUPONS', table:'coupons', preview:'coupon.html?id=',
         hint:'可用優惠名稱、日期、內容搜尋。優惠圖建議方形，方便手機瀏覽。',
         fields:[
-          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],
           ['summary','摘要','textarea'],['content','優惠內容','textarea'],['start_date','開始日期','date'],['end_date','結束日期','date'],
           ['official_website','連結網址','text'],['cover_image','封面圖網址（1080×1080）','text'],['is_published','狀態','boolean']
         ],
@@ -285,7 +346,7 @@
         subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-'),
         statusKey:'is_published',
         typeOptions:[['all','全部類型'],['住宿','住宿'],['美食','美食'],['親子','親子'],['北捷行旅','北捷行旅']],
-        order:'end_date',
+        order:'sort_order',
         idPrefix:'coupon',
         tips:`<ul class="tip-list"><li>優惠券圖片建議：1080 × 1080 px。</li><li>優惠文字請避免直接寫在圖片邊緣，手機會被裁切。</li></ul>`
       }
@@ -293,6 +354,8 @@
 
     let currentTable = 'banners';
     let cache = [];
+    let currentList = [];
+    let draggingId = '';
     let editingId = '';
 
     async function checkLogin(){
@@ -361,7 +424,8 @@
                    currentTable==='foods' ? '類型 / 價格' :
                    currentTable==='trips' ? '建議時間' :
                    currentTable==='coupons' ? '期限' : '日期';
-      document.getElementById('tableHead').innerHTML = `<tr><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
+      const sortHead = currentTable === 'site_settings' ? '' : '<th style="width:56px">排序</th>';
+      document.getElementById('tableHead').innerHTML = `<tr>${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
     }
 
     function nextId(){
@@ -388,7 +452,7 @@
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(name==='id') el.value = nextId();
-        else if(name==='sort_order') el.value = '1';
+        else if(name==='sort_order') el.value = String((cache.map(x=>Number(x.sort_order||0)).reduce((a,b)=>Math.max(a,b),0) || cache.length) + 1);
         else if(name==='is_published' || name==='is_active') el.value = 'true';
         else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
         else el.value = '';
@@ -412,13 +476,14 @@
     async function loadCurrentTable(){
       buildHead();
       const tbody = document.getElementById('listBody');
-      tbody.innerHTML = '<tr><td colspan="4">資料載入中...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6">資料載入中...</td></tr>';
       const cfg = configs[currentTable];
-      const orderCol = cfg.order || 'id';
-      const { data, error } = await db.from(cfg.table).select('*').order(orderCol, { ascending: currentTable==='banners' || currentTable==='site_settings' });
+      const orderCol = cfg.order || 'sort_order';
+      const ascending = currentTable !== 'news';
+      const { data, error } = await db.from(cfg.table).select('*').order(orderCol, { ascending });
       if(error){
         console.error(error);
-        tbody.innerHTML = `<tr><td colspan="4">讀取失敗：${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6">讀取失敗：${error.message}</td></tr>`;
         return;
       }
       cache = data || [];
@@ -441,8 +506,11 @@
         return matchKeyword && matchStatus && matchType;
       });
 
+      currentList = list;
       const tbody = document.getElementById('listBody');
-      if(!list.length){ tbody.innerHTML = '<tr><td colspan="4">沒有符合條件的資料。</td></tr>'; return; }
+      document.getElementById('sortSaveBar').classList.remove('active');
+
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">沒有符合條件的資料。</td></tr>'; return; }
 
       tbody.innerHTML = list.map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
@@ -450,9 +518,16 @@
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
           : `<span class="badge">固定設定</span>`;
         const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
+        const sortCell = currentTable === 'site_settings' ? '' : `
+          <td>
+            <span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span>
+            <span class="row-order">#${item.sort_order ?? '-'}</span>
+          </td>`;
         return `
-          <tr>
-            <td><strong>${title || '未命名'}</strong><br><small>${item.id}</small></td>
+          <tr data-id="${item.id}" draggable="${currentTable === 'site_settings' ? 'false' : 'true'}">
+            ${sortCell}
+            <td><span class="id-code">${item.id}</span></td>
+            <td><strong>${title || '未命名'}</strong></td>
             <td>${cfg.subtitle(item)}</td>
             <td>${statusHtml}</td>
             <td>
@@ -465,6 +540,92 @@
             </td>
           </tr>`;
       }).join('');
+
+      bindDragSort();
+    }
+
+    function bindDragSort(){
+      if(currentTable === 'site_settings') return;
+      document.querySelectorAll('#listBody tr[data-id]').forEach(row=>{
+        row.addEventListener('dragstart', e=>{
+          draggingId = row.dataset.id;
+          row.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', ()=>{
+          row.classList.remove('dragging');
+          document.querySelectorAll('#listBody tr').forEach(r=>r.classList.remove('drag-over'));
+        });
+        row.addEventListener('dragover', e=>{
+          e.preventDefault();
+          if(row.dataset.id !== draggingId) row.classList.add('drag-over');
+        });
+        row.addEventListener('dragleave', ()=>row.classList.remove('drag-over'));
+        row.addEventListener('drop', e=>{
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          if(!draggingId || draggingId === row.dataset.id) return;
+          reorderCurrentList(draggingId, row.dataset.id);
+        });
+      });
+    }
+
+    function reorderCurrentList(fromId, toId){
+      const fromIndex = currentList.findIndex(x=>String(x.id)===String(fromId));
+      const toIndex = currentList.findIndex(x=>String(x.id)===String(toId));
+      if(fromIndex < 0 || toIndex < 0) return;
+      const moved = currentList.splice(fromIndex,1)[0];
+      currentList.splice(toIndex,0,moved);
+
+      // Update visible order only; database is updated after pressing save.
+      currentList.forEach((item, index)=> item.sort_order = index + 1);
+      cache = currentList.concat(cache.filter(x=>!currentList.some(y=>String(y.id)===String(x.id))));
+      renderListFromCurrent();
+      document.getElementById('sortSaveBar').classList.add('active');
+    }
+
+    function renderListFromCurrent(){
+      const cfg = configs[currentTable];
+      const tbody = document.getElementById('listBody');
+      tbody.innerHTML = currentList.map(item=>{
+        const title = item.title || item.footer_title || item.booking_text || item.id;
+        const statusHtml = cfg.statusKey
+          ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
+          : `<span class="badge">固定設定</span>`;
+        const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
+        return `
+          <tr data-id="${item.id}" draggable="true">
+            <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
+            <td><span class="id-code">${item.id}</span></td>
+            <td><strong>${title || '未命名'}</strong></td>
+            <td>${cfg.subtitle(item)}</td>
+            <td>${statusHtml}</td>
+            <td>
+              <div class="actions">
+                <button onclick="editItem('${item.id}')">編輯</button>
+                ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
+                <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
+                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+      bindDragSort();
+    }
+
+    async function saveSortOrder(){
+      if(currentTable === 'site_settings') return;
+      const updates = currentList.map((item, index)=>
+        db.from(configs[currentTable].table).update({sort_order:index+1}).eq('id',item.id)
+      );
+      const results = await Promise.all(updates);
+      const failed = results.find(r=>r.error);
+      if(failed){
+        alert('排序儲存失敗：' + failed.error.message + '\n請確認已執行 sort_order SQL。');
+        return;
+      }
+      document.getElementById('sortSaveBar').classList.remove('active');
+      await loadCurrentTable();
     }
 
     function editItem(id){

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css?v=20260601-drag-sort">
+  <link rel="stylesheet" href="admin.css?v=20260601-trip-sections">
 
   <style>
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
@@ -65,6 +65,52 @@
       color:#6B7280;
       font-size:12px;
       margin-left:6px;
+    }
+  </style>
+
+
+  <style>
+    /* TRIP SECTIONS UPDATE 20260601 */
+    .trip-section-editor{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+    .trip-section-card{
+      border:1px solid #E5E7EB;
+      border-radius:16px;
+      padding:14px;
+      background:#F9FAFB;
+      display:grid;
+      gap:10px;
+    }
+    .trip-section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      cursor:grab;
+    }
+    .trip-section-head strong{
+      color:#1D4ED8;
+    }
+    .trip-section-grid{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:10px;
+    }
+    .trip-section-card textarea{
+      min-height:90px;
+    }
+    .trip-section-card.dragging{
+      opacity:.5;
+    }
+    .trip-section-card.drag-over{
+      outline:2px dashed #2563EB;
+      outline-offset:2px;
+    }
+    @media(max-width:760px){
+      .trip-section-grid{grid-template-columns:1fr}
     }
   </style>
 
@@ -320,11 +366,11 @@
       },
       trips: {
         label:'行程管理', kicker:'TRIPS', table:'trips', preview:'trip.html?id=',
-        hint:'可用行程名稱、時間、內容搜尋。行程內容可輸入多段時間與說明。',
+        hint:'行程改為分段管理。先看列表，點編輯後可自由新增 3 段、4 段或 6 段，每段可填時間、標題、說明與圖片，並可拖曳排序。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
-          ['summary','摘要','textarea'],['content','行程內容','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址（1600×900）','text'],
-          ['is_published','狀態','boolean']
+          ['summary','摘要','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址（1600×900）','text'],
+          ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
         ],
         columns:['title','duration','is_published'],
         subtitle:(x)=>x.duration || '-',
@@ -332,7 +378,7 @@
         typeOptions:[['all','全部類型'],['半日','半日'],['一日','一日'],['親子','親子'],['雨天','雨天']],
         order:'sort_order',
         idPrefix:'trip',
-        tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>內容可用「13:00｜地熱谷｜說明」格式，方便閱讀。</li></ul>`
+        tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>分段建議：每段填「時間、標題、說明、圖片網址」。</li><li>可新增任意段數，例如 3 段、4 段或 6 段，並拖曳調整順序。</li><li>若圖片留空，前台只顯示文字段落。</li></ul>`
       },
       coupons: {
         label:'優惠管理', kicker:'COUPONS', table:'coupons', preview:'coupon.html?id=',
@@ -408,6 +454,7 @@
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
       wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
         if(type === 'boolean') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
         if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
@@ -457,6 +504,7 @@
         else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
         else el.value = '';
       });
+      if(currentTable === 'trips') renderTripSections([]);
       updateImagePreview();
     }
 
@@ -646,6 +694,7 @@
       document.getElementById('deleteInEditor').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
       document.getElementById('listView').classList.add('hidden');
       document.getElementById('editorView').classList.add('active');
+      if(currentTable === 'trips') renderTripSections(item.trip_sections || []);
       updateImagePreview();
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -655,7 +704,8 @@
       configs[currentTable].fields.forEach(([name,label,type])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
-        if(type==='boolean' || type==='booleanActive') payload[name] = el.value === 'true';
+        if(type==='sections') payload[name] = collectTripSections();
+        else if(type==='boolean' || type==='booleanActive') payload[name] = el.value === 'true';
         else if(type==='number') payload[name] = el.value === '' ? null : Number(el.value);
         else payload[name] = String(el.value || '').trim();
       });
@@ -716,6 +766,129 @@
         preview.textContent = '圖片預覽';
       }
     }
+
+
+    function normalizeTripSections(sections){
+      if(!Array.isArray(sections)) return [];
+      return sections.map((s, index)=>({
+        time: s.time || '',
+        title: s.title || '',
+        text: s.text || s.description || '',
+        image: s.image || s.image_url || '',
+        order: Number(s.order || index + 1)
+      })).sort((a,b)=>a.order-b.order);
+    }
+
+    function renderTripSections(sections){
+      const editor = document.getElementById('tripSectionsEditor');
+      const hidden = document.getElementById('f_trip_sections');
+      if(!editor || !hidden) return;
+
+      const list = normalizeTripSections(sections);
+      hidden.value = JSON.stringify(list);
+
+      if(!list.length){
+        editor.innerHTML = '<div class="help">尚未新增分段。請按「＋新增一段」。</div>';
+        return;
+      }
+
+      editor.innerHTML = list.map((s,index)=>`
+        <div class="trip-section-card" draggable="true" data-index="${index}">
+          <div class="trip-section-head">
+            <strong>第 ${String(index+1).padStart(2,'0')} 段</strong>
+            <div class="actions">
+              <button type="button" onclick="removeTripSection(${index})">刪除此段</button>
+            </div>
+          </div>
+          <div class="trip-section-grid">
+            <div class="form-row">
+              <label>時間</label>
+              <input data-field="time" value="${escapeHtml(s.time)}" placeholder="13:00" oninput="syncTripSections()">
+            </div>
+            <div class="form-row">
+              <label>段落標題</label>
+              <input data-field="title" value="${escapeHtml(s.title)}" placeholder="地熱谷" oninput="syncTripSections()">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>說明</label>
+            <textarea data-field="text" placeholder="這一站的介紹與注意事項" oninput="syncTripSections()">${escapeHtml(s.text)}</textarea>
+          </div>
+          <div class="form-row">
+            <label>圖片網址（可留空）</label>
+            <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
+          </div>
+        </div>
+      `).join('');
+
+      bindTripSectionDrag();
+    }
+
+    function collectTripSections(){
+      const cards = [...document.querySelectorAll('.trip-section-card')];
+      return cards.map((card,index)=>({
+        time: card.querySelector('[data-field="time"]')?.value.trim() || '',
+        title: card.querySelector('[data-field="title"]')?.value.trim() || '',
+        text: card.querySelector('[data-field="text"]')?.value.trim() || '',
+        image: card.querySelector('[data-field="image"]')?.value.trim() || '',
+        order: index + 1
+      })).filter(s=>s.time || s.title || s.text || s.image);
+    }
+
+    function syncTripSections(){
+      const hidden = document.getElementById('f_trip_sections');
+      if(hidden) hidden.value = JSON.stringify(collectTripSections());
+    }
+
+    function addTripSection(){
+      const list = collectTripSections();
+      list.push({time:'', title:'', text:'', image:'', order:list.length+1});
+      renderTripSections(list);
+    }
+
+    function removeTripSection(index){
+      const list = collectTripSections();
+      list.splice(index,1);
+      renderTripSections(list);
+    }
+
+    function bindTripSectionDrag(){
+      let fromIndex = null;
+      document.querySelectorAll('.trip-section-card').forEach(card=>{
+        card.addEventListener('dragstart',()=>{
+          fromIndex = Number(card.dataset.index);
+          card.classList.add('dragging');
+        });
+        card.addEventListener('dragend',()=>{
+          card.classList.remove('dragging');
+          document.querySelectorAll('.trip-section-card').forEach(c=>c.classList.remove('drag-over'));
+        });
+        card.addEventListener('dragover',e=>{
+          e.preventDefault();
+          card.classList.add('drag-over');
+        });
+        card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+        card.addEventListener('drop',e=>{
+          e.preventDefault();
+          const toIndex = Number(card.dataset.index);
+          if(fromIndex === null || fromIndex === toIndex) return;
+          const list = collectTripSections();
+          const moved = list.splice(fromIndex,1)[0];
+          list.splice(toIndex,0,moved);
+          renderTripSections(list);
+        });
+      });
+    }
+
+    function escapeHtml(value){
+      return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
 
     checkLogin();
   </script>

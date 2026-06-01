@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>後台登入｜Metro Inn Guide</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="kicker">METRO INN GUIDE CMS</div>
+    <h1>北投旅圖後台登入</h1>
+    <p>請使用 Supabase Auth 建立的管理員 Email 與密碼登入。</p>
+
+    <div class="form-row">
+      <label>帳號 Email</label>
+      <input id="email" type="email" placeholder="admin@example.com" autocomplete="username">
+    </div>
+    <div class="form-row">
+      <label>密碼</label>
+      <input id="password" type="password" placeholder="請輸入密碼" autocomplete="current-password">
+    </div>
+    <button class="primary full" onclick="login()">登入後台</button>
+    <div id="msg" class="msg"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function login(){
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = '登入中...';
+
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if(error){
+        msg.textContent = '登入失敗：' + error.message;
+        return;
+      }
+      location.href = 'admin.html';
+    }
+
+    db.auth.getSession().then(({data})=>{
+      if(data.session) location.href = 'admin.html';
+    });
+  </script>
+</body>
+</html>

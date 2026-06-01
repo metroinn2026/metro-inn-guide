@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Metro Inn Guide｜北投旅圖 CMS 管理後台</title>
   <link rel="stylesheet" href="admin.css">
+
+  <style>
+    textarea{
+      border:1px solid var(--line);
+      padding:12px 14px;
+      color:var(--ink);
+      background:#fff;
+      font-size:15px;
+      width:100%;
+      font-family:Arial,'Noto Sans TC',sans-serif;
+      resize:vertical;
+    }
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+  </style>
 </head>
 <body>
   <div class="admin-shell">
@@ -109,33 +123,127 @@
       </section>
 
       <section id="news" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">NEWS</p><h2>最新消息管理</h2></div><button class="primary">新增最新消息</button></div>
-        <div class="notice">最新消息用於發布北投會館活動、住宿專案、季節推薦與合作資訊。首頁建議只顯示 4 則，避免搶走旅遊內容主軸。</div>
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">NEWS</p>
+            <h2>最新消息管理</h2>
+          </div>
+          <button class="primary" type="button" onclick="openNewsForm()">新增最新消息</button>
+        </div>
+
+        <div class="notice">
+          這裡會直接讀取 Supabase 的 news 資料表。可新增、編輯、上架／下架最新消息。
+        </div>
+
         <div class="grid two">
           <div class="card">
-            <h3>首頁最新消息設定</h3>
-            <ol class="sort-list">
-              <li>捷伴童行親子專案即將開賣</li>
-              <li>北投溫泉慢旅住房專案</li>
-              <li>陽明山季節散策推薦</li>
-              <li>合作店家優惠陸續上架</li>
-            </ol>
-            <button>調整排序</button>
+            <h3 id="newsFormTitle">新增最新消息</h3>
+
+            <input type="hidden" id="newsId">
+
+            <div class="form-row">
+              <label>標題 title</label>
+              <input id="newsTitle" placeholder="例如：捷伴童行親子住房專案">
+            </div>
+
+            <div class="form-row">
+              <label>網址代稱 slug</label>
+              <input id="newsSlug" placeholder="例如：parent-child-trip">
+            </div>
+
+            <div class="form-row">
+              <label>摘要 summary</label>
+              <input id="newsSummary" placeholder="列表與內頁開頭摘要">
+            </div>
+
+            <div class="form-row">
+              <label>內文 content</label>
+              <textarea id="newsContent" rows="5" placeholder="最新消息內文"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>封面圖網址 cover_image</label>
+              <input id="newsCoverImage" placeholder="https://...">
+            </div>
+
+            <div class="form-row">
+              <label>發布日期 publish_date</label>
+              <input id="newsPublishDate" type="date">
+            </div>
+
+            <h3 style="margin-top:22px">活動資訊卡</h3>
+
+            <div class="form-row">
+              <label>活動名稱 event_name</label>
+              <input id="newsEventName" placeholder="例如：捷伴童行親子住房專案">
+            </div>
+
+            <div class="form-row">
+              <label>活動日期 event_date</label>
+              <input id="newsEventDate" placeholder="例如：2026/06/11–2026/08/31">
+            </div>
+
+            <div class="form-row">
+              <label>活動地點（地址） event_address</label>
+              <input id="newsEventAddress" placeholder="台北市北投區...">
+            </div>
+
+            <div class="form-row">
+              <label>電話 phone</label>
+              <input id="newsPhone" placeholder="02-xxxx-xxxx">
+            </div>
+
+            <div class="form-row">
+              <label>活動內容 event_content</label>
+              <textarea id="newsEventContent" rows="4" placeholder="活動內容說明"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>備註 remark</label>
+              <textarea id="newsRemark" rows="3" placeholder="依官網公告為準"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>狀態</label>
+              <select id="newsPublished">
+                <option value="true">已上架</option>
+                <option value="false">草稿 / 下架</option>
+              </select>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" onclick="saveNews()">儲存</button>
+              <button type="button" onclick="resetNewsForm()">清空</button>
+            </div>
+
+            <p id="newsFormMessage" style="margin-top:14px;color:#F3653B;"></p>
           </div>
+
           <div class="card">
-            <h3>消息欄位</h3>
-            <div class="form-row"><label>標題</label><input value="捷伴童行親子專案即將開賣"></div>
-            <div class="form-row"><label>分類</label><select><option>活動</option><option>住宿專案</option><option>公告</option><option>合作活動</option></select></div>
-            <div class="form-row"><label>發布日期</label><input value="2026/06/11"></div>
+            <h3>操作說明</h3>
+            <p>1. 新增時 ID 會自動產生。</p>
+            <p>2. slug 建議使用英文小寫與連字號，例如 parent-child-trip。</p>
+            <p>3. 若要暫時不顯示在前台，狀態選「草稿 / 下架」。</p>
+            <p>4. 儲存後，前台 news.html 與 news-detail.html 會同步讀取資料。</p>
           </div>
         </div>
-        <div class="table-card" style="margin-top:18px"><table>
-          <tr><th>標題</th><th>分類</th><th>發布日期</th><th>首頁推薦</th><th>狀態</th><th></th></tr>
-          <tr><td>捷伴童行親子專案即將開賣</td><td>活動</td><td>2026/06/11</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>北投溫泉慢旅住房專案</td><td>住宿專案</td><td>2026/06/01</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>陽明山季節散策推薦</td><td>季節</td><td>2026/05/20</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>合作店家優惠陸續上架</td><td>合作活動</td><td>2026/05/15</td><td>是</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-        </table></div>
+
+        <div class="table-card" style="margin-top:18px">
+          <table>
+            <thead>
+              <tr>
+                <th>標題</th>
+                <th>活動日期</th>
+                <th>發布日期</th>
+                <th>狀態</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="newsTable">
+              <tr><td colspan="5">資料載入中...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section id="spots" class="panel">
@@ -234,13 +342,219 @@
       </section>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script>
     const links = document.querySelectorAll('.side-nav a');
-    const sections = document.querySelectorAll('.panel');
     links.forEach(link => link.addEventListener('click', () => {
       links.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
     }));
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let newsCache = [];
+
+    function showNewsMessage(text) {
+      const el = document.getElementById('newsFormMessage');
+      if (el) el.textContent = text || '';
+    }
+
+    function generateNewsId() {
+      const nums = newsCache
+        .map(item => String(item.id || '').replace('news_', ''))
+        .map(value => parseInt(value, 10))
+        .filter(num => !Number.isNaN(num));
+      const next = nums.length ? Math.max(...nums) + 1 : 1;
+      return `news_${String(next).padStart(4, '0')}`;
+    }
+
+    function slugify(text) {
+      return String(text || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
+        .replace(/^-+|-+$/g, '') || `news-${Date.now()}`;
+    }
+
+    async function loadNews() {
+      const tbody = document.getElementById('newsTable');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="5">資料載入中...</td></tr>';
+
+      const { data, error } = await db
+        .from('news')
+        .select('*')
+        .order('publish_date', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5">讀取失敗，請確認 news 的 RLS policy / Data API / anon select 權限。</td></tr>';
+        return;
+      }
+
+      newsCache = data || [];
+      renderNews(newsCache);
+    }
+
+    function renderNews(list) {
+      const tbody = document.getElementById('newsTable');
+      if (!tbody) return;
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="5">目前沒有最新消息。</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => `
+        <tr>
+          <td>
+            <strong>${item.title || '未命名'}</strong><br>
+            <small>${item.id || ''}</small>
+          </td>
+          <td>${item.event_date || '-'}</td>
+          <td>${item.publish_date || '-'}</td>
+          <td>
+            <span class="status ${item.is_published ? 'on' : 'draft'}">
+              ${item.is_published ? '已上架' : '草稿'}
+            </span>
+          </td>
+          <td>
+            <button type="button" onclick="editNews('${item.id}')">編輯</button>
+            <button type="button" onclick="toggleNews('${item.id}')">${item.is_published ? '下架' : '上架'}</button>
+            <button type="button" onclick="deleteNews('${item.id}')">刪除</button>
+            <a class="primary" href="news-detail.html?id=${encodeURIComponent(item.id)}" target="_blank">預覽</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openNewsForm() {
+      location.hash = '#news';
+      resetNewsForm();
+      document.getElementById('newsTitle')?.focus();
+    }
+
+    function resetNewsForm() {
+      document.getElementById('newsFormTitle').textContent = '新增最新消息';
+      document.getElementById('newsId').value = '';
+      document.getElementById('newsTitle').value = '';
+      document.getElementById('newsSlug').value = '';
+      document.getElementById('newsSummary').value = '';
+      document.getElementById('newsContent').value = '';
+      document.getElementById('newsCoverImage').value = '';
+      document.getElementById('newsPublishDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('newsEventName').value = '';
+      document.getElementById('newsEventDate').value = '';
+      document.getElementById('newsEventAddress').value = '';
+      document.getElementById('newsPhone').value = '';
+      document.getElementById('newsEventContent').value = '';
+      document.getElementById('newsRemark').value = '';
+      document.getElementById('newsPublished').value = 'true';
+      showNewsMessage('');
+    }
+
+    function editNews(id) {
+      const item = newsCache.find(row => row.id === id);
+      if (!item) return;
+
+      location.hash = '#news';
+      document.getElementById('newsFormTitle').textContent = '編輯最新消息';
+      document.getElementById('newsId').value = item.id || '';
+      document.getElementById('newsTitle').value = item.title || '';
+      document.getElementById('newsSlug').value = item.slug || '';
+      document.getElementById('newsSummary').value = item.summary || '';
+      document.getElementById('newsContent').value = item.content || '';
+      document.getElementById('newsCoverImage').value = item.cover_image || '';
+      document.getElementById('newsPublishDate').value = item.publish_date || '';
+      document.getElementById('newsEventName').value = item.event_name || '';
+      document.getElementById('newsEventDate').value = item.event_date || '';
+      document.getElementById('newsEventAddress').value = item.event_address || '';
+      document.getElementById('newsPhone').value = item.phone || '';
+      document.getElementById('newsEventContent').value = item.event_content || '';
+      document.getElementById('newsRemark').value = item.remark || '';
+      document.getElementById('newsPublished').value = item.is_published ? 'true' : 'false';
+      showNewsMessage('目前正在編輯：' + (item.title || item.id));
+    }
+
+    async function saveNews() {
+      const existingId = document.getElementById('newsId').value;
+      const title = document.getElementById('newsTitle').value.trim();
+
+      if (!title) {
+        showNewsMessage('請先輸入標題。');
+        return;
+      }
+
+      const payload = {
+        id: existingId || generateNewsId(),
+        slug: document.getElementById('newsSlug').value.trim() || slugify(title),
+        title,
+        summary: document.getElementById('newsSummary').value.trim(),
+        content: document.getElementById('newsContent').value.trim(),
+        cover_image: document.getElementById('newsCoverImage').value.trim(),
+        publish_date: document.getElementById('newsPublishDate').value || null,
+        event_name: document.getElementById('newsEventName').value.trim(),
+        event_date: document.getElementById('newsEventDate').value.trim(),
+        event_address: document.getElementById('newsEventAddress').value.trim(),
+        phone: document.getElementById('newsPhone').value.trim(),
+        event_content: document.getElementById('newsEventContent').value.trim(),
+        remark: document.getElementById('newsRemark').value.trim(),
+        is_published: document.getElementById('newsPublished').value === 'true'
+      };
+
+      const { error } = await db
+        .from('news')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (error) {
+        console.error(error);
+        showNewsMessage('儲存失敗：請確認 news 已開啟 INSERT / UPDATE 權限。');
+        return;
+      }
+
+      showNewsMessage('已儲存。');
+      await loadNews();
+      document.getElementById('newsId').value = payload.id;
+      document.getElementById('newsFormTitle').textContent = '編輯最新消息';
+    }
+
+    async function toggleNews(id) {
+      const item = newsCache.find(row => row.id === id);
+      if (!item) return;
+
+      const { error } = await db
+        .from('news')
+        .update({ is_published: !item.is_published })
+        .eq('id', id);
+
+      if (error) {
+        console.error(error);
+        alert('更新失敗：請確認 news 已開啟 UPDATE 權限。');
+        return;
+      }
+
+      await loadNews();
+    }
+
+    async function deleteNews(id) {
+      if (!confirm('確定要刪除這筆最新消息嗎？')) return;
+
+      const { error } = await db
+        .from('news')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error(error);
+        alert('刪除失敗：請確認 news 已開啟 DELETE 權限。');
+        return;
+      }
+
+      resetNewsForm();
+      await loadNews();
+    }
+
+    resetNewsForm();
+    loadNews();
   </script>
 </body>
 </html>

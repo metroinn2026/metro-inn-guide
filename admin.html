@@ -4,7 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=20260601-listfix">
+
+  <style>
+    /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
+    .panel{display:block!important;}
+    .list-view{display:block!important;}
+    .list-view.hidden{display:none!important;}
+    .editor-view{display:none!important;}
+    .editor-view.active{display:block!important;}
+  </style>
+
 </head>
 <body>
   <div class="admin-shell">

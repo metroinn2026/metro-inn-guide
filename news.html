@@ -1,1 +1,148 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>最新消息｜Metro Inn Guide 北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script></head><body id="top"><div id="header"></div><section class="hero coupon-hero"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85"><div class="container"><div class="hero-content"><div class="kicker">LATEST NEWS</div><h1>最新消息</h1><p>北投會館活動、住宿專案、親子體驗與合作優惠資訊，都整理在這裡。</p></div></div></section><section class="crumb"><div class="container"><span>首頁 ＞ 最新消息</span><button class="share-icon" aria-label="分享網頁">↗</button></div></section><section class="section"><div class="container"><div class="section-head"><div><div class="kicker">NEWS LIST</div><h2>活動與公告</h2></div><p>首頁只顯示最新四則，完整列表可依活動、住宿、季節與合作分類管理。</p></div><div class="grid4"><a class="card" href="news-kids.html"><div class="card-img"><img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=1600&q=85"></div><div class="card-pad"><div class="meta">活動 · 2026.06.11</div><h3>捷伴童行親子專案即將開賣</h3><p>結合住宿、親子體驗與在地旅遊，從北投出發安排一場剛剛好的小旅行。</p><span class="arrow">→</span></div></a><a class="card" href="news-kids.html"><div class="card-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg"></div><div class="card-pad"><div class="meta">住宿 · 2026.06.01</div><h3>北投溫泉慢旅住房專案</h3><p>把午後留給北投，入住後可搭配周邊景點與合作優惠。</p><span class="arrow">→</span></div></a><a class="card" href="news-kids.html"><div class="card-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg"></div><div class="card-pad"><div class="meta">季節 · 2026.05.20</div><h3>陽明山季節散策推薦</h3><p>整理適合半日遊的山城路線，從北投會館出發也能輕鬆安排。</p><span class="arrow">→</span></div></a><a class="card" href="news-kids.html"><div class="card-img"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85"></div><div class="card-pad"><div class="meta">合作 · 2026.05.15</div><h3>合作店家優惠陸續上架</h3><p>出示優惠頁面即可使用，讓旅客更容易探索周邊店家。</p><span class="arrow">→</span></div></a></div></div></section><div id="footer"></div><script>document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();</script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>最新消息｜Metro Inn Guide 北投旅圖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+
+<body id="top">
+  <div id="header"></div>
+
+  <section class="directory-hero">
+    <div class="container">
+      <div class="kicker">NEWS</div>
+      <h1>最新消息</h1>
+      <p>整理北投會館最新活動、住宿專案與旅遊推薦，旅客可以先看活動，再延伸安排景點、美食與優惠。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-row">
+        <div class="filter-pills">
+          <a class="pill active" data-keyword="all">全部</a>
+          <a class="pill" data-keyword="親子">親子活動</a>
+          <a class="pill" data-keyword="住宿">住宿專案</a>
+          <a class="pill" data-keyword="北投">北投小旅行</a>
+        </div>
+        <a class="section-link" href="index.html">回首頁搜尋 →</a>
+      </div>
+
+      <div id="newsStatus" class="empty-state">最新消息載入中...</div>
+      <div id="newsGrid" class="directory-grid"></div>
+
+      <div class="pagination">
+        <span class="active">1</span>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+  <script>
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
+
+    const statusEl = document.getElementById('newsStatus');
+    const gridEl = document.getElementById('newsGrid');
+    let allNews = [];
+
+    const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
+
+    function getMeta(item) {
+      const text = `${item.title || ''} ${item.summary || ''} ${item.content || ''} ${item.event_name || ''} ${item.event_content || ''}`;
+      if (text.includes('親子')) return 'FAMILY';
+      if (text.includes('住宿') || text.includes('住房')) return 'STAY';
+      if (text.includes('北投')) return 'BEITOU';
+      return 'NEWS';
+    }
+
+    function renderNews(items) {
+      gridEl.innerHTML = '';
+
+      if (!items.length) {
+        statusEl.textContent = '目前沒有符合條件的最新消息。';
+        statusEl.style.display = 'block';
+        return;
+      }
+
+      statusEl.style.display = 'none';
+
+      items.forEach(item => {
+        const image = item.cover_image || fallbackImage;
+        const summary = item.summary || '更多內容即將補上。';
+        const date = item.publish_date ? `發布日期：${item.publish_date}` : '';
+        const href = `news-detail.html?id=${encodeURIComponent(item.id)}`;
+
+        const card = document.createElement('a');
+        card.className = 'directory-card';
+        card.href = href;
+        card.innerHTML = `
+          <div class="directory-img">
+            <img src="${image}" alt="${item.title || ''}">
+          </div>
+          <div class="directory-body">
+            <div class="meta">${getMeta(item)}</div>
+            <h3>${item.title || '未命名消息'}</h3>
+            <p>${summary}</p>
+            ${date ? `<div class="hours-line">${date}</div>` : ''}
+            <span class="arrow">→</span>
+          </div>
+        `;
+        gridEl.appendChild(card);
+      });
+    }
+
+    async function loadNews() {
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/news?is_published=eq.true&select=*&order=publish_date.desc`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          console.error('Supabase error:', result);
+          throw new Error(result.message || 'Supabase 讀取失敗');
+        }
+
+        allNews = result;
+        renderNews(allNews);
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = '最新消息資料暫時無法載入，請稍後再試。';
+      }
+    }
+
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
+        pill.classList.add('active');
+
+        const keyword = pill.dataset.keyword;
+
+        if (keyword === 'all') {
+          renderNews(allNews);
+        } else {
+          renderNews(allNews.filter(item => {
+            const text = `${item.title || ''} ${item.summary || ''} ${item.content || ''} ${item.event_name || ''} ${item.event_content || ''}`;
+            return text.includes(keyword);
+          }));
+        }
+      });
+    });
+
+    loadNews();
+  </script>
+</body>
+</html>

@@ -54,3 +54,5 @@ th{color:var(--muted);background:#F9FAFB;font-size:13px}
   .topbar,.panel-head{flex-direction:column;align-items:flex-start}.two{grid-template-columns:1fr}
   table{min-width:860px}.toolbar{grid-template-columns:1fr}
 }
+
+.sidebar{overflow-y:auto}.notice strong{color:#2563EB}

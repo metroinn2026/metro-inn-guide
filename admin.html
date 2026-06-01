@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <!-- NEW_ADMIN_CMS_V2_20260601 -->
+  <!-- NEW_ADMIN_CMS_V3_BANNER_SETTINGS_20260601 -->
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -20,6 +20,8 @@
         <a data-table="foods">美食管理</a>
         <a data-table="trips">行程管理</a>
         <a data-table="coupons">優惠管理</a>
+        <a data-table="banners">Banner 管理</a>
+        <a data-table="site_settings">頁首／頁尾設定</a>
       </nav>
       <div class="side-bottom">
         <a class="button" href="index.html" target="_blank">開啟前台預覽 ↗</a>
@@ -39,8 +41,8 @@
       </header>
 
       <section class="notice">
-        後台已串接 Supabase。新增、編輯、上架／下架後，前台頁面會直接讀取最新資料。
-        第一次使用前，請先完成我提供的 SQL 權限設定。
+        後台已串接 Supabase。可管理最新消息、景點、美食、行程、優惠、首頁 Banner 及頁首／頁尾資訊。
+        Banner 最多建議 4 張輪播；圖片可先上傳到 images 資料夾或外部圖床，再把圖片網址貼入欄位。
       </section>
 
       <section id="editorPanel" class="panel active">
@@ -104,13 +106,14 @@
     const configs = {
       news: {
         label:'最新消息', kicker:'NEWS', preview:'news-detail.html?id=',
+        help:'最新消息封面建議 1200×630px（JPG/WEBP，單張 ≤ 500KB）。活動資訊卡會顯示於內頁。',
         fields:[
           ['id','ID','text','auto'],
           ['slug','網址代稱 slug','text'],
           ['title','標題','text','required'],
           ['summary','摘要','textarea'],
           ['content','內文','textarea'],
-          ['cover_image','封面圖網址','text'],
+          ['cover_image','封面圖網址｜建議 1200×630px','text'],
           ['publish_date','發布日期','date'],
           ['event_name','活動名稱','text'],
           ['event_date','活動日期','text'],
@@ -124,77 +127,63 @@
       },
       spots: {
         label:'景點管理', kicker:'SPOTS', preview:'spot.html?id=',
+        help:'景點照片建議 1600×900px；若是直式照片請保留主體在中央，避免列表裁切。',
         fields:[
-          ['id','ID','text','auto'],
-          ['slug','網址代稱 slug','text'],
-          ['title','景點名稱','text','required'],
-          ['area','地區','text'],
-          ['station','最近捷運站','text'],
-          ['summary','摘要','textarea'],
-          ['content','介紹內容','textarea'],
-          ['address','地址','text'],
-          ['business_hours','營業時間','text'],
-          ['stay_time','建議停留','text'],
-          ['tags','標籤','text'],
-          ['google_map','Google Map連結','text'],
-          ['official_website','官方網站','text'],
-          ['cover_image','封面圖網址','text'],
-          ['is_published','狀態','boolean']
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
+          ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
+          ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
+          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖網址｜建議 1600×900px','text'],['is_published','狀態','boolean']
         ],
         subtitle:(x)=>x.area || x.station || '-'
       },
       foods: {
         label:'美食管理', kicker:'FOODS', preview:'food.html?id=',
+        help:'美食照片建議 1200×900px；店面環境可用 1600×900px，餐點特寫可用 4:3。',
         fields:[
-          ['id','ID','text','auto'],
-          ['slug','網址代稱 slug','text'],
-          ['title','店名','text','required'],
-          ['category','類型','text'],
-          ['address','地址','text'],
-          ['business_hours','營業時間','text'],
-          ['phone','電話','text'],
-          ['average_cost','平均消費','text'],
-          ['price_range','價格區間','text'],
-          ['tags','標籤','text'],
-          ['google_map','Google Map連結','text'],
-          ['official_website','官方網站','text'],
-          ['summary','摘要','textarea'],
-          ['content','介紹內容','textarea'],
-          ['cover_image','封面圖網址','text'],
-          ['is_published','狀態','boolean']
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
+          ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],['price_range','價格區間','text'],
+          ['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
+          ['cover_image','封面圖網址｜建議 1200×900px','text'],['is_published','狀態','boolean']
         ],
         subtitle:(x)=>x.category || x.average_cost || '-'
       },
       trips: {
         label:'行程管理', kicker:'TRIPS', preview:'trip.html?id=',
+        help:'行程封面建議 1600×900px；內容可用「時間｜地點｜說明」分段，前台會以文章方式呈現。',
         fields:[
-          ['id','ID','text','auto'],
-          ['slug','網址代稱 slug','text'],
-          ['title','行程名稱','text','required'],
-          ['duration','建議時間','text'],
-          ['summary','摘要','textarea'],
-          ['content','行程內容（方案B格式）','textarea'],
-          ['google_route','Google路線','text'],
-          ['cover_image','封面圖網址','text'],
-          ['is_published','狀態','boolean']
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
+          ['summary','摘要','textarea'],['content','行程內容（方案B格式）','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址｜建議 1600×900px','text'],['is_published','狀態','boolean']
         ],
         subtitle:(x)=>x.duration || '-'
       },
       coupons: {
         label:'優惠管理', kicker:'COUPONS', preview:'coupon.html?id=',
+        help:'優惠券圖片建議 1080×1080px；若需列表裁切，請把文字放在中央安全區。',
         fields:[
-          ['id','ID','text','auto'],
-          ['slug','網址代稱 slug','text'],
-          ['title','優惠名稱','text','required'],
-          ['summary','摘要','textarea'],
-          ['content','優惠內容','textarea'],
-          ['start_date','開始日期','date'],
-          ['end_date','結束日期','date'],
-          ['official_website','連結網址','text'],
-          ['cover_image','封面圖網址','text'],
-          ['is_published','狀態','boolean']
+          ['id','ID','text','auto'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],['summary','摘要','textarea'],['content','優惠內容','textarea'],
+          ['start_date','開始日期','date'],['end_date','結束日期','date'],['official_website','連結網址','text'],['cover_image','封面圖網址｜建議 1080×1080px','text'],['is_published','狀態','boolean']
         ],
         subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-')
+      },
+      banners: {
+        label:'Banner 管理', kicker:'BANNER', preview:'index.html',
+        help:'首頁上方 Banner 最多 4 張輪播。桌機建議 1920×720px；手機建議 1080×1350px；格式 JPG/WEBP；單張 ≤ 500KB；文字安全區左右各預留約 250px。',
+        fields:[
+          ['id','ID','text','auto'],['title','Banner 標題','text','required'],['subtitle','Banner 副標','textarea'],['image_url','桌機圖片網址｜建議 1920×720px','text','required'],
+          ['mobile_image_url','手機圖片網址｜建議 1080×1350px','text'],['button_text','按鈕文字','text'],['button_url','按鈕連結','text'],['sort_order','排序 1–4','number'],['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>'排序 ' + (x.sort_order || '-')
+      },
+      site_settings: {
+        label:'頁首／頁尾設定', kicker:'SETTINGS', preview:'index.html',
+        help:'這裡控制全站頁首與頁尾。Logo 建議 SVG 或 PNG，高度約 80px；社群圖示若使用圖片建議 64×64px；Google Map 可貼網址。',
+        fields:[
+          ['id','ID','text','auto'],['site_title','網站名稱','text','required'],['site_subtitle','網站副標','text'],['logo_text','頁首 Logo 文字','text'],
+          ['booking_text','訂房按鈕文字','text'],['booking_url','訂房按鈕連結','text'],['hotel_url','北投會館連結','text'],
+          ['footer_description','頁尾簡介','textarea'],['footer_address','地址','text'],['footer_phone','電話','text'],['footer_email','Email','text'],
+          ['facebook_url','Facebook 連結','text'],['instagram_url','Instagram 連結','text'],['line_url','LINE 連結','text'],['google_map_url','Google Map 連結','text'],['footer_copyright','版權文字','text']
+        ],
+        subtitle:(x)=>x.site_title || '網站設定'
       }
     };
 
@@ -234,7 +223,7 @@
     function buildForm(){
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
-      wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+      wrap.innerHTML = `<div class="notice">${cfg.help || ''}</div>` + cfg.fields.map(([name,label,type,flag])=>{
         if(type === 'textarea'){
           return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5"></textarea></div>`;
         }
@@ -247,10 +236,9 @@
     }
 
     function nextId(){
-      const prefix = currentTable === 'news' ? 'news' :
-        currentTable === 'spots' ? 'spot' :
-        currentTable === 'foods' ? 'food' :
-        currentTable === 'trips' ? 'trip' : 'coupon';
+      const prefixMap = {news:'news',spots:'spot',foods:'food',trips:'trip',coupons:'coupon',banners:'banner',site_settings:'site'};
+      const prefix = prefixMap[currentTable] || 'item';
+      if(currentTable === 'site_settings') return 'site_0001';
       const nums = cache.map(x=>String(x.id||'').replace(prefix+'_','')).map(n=>parseInt(n,10)).filter(n=>!isNaN(n));
       const next = nums.length ? Math.max(...nums)+1 : 1;
       return `${prefix}_${String(next).padStart(4,'0')}`;
@@ -273,6 +261,10 @@
         if(name==='id') el.value = nextId();
         else if(name==='is_published') el.value = 'true';
         else if(type==='date' && (name==='publish_date')) el.value = new Date().toISOString().slice(0,10);
+        else if(name==='sort_order') el.value = String(Math.min(cache.length + 1, 4));
+        else if(name==='site_title') el.value = 'Metro Inn Guide｜北投旅圖';
+        else if(name==='logo_text') el.value = 'Metro Inn Guide｜北投旅圖';
+        else if(name==='booking_text') el.value = '立即訂房 ↗';
         else el.value = '';
       });
     }
@@ -283,8 +275,8 @@
       const tbody = document.getElementById('listBody');
       tbody.innerHTML = '<tr><td colspan="4">資料載入中...</td></tr>';
 
-      const orderCol = currentTable === 'news' ? 'publish_date' : 'id';
-      const { data, error } = await db.from(currentTable).select('*').order(orderCol, { ascending:false });
+      const orderCol = currentTable === 'news' ? 'publish_date' : (currentTable === 'banners' ? 'sort_order' : 'id');
+      const { data, error } = await db.from(currentTable).select('*').order(orderCol, { ascending: currentTable === 'banners' });
       if(error){
         console.error(error);
         tbody.innerHTML = `<tr><td colspan="4">讀取失敗：${error.message}</td></tr>`;
@@ -316,7 +308,7 @@
 
       tbody.innerHTML = list.map(item=>`
         <tr>
-          <td><strong>${item.title || item.id}</strong><br><small>${item.id}</small></td>
+          <td><strong>${item.title || item.site_title || item.id}</strong><br><small>${item.id}</small></td>
           <td>${configs[currentTable].subtitle(item)}</td>
           <td><span class="status ${item.is_published?'on':'draft'}">${item.is_published?'已上架':'草稿'}</span></td>
           <td>
@@ -324,7 +316,7 @@
               <button onclick="editItem('${item.id}')">編輯</button>
               <button onclick="toggleItem('${item.id}')">${item.is_published?'下架':'上架'}</button>
               <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
-              <a class="button" target="_blank" href="${configs[currentTable].preview}${encodeURIComponent(item.id)}">預覽</a>
+              <a class="button" target="_blank" href="${currentTable === 'banners' || currentTable === 'site_settings' ? configs[currentTable].preview : configs[currentTable].preview + encodeURIComponent(item.id)}">預覽</a>
             </div>
           </td>
         </tr>
@@ -343,7 +335,7 @@
         else el.value = item[name] ?? '';
       });
       const link = document.getElementById('previewLink');
-      link.href = configs[currentTable].preview + encodeURIComponent(id);
+      link.href = (currentTable === 'banners' || currentTable === 'site_settings') ? configs[currentTable].preview : configs[currentTable].preview + encodeURIComponent(id);
       link.style.display = 'inline-flex';
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -354,10 +346,11 @@
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(type==='boolean') payload[name] = el.value === 'true';
+        else if(type==='number') payload[name] = el.value === '' ? null : Number(el.value);
         else payload[name] = el.value.trim();
       });
       if(!payload.id) payload.id = nextId();
-      if(!payload.slug && payload.title) payload.slug = slugify(payload.title);
+      if('slug' in payload && !payload.slug && payload.title) payload.slug = slugify(payload.title);
       Object.keys(payload).forEach(k=>{ if(payload[k]==='') payload[k]=null; });
       return payload;
     }
@@ -365,8 +358,13 @@
     async function saveItem(){
       const msg = document.getElementById('formMsg');
       const payload = formPayload();
-      if(!payload.title){
-        msg.textContent = '請輸入標題 / 名稱。';
+      const required = configs[currentTable].fields.find(f => f[3] === 'required');
+      if(required && !payload[required[0]]){
+        msg.textContent = '請先輸入：' + required[1];
+        return;
+      }
+      if(currentTable === 'banners' && !editingId && cache.length >= 4){
+        msg.textContent = '首頁 Banner 最多 4 張，請先下架或刪除其中一張。';
         return;
       }
       msg.textContent = '儲存中...';

@@ -2,559 +2,401 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Metro Inn Guide｜北投旅圖 CMS 管理後台</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CMS管理後台｜Metro Inn Guide</title>
   <link rel="stylesheet" href="admin.css">
-
-  <style>
-    textarea{
-      border:1px solid var(--line);
-      padding:12px 14px;
-      color:var(--ink);
-      background:#fff;
-      font-size:15px;
-      width:100%;
-      font-family:Arial,'Noto Sans TC',sans-serif;
-      resize:vertical;
-    }
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-  </style>
 </head>
 <body>
   <div class="admin-shell">
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-kicker">METRO INN GUIDE</div>
+        <div class="kicker">METRO INN GUIDE</div>
         <div class="brand-title">北投旅圖 CMS</div>
       </div>
-      <nav class="side-nav" aria-label="後台導覽">
-        <a class="active" href="#dashboard">Dashboard</a>
-        <a href="#home">首頁管理</a>
-        <a href="#news">最新消息</a>
-        <a href="#spots">景點管理</a>
-        <a href="#trips">行程管理</a>
-        <a href="#foods">美食管理</a>
-        <a href="#coupons">優惠管理</a>
-        <a href="#submissions">投稿審核</a>
-        <a href="#partners">合作店家</a>
-        <a href="#banners">Banner 管理</a>
-        <a href="#media">圖片素材庫</a>
-        <a href="#settings">網站設定</a>
+      <nav class="side-nav" id="sideNav">
+        <a class="active" data-table="news">最新消息</a>
+        <a data-table="spots">景點管理</a>
+        <a data-table="foods">美食管理</a>
+        <a data-table="trips">行程管理</a>
+        <a data-table="coupons">優惠管理</a>
       </nav>
-      <a class="front-link" href="index.html" target="_blank">開啟前台預覽 ↗</a>
+      <div class="side-bottom">
+        <a class="button" href="index.html" target="_blank">開啟前台預覽 ↗</a>
+        <button onclick="logout()">登出</button>
+      </div>
     </aside>
 
     <main class="main">
       <header class="topbar">
         <div>
-          <p class="eyebrow">ADMIN MOCKUP</p>
-          <h1>Metro Inn Guide｜北投旅圖管理中心</h1>
+          <p class="kicker">ADMIN CENTER</p>
+          <h1>Metro Inn Guide｜內容管理中心</h1>
         </div>
-        <div class="admin-user">
-          <span>管理員</span>
-          <button>登出</button>
+        <div>
+          <span id="userEmail">檢查登入中...</span>
         </div>
       </header>
 
-      <section id="dashboard" class="panel">
-        <div class="panel-head">
-          <div>
-            <p class="eyebrow">OVERVIEW</p>
-            <h2>儀表板</h2>
-          </div>
-          <button class="primary">新增內容</button>
-        </div>
-        <div class="metrics">
-          <div class="metric"><span>今日瀏覽</span><strong>1,286</strong><em>較昨日 +12%</em></div>
-          <div class="metric"><span>上架消息</span><strong>8</strong><em>首頁顯示 4 則</em></div>
-          <div class="metric"><span>上架優惠</span><strong>12</strong><em>本月點擊 348</em></div>
-          <div class="metric"><span>合作店家</span><strong>28</strong><em>新增 3 家洽談中</em></div>
-        </div>
-        <div class="grid two">
-          <div class="card">
-            <h3>待辦事項</h3>
-            <ul class="task-list">
-              <li><b>投稿審核</b><span>北投市場早餐推薦</span><button>查看</button></li>
-              <li><b>優惠審核</b><span>草山咖啡下午茶優惠</span><button>查看</button></li>
-              <li><b>Banner 排程</b><span>陽明山花季主視覺</span><button>查看</button></li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>熱門內容</h3>
-            <table>
-              <tr><th>內容</th><th>類型</th><th>瀏覽</th></tr>
-              <tr><td>地熱谷</td><td>景點</td><td>3,421</td></tr>
-              <tr><td>北投溫泉半日遊</td><td>行程</td><td>2,184</td></tr>
-              <tr><td>滿來溫泉拉麵</td><td>美食</td><td>1,768</td></tr>
-            </table>
-          </div>
-        </div>
+      <section class="notice">
+        後台已串接 Supabase。新增、編輯、上架／下架後，前台頁面會直接讀取最新資料。
+        第一次使用前，請先完成我提供的 SQL 權限設定。
       </section>
 
-      <section id="home" class="panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">HOMEPAGE</p><h2>首頁管理</h2></div>
-          <button class="primary">儲存首頁排序</button>
-        </div>
-        <div class="grid two">
-          <div class="card">
-            <h3>首頁區塊排序</h3>
-            <ol class="sort-list">
-              <li>Hero 主視覺</li>
-              <li>關鍵字搜尋</li>
-              <li>最新消息</li>
-              <li>熱門景點</li>
-              <li>本週編輯推薦</li>
-              <li>熱門優惠</li>
-              <li>精選行程</li>
-              <li>在地美食</li>
-              <li>北投會館導流</li>
-            </ol>
-          </div>
-          <div class="card">
-            <h3>熱門關鍵字</h3>
-            <div class="tags">
-              <span>地熱谷</span><span>北投溫泉</span><span>親子景點</span><span>陽明山</span><span>淡水夕陽</span><span>士林夜市</span><span>泡湯</span><span>咖啡廳</span><span>拉麵</span><span>優惠券</span>
-            </div>
-            <div class="form-row"><label>新增關鍵字</label><input value="雨天備案"></div>
-            <button>新增</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="news" class="panel">
+      <section id="editorPanel" class="panel active">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">NEWS</p>
-            <h2>最新消息管理</h2>
+            <p class="kicker" id="currentKicker">NEWS</p>
+            <h2 id="currentTitle">最新消息管理</h2>
           </div>
-          <button class="primary" type="button" onclick="openNewsForm()">新增最新消息</button>
+          <div class="actions">
+            <button class="primary" onclick="newItem()">新增</button>
+            <button onclick="loadCurrentTable()">重新讀取</button>
+          </div>
         </div>
 
-        <div class="notice">
-          這裡會直接讀取 Supabase 的 news 資料表。可新增、編輯、上架／下架最新消息。
+        <div class="toolbar">
+          <input id="searchInput" placeholder="搜尋標題、摘要、內容..." oninput="renderList()">
+          <select id="statusFilter" onchange="renderList()">
+            <option value="all">全部狀態</option>
+            <option value="published">已上架</option>
+            <option value="draft">草稿 / 下架</option>
+          </select>
         </div>
 
         <div class="grid two">
           <div class="card">
-            <h3 id="newsFormTitle">新增最新消息</h3>
-
-            <input type="hidden" id="newsId">
-
-            <div class="form-row">
-              <label>標題 title</label>
-              <input id="newsTitle" placeholder="例如：捷伴童行親子住房專案">
-            </div>
-
-            <div class="form-row">
-              <label>網址代稱 slug</label>
-              <input id="newsSlug" placeholder="例如：parent-child-trip">
-            </div>
-
-            <div class="form-row">
-              <label>摘要 summary</label>
-              <input id="newsSummary" placeholder="列表與內頁開頭摘要">
-            </div>
-
-            <div class="form-row">
-              <label>內文 content</label>
-              <textarea id="newsContent" rows="5" placeholder="最新消息內文"></textarea>
-            </div>
-
-            <div class="form-row">
-              <label>封面圖網址 cover_image</label>
-              <input id="newsCoverImage" placeholder="https://...">
-            </div>
-
-            <div class="form-row">
-              <label>發布日期 publish_date</label>
-              <input id="newsPublishDate" type="date">
-            </div>
-
-            <h3 style="margin-top:22px">活動資訊卡</h3>
-
-            <div class="form-row">
-              <label>活動名稱 event_name</label>
-              <input id="newsEventName" placeholder="例如：捷伴童行親子住房專案">
-            </div>
-
-            <div class="form-row">
-              <label>活動日期 event_date</label>
-              <input id="newsEventDate" placeholder="例如：2026/06/11–2026/08/31">
-            </div>
-
-            <div class="form-row">
-              <label>活動地點（地址） event_address</label>
-              <input id="newsEventAddress" placeholder="台北市北投區...">
-            </div>
-
-            <div class="form-row">
-              <label>電話 phone</label>
-              <input id="newsPhone" placeholder="02-xxxx-xxxx">
-            </div>
-
-            <div class="form-row">
-              <label>活動內容 event_content</label>
-              <textarea id="newsEventContent" rows="4" placeholder="活動內容說明"></textarea>
-            </div>
-
-            <div class="form-row">
-              <label>備註 remark</label>
-              <textarea id="newsRemark" rows="3" placeholder="依官網公告為準"></textarea>
-            </div>
-
-            <div class="form-row">
-              <label>狀態</label>
-              <select id="newsPublished">
-                <option value="true">已上架</option>
-                <option value="false">草稿 / 下架</option>
-              </select>
-            </div>
-
+            <h3 id="formTitle">新增內容</h3>
+            <div id="formFields"></div>
             <div class="actions">
-              <button class="primary" type="button" onclick="saveNews()">儲存</button>
-              <button type="button" onclick="resetNewsForm()">清空</button>
+              <button class="primary" onclick="saveItem()">儲存</button>
+              <button onclick="clearForm()">清空</button>
+              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
             </div>
-
-            <p id="newsFormMessage" style="margin-top:14px;color:#F3653B;"></p>
+            <p id="formMsg" class="msg"></p>
           </div>
 
-          <div class="card">
-            <h3>操作說明</h3>
-            <p>1. 新增時 ID 會自動產生。</p>
-            <p>2. slug 建議使用英文小寫與連字號，例如 parent-child-trip。</p>
-            <p>3. 若要暫時不顯示在前台，狀態選「草稿 / 下架」。</p>
-            <p>4. 儲存後，前台 news.html 與 news-detail.html 會同步讀取資料。</p>
-          </div>
-        </div>
-
-        <div class="table-card" style="margin-top:18px">
-          <table>
-            <thead>
-              <tr>
-                <th>標題</th>
-                <th>活動日期</th>
-                <th>發布日期</th>
-                <th>狀態</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="newsTable">
-              <tr><td colspan="5">資料載入中...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="spots" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">CONTENT</p><h2>景點管理</h2></div><button class="primary">新增景點</button></div>
-        <div class="toolbar"><input placeholder="搜尋景點名稱、捷運站、標籤"><select><option>全部狀態</option><option>已上架</option><option>草稿</option></select><select><option>全部地區</option><option>北投</option><option>新北投</option><option>陽明山</option></select></div>
-        <div class="table-card">
-          <table>
-            <tr><th>名稱</th><th>地區</th><th>最近捷運站</th><th>營業時間</th><th>標籤</th><th>狀態</th><th></th></tr>
-            <tr><td>地熱谷</td><td>新北投</td><td>新北投站</td><td>09:00–17:00</td><td>免費・拍照・步行</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-            <tr><td>北投圖書館</td><td>新北投</td><td>新北投站</td><td>依館方公告</td><td>雨天・親子</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-            <tr><td>小油坑</td><td>陽明山</td><td>劍潭轉公車</td><td>09:00–16:30</td><td>自然・健行</td><td><span class="status draft">草稿</span></td><td><button>編輯</button></td></tr>
-          </table>
-        </div>
-      </section>
-
-      <section id="trips" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">ITINERARY</p><h2>行程管理</h2></div><button class="primary">新增行程</button></div>
-        <div class="table-card"><table>
-          <tr><th>行程名稱</th><th>時間</th><th>適合對象</th><th>串接景點</th><th>狀態</th><th></th></tr>
-          <tr><td>北投溫泉半日遊</td><td>4–5 小時</td><td>親子・情侶・雨天</td><td>地熱谷、溫泉博物館、圖書館</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>淡水河岸慢旅行</td><td>半日</td><td>散步・夕陽</td><td>淡水老街、漁人碼頭</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-        </table></div>
-      </section>
-
-      <section id="foods" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">FOOD</p><h2>美食管理</h2></div><button class="primary">新增店家</button></div>
-        <div class="table-card"><table>
-          <tr><th>店名</th><th>地區</th><th>營業時間</th><th>平均消費</th><th>導流網址</th><th>狀態</th><th></th></tr>
-          <tr><td>滿來溫泉拉麵</td><td>新北投</td><td>11:30–21:00</td><td>$200–400</td><td>Google Map／官網</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>草山咖啡館</td><td>陽明山</td><td>10:00–18:00</td><td>$150–350</td><td>IG／訂位網址</td><td><span class="status draft">草稿</span></td><td><button>編輯</button></td></tr>
-        </table></div>
-      </section>
-
-      <section id="coupons" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">OFFERS</p><h2>優惠管理</h2></div><button class="primary">新增優惠</button></div>
-        <div class="notice">第一階段優惠採「出示本頁面即可使用」，不做會員領券與核銷。</div>
-        <div class="table-card"><table>
-          <tr><th>優惠名稱</th><th>店家</th><th>使用方式</th><th>期限</th><th>點擊使用</th><th>狀態</th><th></th></tr>
-          <tr><td>湯屋 95 折</td><td>山月湯屋</td><td>出示頁面</td><td>2026/12/31</td><td>128</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-          <tr><td>拉麵送小菜</td><td>滿來溫泉拉麵</td><td>出示頁面</td><td>2026/09/30</td><td>76</td><td><span class="status on">已上架</span></td><td><button>編輯</button></td></tr>
-        </table></div>
-      </section>
-
-      <section id="submissions" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">UGC</p><h2>投稿審核</h2></div></div>
-        <div class="review-card">
-          <div><span class="status pending">待審核</span><h3>北投市場早午餐散步路線</h3><p>投稿人：旅人小林｜分類：美食／行程｜地區：北投</p></div>
-          <div class="actions"><button>預覽</button><button>退件</button><button class="primary">通過上架</button></div>
-        </div>
-        <div class="review-card">
-          <div><span class="status pending">待審核</span><h3>淡水夕陽拍照點推薦</h3><p>投稿人：Mina｜分類：景點｜地區：淡水</p></div>
-          <div class="actions"><button>預覽</button><button>退件</button><button class="primary">通過上架</button></div>
-        </div>
-      </section>
-
-      <section id="partners" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">PARTNERS</p><h2>合作店家管理</h2></div><button class="primary">新增合作店家</button></div>
-        <div class="table-card"><table>
-          <tr><th>店家</th><th>類型</th><th>聯絡人</th><th>導流連結</th><th>合作狀態</th><th></th></tr>
-          <tr><td>山月湯屋</td><td>泡湯</td><td>王小姐</td><td>官網／Google Map</td><td><span class="status on">合作中</span></td><td><button>編輯</button></td></tr>
-          <tr><td>草山咖啡館</td><td>咖啡甜點</td><td>林先生</td><td>IG／訂位</td><td><span class="status pending">洽談中</span></td><td><button>編輯</button></td></tr>
-        </table></div>
-      </section>
-
-      <section id="banners" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">ADS</p><h2>Banner 管理</h2></div><button class="primary">新增 Banner</button></div>
-        <div class="grid three">
-          <div class="banner-card"><div></div><h3>首頁主視覺</h3><p>陽明山花季專題｜2026/03/01–04/30</p><button>編輯</button></div>
-          <div class="banner-card"><div></div><h3>熱門優惠區</h3><p>山月湯屋合作曝光｜2026/12/31止</p><button>編輯</button></div>
-          <div class="banner-card"><div></div><h3>文章側欄</h3><p>北投會館訂房導流｜常駐</p><button>編輯</button></div>
-        </div>
-      </section>
-
-      <section id="media" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">MEDIA</p><h2>圖片素材庫</h2></div><button class="primary">上傳圖片</button></div>
-        <div class="media-grid">
-          <img src="assets/valley.jpg" alt="地熱谷"><img src="assets/museum.jpg" alt="博物館"><img src="assets/yang.jpg" alt="陽明山"><img src="assets/shilin.jpg" alt="士林">
-        </div>
-      </section>
-
-      <section id="settings" class="panel">
-        <div class="panel-head"><div><p class="eyebrow">SETTINGS</p><h2>網站設定</h2></div><button class="primary">儲存設定</button></div>
-        <div class="grid two">
-          <div class="card">
-            <h3>品牌設定</h3>
-            <div class="form-row"><label>網站英文名</label><input value="METRO INN GUIDE"></div>
-            <div class="form-row"><label>網站中文名</label><input value="北投旅圖"></div>
-            <div class="form-row"><label>首頁副標</label><input value="從北投出發，探索北台北最剛剛好的風景"></div>
-          </div>
-          <div class="card">
-            <h3>外部連結</h3>
-            <div class="form-row"><label>北投會館官網</label><input value="https://btresort.metro.taipei/"></div>
-            <div class="form-row"><label>立即訂房</label><input value="https://rwd.ezhotel.cloud/btresort/1"></div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>標題</th>
+                  <th>日期 / 地區</th>
+                  <th>狀態</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="listBody">
+                <tr><td colspan="4">資料載入中...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
     </main>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script>
-    const links = document.querySelectorAll('.side-nav a');
-    links.forEach(link => link.addEventListener('click', () => {
-      links.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-    }));
-
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let newsCache = [];
 
-    function showNewsMessage(text) {
-      const el = document.getElementById('newsFormMessage');
-      if (el) el.textContent = text || '';
+    const configs = {
+      news: {
+        label:'最新消息', kicker:'NEWS', preview:'news-detail.html?id=',
+        fields:[
+          ['id','ID','text','auto'],
+          ['slug','網址代稱 slug','text'],
+          ['title','標題','text','required'],
+          ['summary','摘要','textarea'],
+          ['content','內文','textarea'],
+          ['cover_image','封面圖網址','text'],
+          ['publish_date','發布日期','date'],
+          ['event_name','活動名稱','text'],
+          ['event_date','活動日期','text'],
+          ['event_address','活動地點（地址）','text'],
+          ['phone','電話','text'],
+          ['event_content','活動內容','textarea'],
+          ['remark','備註','textarea'],
+          ['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>x.publish_date || x.event_date || '-'
+      },
+      spots: {
+        label:'景點管理', kicker:'SPOTS', preview:'spot.html?id=',
+        fields:[
+          ['id','ID','text','auto'],
+          ['slug','網址代稱 slug','text'],
+          ['title','景點名稱','text','required'],
+          ['area','地區','text'],
+          ['station','最近捷運站','text'],
+          ['summary','摘要','textarea'],
+          ['content','介紹內容','textarea'],
+          ['address','地址','text'],
+          ['business_hours','營業時間','text'],
+          ['stay_time','建議停留','text'],
+          ['tags','標籤','text'],
+          ['google_map','Google Map連結','text'],
+          ['official_website','官方網站','text'],
+          ['cover_image','封面圖網址','text'],
+          ['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>x.area || x.station || '-'
+      },
+      foods: {
+        label:'美食管理', kicker:'FOODS', preview:'food.html?id=',
+        fields:[
+          ['id','ID','text','auto'],
+          ['slug','網址代稱 slug','text'],
+          ['title','店名','text','required'],
+          ['category','類型','text'],
+          ['address','地址','text'],
+          ['business_hours','營業時間','text'],
+          ['phone','電話','text'],
+          ['average_cost','平均消費','text'],
+          ['price_range','價格區間','text'],
+          ['tags','標籤','text'],
+          ['google_map','Google Map連結','text'],
+          ['official_website','官方網站','text'],
+          ['summary','摘要','textarea'],
+          ['content','介紹內容','textarea'],
+          ['cover_image','封面圖網址','text'],
+          ['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>x.category || x.average_cost || '-'
+      },
+      trips: {
+        label:'行程管理', kicker:'TRIPS', preview:'trip.html?id=',
+        fields:[
+          ['id','ID','text','auto'],
+          ['slug','網址代稱 slug','text'],
+          ['title','行程名稱','text','required'],
+          ['duration','建議時間','text'],
+          ['summary','摘要','textarea'],
+          ['content','行程內容（方案B格式）','textarea'],
+          ['google_route','Google路線','text'],
+          ['cover_image','封面圖網址','text'],
+          ['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>x.duration || '-'
+      },
+      coupons: {
+        label:'優惠管理', kicker:'COUPONS', preview:'coupon.html?id=',
+        fields:[
+          ['id','ID','text','auto'],
+          ['slug','網址代稱 slug','text'],
+          ['title','優惠名稱','text','required'],
+          ['summary','摘要','textarea'],
+          ['content','優惠內容','textarea'],
+          ['start_date','開始日期','date'],
+          ['end_date','結束日期','date'],
+          ['official_website','連結網址','text'],
+          ['cover_image','封面圖網址','text'],
+          ['is_published','狀態','boolean']
+        ],
+        subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-')
+      }
+    };
+
+    let currentTable = 'news';
+    let cache = [];
+    let editingId = '';
+
+    async function checkLogin(){
+      const { data } = await db.auth.getSession();
+      if(!data.session){
+        location.href = 'admin-login.html';
+        return;
+      }
+      document.getElementById('userEmail').textContent = data.session.user.email;
+      buildForm();
+      loadCurrentTable();
     }
 
-    function generateNewsId() {
-      const nums = newsCache
-        .map(item => String(item.id || '').replace('news_', ''))
-        .map(value => parseInt(value, 10))
-        .filter(num => !Number.isNaN(num));
-      const next = nums.length ? Math.max(...nums) + 1 : 1;
-      return `news_${String(next).padStart(4, '0')}`;
+    async function logout(){
+      await db.auth.signOut();
+      location.href='admin-login.html';
     }
 
-    function slugify(text) {
-      return String(text || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-        .replace(/^-+|-+$/g, '') || `news-${Date.now()}`;
+    document.querySelectorAll('#sideNav a').forEach(a=>{
+      a.addEventListener('click',()=>{
+        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.remove('active'));
+        a.classList.add('active');
+        currentTable = a.dataset.table;
+        document.getElementById('currentKicker').textContent = configs[currentTable].kicker;
+        document.getElementById('currentTitle').textContent = configs[currentTable].label;
+        editingId = '';
+        buildForm();
+        loadCurrentTable();
+      });
+    });
+
+    function buildForm(){
+      const cfg = configs[currentTable];
+      const wrap = document.getElementById('formFields');
+      wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        if(type === 'textarea'){
+          return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5"></textarea></div>`;
+        }
+        if(type === 'boolean'){
+          return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        }
+        return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'?'readonly':''}></div>`;
+      }).join('');
+      clearForm();
     }
 
-    async function loadNews() {
-      const tbody = document.getElementById('newsTable');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="5">資料載入中...</td></tr>';
+    function nextId(){
+      const prefix = currentTable === 'news' ? 'news' :
+        currentTable === 'spots' ? 'spot' :
+        currentTable === 'foods' ? 'food' :
+        currentTable === 'trips' ? 'trip' : 'coupon';
+      const nums = cache.map(x=>String(x.id||'').replace(prefix+'_','')).map(n=>parseInt(n,10)).filter(n=>!isNaN(n));
+      const next = nums.length ? Math.max(...nums)+1 : 1;
+      return `${prefix}_${String(next).padStart(4,'0')}`;
+    }
 
-      const { data, error } = await db
-        .from('news')
-        .select('*')
-        .order('publish_date', { ascending: false });
+    function slugify(text){
+      return String(text||'').trim().toLowerCase()
+        .replace(/[^\w\u4e00-\u9fa5]+/g,'-')
+        .replace(/^-+|-+$/g,'') || `${currentTable}-${Date.now()}`;
+    }
 
-      if (error) {
+    function clearForm(){
+      editingId = '';
+      document.getElementById('formTitle').textContent = '新增內容';
+      document.getElementById('formMsg').textContent = '';
+      document.getElementById('previewLink').style.display = 'none';
+      configs[currentTable].fields.forEach(([name,label,type])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(name==='id') el.value = nextId();
+        else if(name==='is_published') el.value = 'true';
+        else if(type==='date' && (name==='publish_date')) el.value = new Date().toISOString().slice(0,10);
+        else el.value = '';
+      });
+    }
+
+    function newItem(){ clearForm(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+    async function loadCurrentTable(){
+      const tbody = document.getElementById('listBody');
+      tbody.innerHTML = '<tr><td colspan="4">資料載入中...</td></tr>';
+
+      const orderCol = currentTable === 'news' ? 'publish_date' : 'id';
+      const { data, error } = await db.from(currentTable).select('*').order(orderCol, { ascending:false });
+      if(error){
         console.error(error);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="5">讀取失敗，請確認 news 的 RLS policy / Data API / anon select 權限。</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="4">讀取失敗：${error.message}</td></tr>`;
         return;
       }
-
-      newsCache = data || [];
-      renderNews(newsCache);
+      cache = data || [];
+      renderList();
+      clearForm();
     }
 
-    function renderNews(list) {
-      const tbody = document.getElementById('newsTable');
-      if (!tbody) return;
+    function renderList(){
+      const keyword = document.getElementById('searchInput').value.trim();
+      const status = document.getElementById('statusFilter').value;
+      let list = cache.filter(item=>{
+        const text = JSON.stringify(item);
+        const matchKeyword = !keyword || text.includes(keyword);
+        const matchStatus =
+          status==='all' ||
+          (status==='published' && item.is_published) ||
+          (status==='draft' && !item.is_published);
+        return matchKeyword && matchStatus;
+      });
 
-      if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="5">目前沒有最新消息。</td></tr>';
+      const tbody = document.getElementById('listBody');
+      if(!list.length){
+        tbody.innerHTML = '<tr><td colspan="4">沒有符合條件的資料。</td></tr>';
         return;
       }
 
-      tbody.innerHTML = list.map(item => `
+      tbody.innerHTML = list.map(item=>`
         <tr>
+          <td><strong>${item.title || item.id}</strong><br><small>${item.id}</small></td>
+          <td>${configs[currentTable].subtitle(item)}</td>
+          <td><span class="status ${item.is_published?'on':'draft'}">${item.is_published?'已上架':'草稿'}</span></td>
           <td>
-            <strong>${item.title || '未命名'}</strong><br>
-            <small>${item.id || ''}</small>
-          </td>
-          <td>${item.event_date || '-'}</td>
-          <td>${item.publish_date || '-'}</td>
-          <td>
-            <span class="status ${item.is_published ? 'on' : 'draft'}">
-              ${item.is_published ? '已上架' : '草稿'}
-            </span>
-          </td>
-          <td>
-            <button type="button" onclick="editNews('${item.id}')">編輯</button>
-            <button type="button" onclick="toggleNews('${item.id}')">${item.is_published ? '下架' : '上架'}</button>
-            <button type="button" onclick="deleteNews('${item.id}')">刪除</button>
-            <a class="primary" href="news-detail.html?id=${encodeURIComponent(item.id)}" target="_blank">預覽</a>
+            <div class="actions">
+              <button onclick="editItem('${item.id}')">編輯</button>
+              <button onclick="toggleItem('${item.id}')">${item.is_published?'下架':'上架'}</button>
+              <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
+              <a class="button" target="_blank" href="${configs[currentTable].preview}${encodeURIComponent(item.id)}">預覽</a>
+            </div>
           </td>
         </tr>
       `).join('');
     }
 
-    function openNewsForm() {
-      location.hash = '#news';
-      resetNewsForm();
-      document.getElementById('newsTitle')?.focus();
+    function editItem(id){
+      const item = cache.find(x=>x.id===id);
+      if(!item) return;
+      editingId = id;
+      document.getElementById('formTitle').textContent = '編輯內容';
+      configs[currentTable].fields.forEach(([name,label,type])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(type==='boolean') el.value = item[name] ? 'true' : 'false';
+        else el.value = item[name] ?? '';
+      });
+      const link = document.getElementById('previewLink');
+      link.href = configs[currentTable].preview + encodeURIComponent(id);
+      link.style.display = 'inline-flex';
+      window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function resetNewsForm() {
-      document.getElementById('newsFormTitle').textContent = '新增最新消息';
-      document.getElementById('newsId').value = '';
-      document.getElementById('newsTitle').value = '';
-      document.getElementById('newsSlug').value = '';
-      document.getElementById('newsSummary').value = '';
-      document.getElementById('newsContent').value = '';
-      document.getElementById('newsCoverImage').value = '';
-      document.getElementById('newsPublishDate').value = new Date().toISOString().slice(0, 10);
-      document.getElementById('newsEventName').value = '';
-      document.getElementById('newsEventDate').value = '';
-      document.getElementById('newsEventAddress').value = '';
-      document.getElementById('newsPhone').value = '';
-      document.getElementById('newsEventContent').value = '';
-      document.getElementById('newsRemark').value = '';
-      document.getElementById('newsPublished').value = 'true';
-      showNewsMessage('');
+    function formPayload(){
+      const payload = {};
+      configs[currentTable].fields.forEach(([name,label,type])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(type==='boolean') payload[name] = el.value === 'true';
+        else payload[name] = el.value.trim();
+      });
+      if(!payload.id) payload.id = nextId();
+      if(!payload.slug && payload.title) payload.slug = slugify(payload.title);
+      Object.keys(payload).forEach(k=>{ if(payload[k]==='') payload[k]=null; });
+      return payload;
     }
 
-    function editNews(id) {
-      const item = newsCache.find(row => row.id === id);
-      if (!item) return;
-
-      location.hash = '#news';
-      document.getElementById('newsFormTitle').textContent = '編輯最新消息';
-      document.getElementById('newsId').value = item.id || '';
-      document.getElementById('newsTitle').value = item.title || '';
-      document.getElementById('newsSlug').value = item.slug || '';
-      document.getElementById('newsSummary').value = item.summary || '';
-      document.getElementById('newsContent').value = item.content || '';
-      document.getElementById('newsCoverImage').value = item.cover_image || '';
-      document.getElementById('newsPublishDate').value = item.publish_date || '';
-      document.getElementById('newsEventName').value = item.event_name || '';
-      document.getElementById('newsEventDate').value = item.event_date || '';
-      document.getElementById('newsEventAddress').value = item.event_address || '';
-      document.getElementById('newsPhone').value = item.phone || '';
-      document.getElementById('newsEventContent').value = item.event_content || '';
-      document.getElementById('newsRemark').value = item.remark || '';
-      document.getElementById('newsPublished').value = item.is_published ? 'true' : 'false';
-      showNewsMessage('目前正在編輯：' + (item.title || item.id));
-    }
-
-    async function saveNews() {
-      const existingId = document.getElementById('newsId').value;
-      const title = document.getElementById('newsTitle').value.trim();
-
-      if (!title) {
-        showNewsMessage('請先輸入標題。');
+    async function saveItem(){
+      const msg = document.getElementById('formMsg');
+      const payload = formPayload();
+      if(!payload.title){
+        msg.textContent = '請輸入標題 / 名稱。';
         return;
       }
+      msg.textContent = '儲存中...';
 
-      const payload = {
-        id: existingId || generateNewsId(),
-        slug: document.getElementById('newsSlug').value.trim() || slugify(title),
-        title,
-        summary: document.getElementById('newsSummary').value.trim(),
-        content: document.getElementById('newsContent').value.trim(),
-        cover_image: document.getElementById('newsCoverImage').value.trim(),
-        publish_date: document.getElementById('newsPublishDate').value || null,
-        event_name: document.getElementById('newsEventName').value.trim(),
-        event_date: document.getElementById('newsEventDate').value.trim(),
-        event_address: document.getElementById('newsEventAddress').value.trim(),
-        phone: document.getElementById('newsPhone').value.trim(),
-        event_content: document.getElementById('newsEventContent').value.trim(),
-        remark: document.getElementById('newsRemark').value.trim(),
-        is_published: document.getElementById('newsPublished').value === 'true'
-      };
-
-      const { error } = await db
-        .from('news')
-        .upsert(payload, { onConflict: 'id' });
-
-      if (error) {
+      const { error } = await db.from(currentTable).upsert(payload, { onConflict:'id' });
+      if(error){
         console.error(error);
-        showNewsMessage('儲存失敗：請確認 news 已開啟 INSERT / UPDATE 權限。');
+        msg.textContent = '儲存失敗：' + error.message;
         return;
       }
-
-      showNewsMessage('已儲存。');
-      await loadNews();
-      document.getElementById('newsId').value = payload.id;
-      document.getElementById('newsFormTitle').textContent = '編輯最新消息';
+      msg.textContent = '已儲存。';
+      await loadCurrentTable();
+      editItem(payload.id);
     }
 
-    async function toggleNews(id) {
-      const item = newsCache.find(row => row.id === id);
-      if (!item) return;
-
-      const { error } = await db
-        .from('news')
-        .update({ is_published: !item.is_published })
-        .eq('id', id);
-
-      if (error) {
-        console.error(error);
-        alert('更新失敗：請確認 news 已開啟 UPDATE 權限。');
-        return;
-      }
-
-      await loadNews();
+    async function toggleItem(id){
+      const item = cache.find(x=>x.id===id);
+      if(!item) return;
+      const { error } = await db.from(currentTable).update({is_published:!item.is_published}).eq('id',id);
+      if(error){ alert('更新失敗：' + error.message); return; }
+      await loadCurrentTable();
     }
 
-    async function deleteNews(id) {
-      if (!confirm('確定要刪除這筆最新消息嗎？')) return;
-
-      const { error } = await db
-        .from('news')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error(error);
-        alert('刪除失敗：請確認 news 已開啟 DELETE 權限。');
-        return;
-      }
-
-      resetNewsForm();
-      await loadNews();
+    async function deleteItem(id){
+      if(!confirm('確定要刪除這筆資料嗎？')) return;
+      const { error } = await db.from(currentTable).delete().eq('id',id);
+      if(error){ alert('刪除失敗：' + error.message); return; }
+      await loadCurrentTable();
     }
 
-    resetNewsForm();
-    loadNews();
+    checkLogin();
   </script>
 </body>
 </html>

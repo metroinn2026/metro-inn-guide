@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css?v=20260601-trip-sections">
+  <link rel="stylesheet" href="admin.css?v=20260602-roles">
 
   <style>
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
@@ -114,6 +114,11 @@
     }
   </style>
 
+  <style>
+    .role-pill{display:inline-block;border-radius:99px;padding:5px 10px;font-size:12px;background:#EFF6FF;color:#1D4ED8;font-weight:700}
+    .role-pill.super{background:#FEF3C7;color:#92400E}
+    .readonly-note{font-size:13px;color:#6B7280;line-height:1.7;margin-top:8px}
+  </style>
 </head>
 <body>
   <div class="admin-shell">
@@ -125,6 +130,7 @@
       <nav class="side-nav" id="sideNav">
         <a class="active" data-table="banners">Banner 管理</a>
         <a data-table="site_settings">頁首頁尾設定</a>
+        <a data-table="admin_profiles">管理員帳號</a>
         <a data-table="news">最新消息</a>
         <a data-table="spots">景點管理</a>
         <a data-table="foods">美食管理</a>
@@ -150,7 +156,7 @@
       </header>
 
       <section class="notice">
-        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；也可按住左側排序圖示拖曳調整顯示順序。
+        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；Banner 會顯示友善編號 banner_0001。超級管理員可建立帳號與設定權限。
       </section>
 
       <section class="panel">
@@ -311,6 +317,26 @@
           <li><b>社群圖示</b>：若未來使用圖片，建議 64 × 64 px PNG。</li>
         </ul>`
       },
+
+      admin_profiles: {
+        label:'管理員帳號', kicker:'ADMINS', table:'admin_profiles', preview:'admin.html',
+        hint:'只有超級管理員可建立帳號與調整權限。一般管理員可管理內容，但不能新增管理員帳號。',
+        fields:[
+          ['id','User ID','text','auto'],
+          ['email','Email','text','required'],
+          ['role','權限角色','role'],
+          ['display_name','顯示名稱','text'],
+          ['password','建立新帳號密碼（新增時必填，編輯時留空即可）','password']
+        ],
+        columns:['email','role','display_name'],
+        subtitle:(x)=>x.display_name || '-',
+        statusKey:null,
+        typeOptions:[['all','全部角色'],['super_admin','超級管理員'],['admin','管理員']],
+        order:'email',
+        idMode:'auth',
+        tips:`<ul class="tip-list"><li><b>超級管理員</b>：可新增管理員帳號、調整權限、管理所有內容。</li><li><b>管理員</b>：可管理 Banner、消息、景點、美食、行程、優惠，但不可建立其他管理員。</li><li>建立帳號會透過 Vercel API 寫入 Supabase Auth，因此 Vercel 需設定 SERVICE ROLE KEY。</li></ul>`
+      },
+
       news: {
         label:'最新消息', kicker:'NEWS', table:'news', preview:'news-detail.html?id=',
         hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
@@ -403,15 +429,39 @@
     let currentList = [];
     let draggingId = '';
     let editingId = '';
+    let currentUserRole = 'admin';
 
     async function checkLogin(){
       const { data } = await db.auth.getSession();
       if(!data.session){ location.href = 'admin-login.html'; return; }
       document.getElementById('userEmail').textContent = data.session.user.email;
+      await loadMyProfile(data.session.user);
       switchTable('banners');
     }
 
     async function logout(){ await db.auth.signOut(); location.href='admin-login.html'; }
+
+
+    async function loadMyProfile(user){
+      const { data } = await db.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+      if(data?.role) currentUserRole = data.role;
+      if(!data){
+        await db.from('admin_profiles').upsert({id:user.id,email:user.email,role:'admin',display_name:user.email},{onConflict:'id'});
+      }
+      if(currentUserRole !== 'super_admin'){
+        const accountLink = document.querySelector('[data-table="admin_profiles"]');
+        if(accountLink) accountLink.style.display = 'none';
+      }
+    }
+
+    function requireSuperAdmin(){
+      if(currentUserRole !== 'super_admin'){
+        alert('此功能限超級管理員使用。');
+        return false;
+      }
+      return true;
+    }
+
 
     document.querySelectorAll('#sideNav a').forEach(a=>{
       a.addEventListener('click',()=>{
@@ -422,6 +472,7 @@
     });
 
     function switchTable(table){
+      if(table === 'admin_profiles' && !requireSuperAdmin()) return;
       currentTable = table;
       const cfg = configs[currentTable];
       document.getElementById('currentKicker').textContent = cfg.kicker;
@@ -454,6 +505,8 @@
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
       wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
+        if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
         if(type === 'boolean') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
@@ -471,12 +524,13 @@
                    currentTable==='foods' ? '類型 / 價格' :
                    currentTable==='trips' ? '建議時間' :
                    currentTable==='coupons' ? '期限' : '日期';
-      const sortHead = currentTable === 'site_settings' ? '' : '<th style="width:56px">排序</th>';
+      const sortHead = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : '<th style="width:56px">排序</th>';
       document.getElementById('tableHead').innerHTML = `<tr>${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
     }
 
     function nextId(){
       const cfg = configs[currentTable];
+      if(cfg.idMode === 'auth') return '建立後自動產生';
       if(cfg.idMode === 'uuid') return crypto.randomUUID();
       if(cfg.idMode === 'fixed1') return 1;
       const prefix = cfg.idPrefix || currentTable;
@@ -499,6 +553,8 @@
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(name==='id') el.value = nextId();
+        else if(name==='role') el.value = 'admin';
+        else if(name==='password') el.value = '';
         else if(name==='sort_order') el.value = String((cache.map(x=>Number(x.sort_order||0)).reduce((a,b)=>Math.max(a,b),0) || cache.length) + 1);
         else if(name==='is_published' || name==='is_active') el.value = 'true';
         else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
@@ -538,6 +594,25 @@
       renderList();
     }
 
+
+    function friendlyId(item, index){
+      if(currentTable === 'banners'){
+        const n = Number(item.sort_order || index + 1);
+        return `banner_${String(n).padStart(4,'0')}`;
+      }
+      if(currentTable === 'admin_profiles'){
+        return item.email || item.id;
+      }
+      return item.id;
+    }
+
+    function roleLabel(role){
+      if(role === 'super_admin') return '<span class="role-pill super">超級管理員</span>';
+      if(role === 'admin') return '<span class="role-pill">管理員</span>';
+      return '<span class="badge">未設定</span>';
+    }
+
+
     function renderList(){
       const keyword = document.getElementById('searchInput').value.trim();
       const status = document.getElementById('statusFilter').value;
@@ -562,19 +637,19 @@
 
       tbody.innerHTML = list.map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
-        const statusHtml = cfg.statusKey
+        const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
-          : `<span class="badge">固定設定</span>`;
+          : `<span class="badge">固定設定</span>`);
         const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
-        const sortCell = currentTable === 'site_settings' ? '' : `
+        const sortCell = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : `
           <td>
             <span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span>
             <span class="row-order">#${item.sort_order ?? '-'}</span>
           </td>`;
         return `
-          <tr data-id="${item.id}" draggable="${currentTable === 'site_settings' ? 'false' : 'true'}">
+          <tr data-id="${item.id}" draggable="${(currentTable === 'site_settings' || currentTable === 'admin_profiles') ? 'false' : 'true'}">
             ${sortCell}
-            <td><span class="id-code">${item.id}</span></td>
+            <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
             <td><strong>${title || '未命名'}</strong></td>
             <td>${cfg.subtitle(item)}</td>
             <td>${statusHtml}</td>
@@ -593,7 +668,7 @@
     }
 
     function bindDragSort(){
-      if(currentTable === 'site_settings') return;
+      if(currentTable === 'site_settings' || currentTable === 'admin_profiles') return;
       document.querySelectorAll('#listBody tr[data-id]').forEach(row=>{
         row.addEventListener('dragstart', e=>{
           draggingId = row.dataset.id;
@@ -637,14 +712,14 @@
       const tbody = document.getElementById('listBody');
       tbody.innerHTML = currentList.map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
-        const statusHtml = cfg.statusKey
+        const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
-          : `<span class="badge">固定設定</span>`;
+          : `<span class="badge">固定設定</span>`);
         const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
         return `
           <tr data-id="${item.id}" draggable="true">
             <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
-            <td><span class="id-code">${item.id}</span></td>
+            <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
             <td><strong>${title || '未命名'}</strong></td>
             <td>${cfg.subtitle(item)}</td>
             <td>${statusHtml}</td>
@@ -662,7 +737,7 @@
     }
 
     async function saveSortOrder(){
-      if(currentTable === 'site_settings') return;
+      if(currentTable === 'site_settings' || currentTable === 'admin_profiles') return;
       const updates = currentList.map((item, index)=>
         db.from(configs[currentTable].table).update({sort_order:index+1}).eq('id',item.id)
       );
@@ -685,6 +760,7 @@
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(type==='boolean' || type==='booleanActive') el.value = item[name] ? 'true' : 'false';
+        else if(name === 'password') el.value = '';
         else el.value = item[name] ?? '';
       });
       const link = document.getElementById('previewLink');
@@ -715,7 +791,60 @@
       return payload;
     }
 
+
+    async function saveAdminProfile(){
+      if(!requireSuperAdmin()) return;
+      const msg = document.getElementById('formMsg');
+      const id = document.getElementById('f_id').value;
+      const email = document.getElementById('f_email').value.trim();
+      const role = document.getElementById('f_role').value;
+      const display_name = document.getElementById('f_display_name').value.trim();
+      const password = document.getElementById('f_password').value;
+
+      if(!email){
+        msg.textContent = '請輸入 Email。';
+        return;
+      }
+
+      msg.textContent = '儲存管理員帳號中...';
+
+      if(id && id !== '建立後自動產生'){
+        const { error } = await db.from('admin_profiles').upsert({id,email,role,display_name},{onConflict:'id'});
+        if(error){ msg.textContent = '更新失敗：' + error.message; return; }
+        msg.textContent = '已更新權限。';
+        await loadCurrentTable();
+        editItem(id);
+        return;
+      }
+
+      if(!password || password.length < 6){
+        msg.textContent = '新增帳號時密碼至少 6 碼。';
+        return;
+      }
+
+      const { data: sessionData } = await db.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch('/api/create-admin-user', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({email,password,role,display_name})
+      });
+
+      const result = await res.json().catch(()=>({}));
+      if(!res.ok){
+        msg.textContent = '新增失敗：' + (result.error || '請確認 Vercel 環境變數與 API 已部署');
+        return;
+      }
+
+      msg.textContent = '管理員帳號已建立。';
+      await loadCurrentTable();
+      editItem(result.user_id);
+    }
+
+
     async function saveItem(){
+      if(currentTable === 'admin_profiles') return saveAdminProfile();
       const msg = document.getElementById('formMsg');
       const payload = formPayload();
       if(configs[currentTable].fields.some(f=>f[3]==='required') && !payload.title){

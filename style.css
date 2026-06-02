@@ -221,3 +221,22 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   line-height:1.6;
   color:rgba(255,255,255,.78);
 }
+
+/* 強制顯示圖片來源：避免被版面或外掛樣式蓋掉 */
+.story-img .image-source-caption,
+.image-source-caption,
+.photo-credit {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  color: #6F7A72 !important;
+  text-align: left !important;
+  background: transparent !important;
+  position: static !important;
+  height: auto !important;
+  overflow: visible !important;
+}

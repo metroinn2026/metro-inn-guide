@@ -388,8 +388,10 @@
           <section class="story numbered-story" id="s${index + 1}">
             <h2><span class="step-no">${String(index + 1).padStart(2, '0')}</span><span>${step.title}</span></h2>
             <p>${step.time ? step.time + '｜' : ''}${step.text}</p>
-            <div class="story-img"><img src="${step.image}" alt="${step.title}"></div>
-            ${step.image_source ? `<p class="image-source-caption">${formatImageCaptionText(step.image_source)}</p>` : ''}
+            <div class="story-img">
+              <img src="${step.image}" alt="${step.title}">
+            </div>
+            <p class="image-source-caption">${formatImageCaptionText(step.image_source || '')}</p>
           </section>
         `).join('');
 

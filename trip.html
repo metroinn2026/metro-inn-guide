@@ -3,54 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>行程｜Metro Inn Guide 北投旅圖</title>
+  <title>行程介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
-  <style>
-    .trip-step-card{
-      display:grid;
-      grid-template-columns:120px 1fr;
-      gap:28px;
-      padding:42px 0;
-      border-bottom:1px solid var(--line,#E5E7EB);
-    }
-    .trip-step-no{
-      font-size:64px;
-      line-height:1;
-      font-weight:800;
-      color:#78906f;
-      letter-spacing:.04em;
-    }
-    .trip-step-body h2{
-      font-size:34px;
-      margin:0 0 18px;
-    }
-    .trip-time{
-      color:#3d7db4;
-      font-weight:700;
-      letter-spacing:.08em;
-      margin-bottom:8px;
-    }
-    .trip-step-body p{
-      font-size:18px;
-      line-height:2;
-      color:#5f6f72;
-    }
-    .trip-step-body img{
-      width:100%;
-      max-height:520px;
-      object-fit:cover;
-      margin-top:24px;
-    }
-    @media(max-width:760px){
-      .trip-step-card{grid-template-columns:1fr;gap:8px;padding:30px 0}
-      .trip-step-no{font-size:46px}
-      .trip-step-body h2{font-size:28px}
-    }
-  
-    .image-source-caption{margin-top:8px;font-size:13px;line-height:1.7;color:#7A8588}
-</style>
 </head>
 
 <body id="top">
@@ -60,13 +16,14 @@
     <img id="heroImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
     <div class="container">
       <div class="hero-content">
-        <div class="kicker">TRIP</div>
-        <h1 id="tripTitle">行程載入中...</h1>
-        <p id="tripSummary">正在讀取行程資料。</p>
+        <div id="heroKicker" class="kicker">ROUTE DETAIL</div>
+        <h1 id="heroTitle">行程介紹</h1>
+        <p id="heroSubtitle">行程資料載入中...</p>
         <div class="hero-icons">
-          <span id="tripDuration">建議時間</span>
+          <span id="heroDuration">建議時間</span>
           <span>捷運＋步行</span>
-          <span>自由安排</span>
+          <span>可搭配景點美食</span>
+          <span>人工精選路線</span>
         </div>
       </div>
     </div>
@@ -83,14 +40,50 @@
     <article>
       <p id="leadText" class="lead">行程資料載入中...</p>
 
-      <section id="tripSections"></section>
+      <div class="route">
+        <div class="kicker">TODAY'S ROUTE</div>
+        <div id="routeGrid" class="route-grid"></div>
+      </div>
 
-      <section id="routeBox" class="info-card point-info" style="display:none">
-        <div class="kicker">ROUTE MAP</div>
-        <h3>本次路線地圖</h3>
-        <p>可開啟 Google Maps 查看路線與實際交通時間。</p>
-        <div class="info-actions multi">
-          <a id="routeLink" class="button" target="_blank">開啟 Google Maps</a>
+      <div class="story-note">
+        這條路線適合不想自己從零開始規劃的旅客。景點、美食與優惠由編輯人工挑選，不使用自動附近推薦，內容比較好維護，也比較符合實際合作情境。
+      </div>
+
+      <div id="storySections"></div>
+
+      <section class="route-map-section" id="route-map">
+        <div class="route-map-head">
+          <div>
+            <div class="kicker">ROUTE MAP</div>
+            <h2>本次路線地圖</h2>
+          </div>
+          <p>這裡會依照後台填入的「行程地圖網址」顯示 Google Maps；若要更精準，也可以改放 Google My Maps 分享連結。</p>
+        </div>
+        <iframe id="mapEmbed" class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div style="margin-top:18px">
+          <a id="mapButton" class="button outline" href="#" target="_blank">開啟 Google Maps</a>
+        </div>
+      </section>
+
+      <section class="route-related-panel">
+        <div class="kicker">CONNECTED CONTENT</div>
+        <h2>這趟旅程會經過</h2>
+        <div class="route-related-grid">
+          <div class="route-related-box">
+            <div class="meta">SPOTS</div>
+            <h3>景點</h3>
+            <div id="relatedSpots"></div>
+          </div>
+          <div class="route-related-box food">
+            <div class="meta">FOOD</div>
+            <h3>美食</h3>
+            <div id="relatedFoods"></div>
+          </div>
+          <div class="route-related-box offer">
+            <div class="meta">OFFERS</div>
+            <h3>優惠</h3>
+            <div id="relatedCoupons"></div>
+          </div>
         </div>
       </section>
     </article>
@@ -99,22 +92,60 @@
       <div class="sticky-panel">
         <div class="sidebox compact">
           <div class="kicker">TRIP INFO</div>
-          <h3 id="sideTitle">行程</h3>
-          <p id="sideDuration">建議時間</p>
-          <p>🚇 捷運＋步行</p>
-          <p>適合依照停留時間彈性調整。</p>
-          <a id="sideRoute" class="button outline" target="_blank" style="display:none">路線地圖</a>
+          <h3 id="sideTitle">行程介紹</h3>
+          <p id="sideDuration">◷ 建議停留</p>
+          <p>🚇　捷運＋步行</p>
+          <p>⌁　適合第一次造訪或不想自己規劃的旅客</p>
+          <div class="info-actions trip-actions">
+            <a class="button outline" href="#route-map">路線地圖</a>
+            <button class="share-mini" type="button" aria-label="分享行程">⇪</button>
+          </div>
+        </div>
+
+        <div class="sidebox compact fill">
+          <div class="kicker">TRAVEL NOTES</div>
+          <h3>出發前的小提醒</h3>
+          <p>建議穿著好走的鞋；山區或戶外景點請依天候調整。若安排泡湯或餐廳，建議事先確認營業資訊。</p>
+        </div>
+
+        <div class="sidebox compact">
+          <div class="kicker">NEARBY STATION</div>
+          <h3>交通建議</h3>
+          <p>🚇　可依行程起點選擇捷運站</p>
+          <p>🗺️　建議開啟 Google Maps 確認即時路線</p>
         </div>
 
         <div class="sidebox compact dark">
           <div class="kicker" style="color:white">STAY NEARBY</div>
-          <h3>入住北捷行旅</h3>
-          <p>把一晚留給北投，讓散步、泡湯與晚風慢慢開始。</p>
+          <h3>如果還想再慢一點</h3>
+          <p>把一晚留給北投，讓散步、泡湯與晚風都不用趕著結束。</p>
           <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a>
         </div>
       </div>
     </aside>
   </main>
+
+  <section class="section related">
+    <div class="container">
+      <div class="kicker">MORE STORIES</div>
+      <h2>延伸閱讀</h2>
+      <div class="rel-grid">
+        <a class="rel" href="spots.html"><div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg"></div><div class="meta">SPOTS</div><h3>景點探索</h3></a>
+        <a class="rel" href="foods.html"><div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou_Market.jpg"></div><div class="meta">FOOD</div><h3>美食目錄</h3></a>
+        <a class="rel" href="coupons.html"><div class="rel-img"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85"></div><div class="meta">OFFERS</div><h3>優惠目錄</h3></a>
+        <a class="rel" href="index.html"><div class="rel-img"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=85"></div><div class="meta">GUIDE</div><h3>回首頁搜尋</h3></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <div class="kicker">PLAN YOUR STAY</div>
+      <h2>下一次出發，就從一晚舒服的停留開始</h2>
+      <p style="color:var(--muted)">把步調交給城市，把休息留給自己。從北捷行旅出發，重新認識你以為熟悉的台北。</p>
+      <a class="button" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房</a>
+    </div>
+  </section>
 
   <div id="footer"></div>
 
@@ -124,8 +155,22 @@
 
     const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
 
-    function getParam(name){ return new URLSearchParams(location.search).get(name); }
-    function setText(id,value,fallback=''){ const el=document.getElementById(id); if(el) el.textContent=value||fallback; }
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    function setText(id, value, fallback = '尚未提供') {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || fallback;
+    }
+
+    function normalizeText(text) {
+      return String(text || '')
+        .replace(/\r/g, '\n')
+        .replace(/\s+(?=\d{1,2}:\d{2}｜)/g, '\n')
+        .replace(/\s+(?=\d{1,2}:\d{2}\s*\|)/g, '\n')
+        .trim();
+    }
 
     function formatImageCaptionText(text){
       const raw = (text || '').trim();
@@ -146,129 +191,217 @@
       if(!text) return '';
       let output = String(text);
       if(imageUrl) output = output.replace(imageUrl, '');
-      return output
-        .replace(/\s*\|\s*$/g, '')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
+      return output.replace(/\s*\|\s*$/g, '').replace(/\n{3,}/g, '\n\n').trim();
     }
 
-    function parseLegacyContent(content){
-      if(!content) return [];
-      return String(content).split(/\n+/).filter(Boolean).map((line,index)=>{
-        const parts = line.split('|').map(x=>x.trim());
-        let time = '';
-        let title = `第 ${index+1} 段`;
-        let text = line;
-        let image = '';
-        let image_source = '';
+    function parseSteps(content) {
+      const text = normalizeText(content);
+      const rawLines = text.includes('\n') ? text.split('\n') : text.split(/(?=\d{1,2}:\d{2}[｜|])/g);
 
-        if(parts.length >= 3){
-          time = parts[0];
-          title = parts[1];
-          text = parts.slice(2).join('｜');
-        }
-
-        image = extractImageUrl(text);
-        text = cleanTextImageUrl(text, image);
-
-        return {time, title, text, image, image_source, order:index+1};
-      });
+      return rawLines
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map((line,index) => {
+          const parts = line.split(/[｜|]/).map(p => p.trim());
+          const time = parts[0] || '';
+          const title = parts[1] || `第 ${index + 1} 段`;
+          let body = parts[2] || parts.slice(0, 3).join(' ');
+          let image = parts[3] || extractImageUrl(body) || fallbackImage;
+          let image_source = parts[4] || '';
+          body = cleanTextImageUrl(body, image);
+          return { time, title, text: body, image, image_source };
+        });
     }
 
-    function normalizeSection(s){
-      const item = Object.assign({}, s || {});
+    function normalizeTripSection(section, index){
+      const item = section || {};
       let text = item.text || item.content || item.description || '';
-      let image = item.image || item.image_url || item.cover_image || '';
-      let imageSource = item.image_source || item.cover_image_source || item.source || '';
-
-      if(!image){
-        image = extractImageUrl(text);
-        text = cleanTextImageUrl(text, image);
-      }
+      let image = item.image || item.image_url || item.cover_image || extractImageUrl(text) || fallbackImage;
+      let image_source = item.image_source || item.cover_image_source || item.source || '';
+      text = cleanTextImageUrl(text, image);
 
       return {
         time: item.time || '',
-        title: item.title || '行程段落',
+        title: item.title || `第 ${index + 1} 段`,
         text,
         image,
-        image_source: imageSource,
-        order: item.order || item.sort_order || 0
+        image_source
       };
     }
 
-    function renderSections(sections, legacyContent){
-      const wrap = document.getElementById('tripSections');
-      const list = Array.isArray(sections) && sections.length
-        ? sections.slice().sort((a,b)=>(a.order||a.sort_order||0)-(b.order||b.sort_order||0)).map(normalizeSection)
-        : parseLegacyContent(legacyContent);
-
-      if(!list.length){
-        wrap.innerHTML = '<p>行程分段即將補上。</p>';
-        return;
+    function getTripSteps(trip){
+      if(Array.isArray(trip.trip_sections) && trip.trip_sections.length){
+        return trip.trip_sections
+          .slice()
+          .sort((a,b)=>(a.order || a.sort_order || 0) - (b.order || b.sort_order || 0))
+          .map(normalizeTripSection);
       }
-
-      wrap.innerHTML = list.map((s,index)=>`
-        <section class="trip-step-card">
-          <div class="trip-step-no">${String(index+1).padStart(2,'0')}</div>
-          <div class="trip-step-body">
-            ${s.time ? `<div class="trip-time">${s.time}</div>` : ''}
-            <h2>${s.title || '行程段落'}</h2>
-            ${s.text ? `<p>${String(s.text).replace(/\n/g,'<br>')}</p>` : ''}
-            ${s.image ? `
-              <img src="${s.image}" alt="${s.title || '行程圖片'}">
-              ${s.image_source ? `<p class="image-source-caption">${formatImageCaptionText(s.image_source)}</p>` : ''}
-            ` : ''}
-          </div>
-        </section>
-      `).join('');
+      return parseSteps(trip.content);
     }
 
-    async function loadTrip(){
-      const id = getParam('id');
-      if(!id){
-        setText('tripTitle','找不到行程');
-        setText('tripSummary','請從行程列表重新進入。');
+    function getRouteQuery(trip, steps) {
+      if (trip.google_route) {
+        try {
+          const url = new URL(trip.google_route);
+          const q = url.searchParams.get('query') || url.searchParams.get('q');
+          if (q) return q;
+        } catch (e) {}
+      }
+
+      const stepNames = steps.map(s => s.title).filter(Boolean).join(' ');
+      return stepNames || trip.title || '';
+    }
+
+    function getGoogleMapsUrl(trip, steps) {
+      if (trip.google_route && trip.google_route.startsWith('http')) return trip.google_route;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getRouteQuery(trip, steps))}`;
+    }
+
+    function getMapEmbedUrl(trip, steps) {
+      return `https://www.google.com/maps?q=${encodeURIComponent(getRouteQuery(trip, steps))}&output=embed`;
+    }
+
+    function getTripKeyword(trip) {
+      const text = `${trip.title || ''} ${trip.summary || ''} ${trip.content || ''}`;
+      if (text.includes('陽明山')) return '陽明山';
+      if (text.includes('淡水')) return '淡水';
+      if (text.includes('士林')) return '士林';
+      if (text.includes('北投') || text.includes('新北投')) return '北投';
+      return '';
+    }
+
+    async function fetchTable(table) {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/${table}?is_published=eq.true&select=*&order=id.asc`,
+        {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || `${table} 讀取失敗`);
+      return result;
+    }
+
+    function renderRelatedList(targetId, rows, type, keyword, maxCount) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const filtered = rows.filter(item => {
+        const text = `${item.title || ''} ${item.area || ''} ${item.category || ''} ${item.summary || ''} ${item.content || ''} ${item.tags || ''}`;
+        return !keyword || text.includes(keyword);
+      }).slice(0, maxCount);
+
+      const list = filtered.length ? filtered : rows.slice(0, maxCount);
+
+      if (!list.length) {
+        target.innerHTML = `<a class="route-related-item" href="${type}s.html"><strong>查看全部</strong>目前尚未建立相關內容</a>`;
         return;
       }
 
-      try{
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/trips?id=eq.${encodeURIComponent(id)}&select=*`,{
-          headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
-        });
-        const result = await res.json();
-        if(!res.ok) throw new Error(result.message || '讀取失敗');
+      target.innerHTML = list.map(item => {
+        const href = type === 'spot'
+          ? `spot.html?id=${encodeURIComponent(item.id)}`
+          : type === 'food'
+            ? `food.html?id=${encodeURIComponent(item.id)}`
+            : `coupon.html?id=${encodeURIComponent(item.id)}`;
+
+        return `<a class="route-related-item" href="${href}"><strong>${item.title || '未命名'}</strong>${item.summary || '更多介紹即將補上。'}</a>`;
+      }).join('');
+    }
+
+    async function renderRelatedContent(trip) {
+      const keyword = getTripKeyword(trip);
+
+      try {
+        const [spots, foods, coupons] = await Promise.all([
+          fetchTable('spots'),
+          fetchTable('foods'),
+          fetchTable('coupons')
+        ]);
+
+        renderRelatedList('relatedSpots', spots, 'spot', keyword, 4);
+        renderRelatedList('relatedFoods', foods, 'food', keyword, 3);
+        renderRelatedList('relatedCoupons', coupons, 'coupon', keyword, 3);
+      } catch (error) {
+        console.error(error);
+        document.getElementById('relatedSpots').innerHTML = '<a class="route-related-item" href="spots.html"><strong>景點探索</strong>查看景點列表</a>';
+        document.getElementById('relatedFoods').innerHTML = '<a class="route-related-item" href="foods.html"><strong>美食目錄</strong>查看美食列表</a>';
+        document.getElementById('relatedCoupons').innerHTML = '<a class="route-related-item" href="coupons.html"><strong>優惠目錄</strong>查看優惠列表</a>';
+      }
+    }
+
+    async function loadTrip() {
+      const id = getParam('id');
+
+      if (!id) {
+        setText('heroSubtitle', '找不到行程代碼，請回行程列表重新進入。');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/trips?id=eq.${encodeURIComponent(id)}&select=*`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Supabase 讀取失敗');
 
         const trip = result[0];
-        if(!trip){
-          setText('tripTitle','找不到行程');
-          setText('tripSummary','這筆行程不存在或尚未上架。');
+        if (!trip) {
+          setText('heroSubtitle', '找不到這筆行程資料。');
           return;
         }
 
         const image = trip.cover_image || fallbackImage;
-        document.title = `${trip.title || '行程'}｜Metro Inn Guide 北投旅圖`;
+        const steps = getTripSteps(trip);
+
+        document.title = `${trip.title || '行程介紹'}｜Metro Inn Guide 北投旅圖`;
         document.getElementById('heroImage').src = image;
-
-        setText('tripTitle', trip.title);
-        setText('tripSummary', trip.summary);
+        setText('heroKicker', (trip.slug || 'route').replaceAll('-', ' ').toUpperCase());
+        setText('heroTitle', trip.title);
+        setText('heroSubtitle', trip.summary);
+        setText('heroDuration', trip.duration);
+        setText('breadcrumb', `首頁　›　行程　›　${trip.title}`);
         setText('leadText', trip.summary);
-        setText('tripDuration', trip.duration || '建議時間');
         setText('sideTitle', trip.title);
-        setText('sideDuration', trip.duration ? `⏱ ${trip.duration}` : '⏱ 建議時間');
-        setText('breadcrumb', `首頁　›　行程　›　${trip.title || ''}`);
+        setText('sideDuration', `◷　建議停留 ${trip.duration || '依行程安排'}`);
 
-        renderSections(trip.trip_sections, trip.content);
+        document.getElementById('routeGrid').innerHTML = steps.slice(0, 4).map(step => `
+          <div>
+            <small>${step.time}</small>
+            <strong>${step.title}</strong>
+            <p>${step.text}</p>
+          </div>
+        `).join('');
 
-        if(trip.google_route){
-          document.getElementById('routeBox').style.display = 'block';
-          document.getElementById('routeLink').href = trip.google_route;
-          document.getElementById('sideRoute').href = trip.google_route;
-          document.getElementById('sideRoute').style.display = 'inline-flex';
-        }
-      }catch(error){
+        document.getElementById('storySections').innerHTML = steps.map((step, index) => `
+          <section class="story numbered-story" id="s${index + 1}">
+            <h2><span class="step-no">${String(index + 1).padStart(2, '0')}</span><span>${step.title}</span></h2>
+            <p>${step.time ? step.time + '｜' : ''}${step.text}</p>
+            <div class="story-img"><img src="${step.image}" alt="${step.title}"></div>
+            ${step.image_source ? `<p class="image-source-caption">${formatImageCaptionText(step.image_source)}</p>` : ''}
+          </section>
+        `).join('');
+
+        document.getElementById('mapButton').href = getGoogleMapsUrl(trip, steps);
+        document.getElementById('mapEmbed').src = getMapEmbedUrl(trip, steps);
+
+        renderRelatedContent(trip);
+
+      } catch (error) {
         console.error(error);
-        setText('tripTitle','行程資料暫時無法載入');
-        setText('tripSummary','請稍後再試。');
+        setText('heroSubtitle', '行程資料暫時無法載入，請稍後再試。');
+        setText('leadText', '行程資料暫時無法載入，請稍後再試。');
       }
     }
 

@@ -97,107 +97,16 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   color:#7A8588;
 }
 
+/* CMS Banner / dynamic footer additions */
+.home-banner-section{position:relative;overflow:hidden}.home-banner-carousel{position:relative;min-height:520px;background:#eef2f0}.home-banner-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}.home-banner-slide.active{opacity:1;z-index:1}.home-banner-slide picture,.home-banner-slide img{display:block;width:100%;height:100%;min-height:520px}.home-banner-slide img{object-fit:cover}.home-banner-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,32,28,.72),rgba(20,32,28,.12));display:flex;align-items:center;color:#fff}.home-banner-copy{max-width:620px;padding:80px 0}.home-banner-copy h1{font-size:clamp(42px,6vw,76px);margin:12px 0 18px;color:#fff}.home-banner-copy p{font-size:20px;line-height:1.8;color:rgba(255,255,255,.9)}.home-banner-dots{position:absolute;z-index:5;left:50%;bottom:24px;transform:translateX(-50%);display:flex;gap:10px}.home-banner-dots button{width:12px;height:12px;border-radius:99px;border:1px solid #fff;background:rgba(255,255,255,.35);cursor:pointer}.home-banner-dots button.active{background:#fff}.footer-contact{color:rgba(255,255,255,.78);line-height:1.8}.footer-social{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}.footer-social a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+@media(max-width:700px){.home-banner-carousel{min-height:620px}.home-banner-slide picture,.home-banner-slide img{min-height:620px}.home-banner-overlay{background:linear-gradient(0deg,rgba(20,32,28,.76),rgba(20,32,28,.18))}.home-banner-copy{padding:330px 0 70px}.home-banner-copy p{font-size:16px}.home-banner-copy h1{font-size:40px}}
 
-/* 首頁 Banner 輪播 */
-.home-banner-section{
-  position:relative;
-  background:var(--bg);
-}
-.home-banner-carousel{
-  position:relative;
-  height:calc(100vh - 90px);
-  min-height:560px;
-  max-height:820px;
-  overflow:hidden;
-  background:#1f2b24;
-}
-.home-banner-slide{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transition:opacity .85s ease, visibility .85s ease;
-}
-.home-banner-slide.active{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-  z-index:1;
-}
-.home-banner-slide picture,
-.home-banner-slide img{
-  display:block;
-  width:100%;
-  height:100%;
-}
-.home-banner-slide img{
-  object-fit:cover;
-}
-.home-banner-overlay{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  background:linear-gradient(90deg, rgba(18,32,40,.58), rgba(18,32,40,.18) 48%, rgba(18,32,40,.05));
-}
-.home-banner-copy{
-  max-width:560px;
-  color:#fff;
-}
-.home-banner-copy h1{
-  margin:18px 0;
-  font-size:64px;
-  line-height:1.08;
-  letter-spacing:.08em;
-  color:#fff;
-}
-.home-banner-copy p{
-  max-width:520px;
-  font-size:17px;
-  line-height:2;
-  color:rgba(255,255,255,.88);
-  margin:0 0 28px;
-}
-.home-banner-copy .kicker{
-  color:#a9cce8;
-}
-.home-banner-dots{
-  position:absolute;
-  left:50%;
-  bottom:24px;
-  transform:translateX(-50%);
-  z-index:5;
-  display:flex;
-  gap:8px;
-}
-.home-banner-dots button{
-  width:9px;
-  height:9px;
-  border:0;
-  border-radius:999px;
-  padding:0;
-  background:rgba(255,255,255,.52);
-  cursor:pointer;
-}
-.home-banner-dots button.active{
-  background:#fff;
-}
-@media(max-width:760px){
-  .home-banner-carousel{
-    height:620px;
-    min-height:620px;
-  }
-  .home-banner-overlay{
-    align-items:flex-end;
-    padding-bottom:86px;
-    background:linear-gradient(180deg, rgba(18,32,40,.05), rgba(18,32,40,.72));
-  }
-  .home-banner-copy h1{
-    font-size:42px;
-  }
-}
+
+/* banner carousel fix */
+.home-banner-slide{pointer-events:none}.home-banner-slide.active{pointer-events:auto}.home-banner-section{padding:0;background:var(--bg)}
+.home-banner-carousel{height:calc(100vh - 76px);min-height:520px;max-height:760px}
+.home-banner-slide picture,.home-banner-slide img{height:100%;min-height:520px}
+@media(max-width:700px){.home-banner-carousel{height:620px;min-height:620px}.home-banner-slide picture,.home-banner-slide img{height:620px}}
 
 
 /* 圖片來源說明：放在圖片裁切框外側下方，避免被 .story-img overflow:hidden 吃掉 */
@@ -211,7 +120,4 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   letter-spacing:.02em !important;
   height:auto !important;
   overflow:visible !important;
-}
-.trip-step-body .image-source-caption{
-  margin-top:8px !important;
 }

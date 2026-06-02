@@ -62,6 +62,39 @@ document.getElementById('footer').innerHTML=footer();
 
 let homeBannerAutoTimer = null;
 
+function renderHomeBanners(banners){
+  const section = document.getElementById('homeBannerSection');
+  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
+
+  if(!valid.length){
+    setupHomeBannerCarousel();
+    return;
+  }
+
+  const bannerItems = valid.slice(0,4);
+  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${bannerItems.map((b,i)=>{
+    const pc = b.image_url || b.image_pc;
+    const mobile = b.mobile_image_url || b.image_mobile || pc;
+    const title = b.title || '北投旅圖';
+    const subtitle = b.subtitle || b.summary || '';
+    const buttonText = b.button_text || '了解更多';
+    const buttonUrl = b.button_url || 'spots.html';
+    return `<article class="home-banner-slide ${i===0?'active':''}">
+      <picture>
+        <source media="(max-width:700px)" srcset="${mobile}">
+        <img src="${pc}" alt="${title}">
+      </picture>
+      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
+        <div class="kicker">${b.kicker || 'METRO INN GUIDE'}</div>
+        <h1>${title}</h1>
+        <p>${subtitle}</p>
+        ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
+      </div></div></div>
+    </article>`;
+  }).join('')}<div class="home-banner-dots">${bannerItems.map((_,i)=>`<button class="${i===0?'active':''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('')}</div></div>`;
+  setupHomeBannerCarousel();
+}
+
 function setupHomeBannerCarousel(){
   const carousel = document.getElementById('homeBannerCarousel');
   if(!carousel) return;
@@ -75,81 +108,32 @@ function setupHomeBannerCarousel(){
     homeBannerAutoTimer = null;
   }
 
-  let current = slides.findIndex(s => s.classList.contains('active'));
-  if(current < 0) current = 0;
+  let idx = slides.findIndex(s => s.classList.contains('active'));
+  if(idx < 0) idx = 0;
 
-  function show(index){
-    current = (index + slides.length) % slides.length;
-    slides.forEach((slide,i)=>slide.classList.toggle('active', i === current));
-    dots.forEach((dot,i)=>dot.classList.toggle('active', i === current));
+  function show(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+    dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
   }
 
-  show(current);
+  show(idx);
+  dots.forEach((d,i)=>d.addEventListener('click',()=>show(i)));
 
-  dots.forEach((dot,i)=>dot.addEventListener('click', () => show(i)));
-
-  if(slides.length > 1){
-    homeBannerAutoTimer = setInterval(() => show(current + 1), 4500);
+  if(slides.length>1){
+    homeBannerAutoTimer = setInterval(()=>show(idx+1),4500);
   }
-}
-
-function renderHomeBanners(banners){
-  const section = document.getElementById('homeBannerSection');
-  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
-
-  if(!valid.length){
-    setupHomeBannerCarousel();
-    return;
-  }
-
-  const bannerItems = valid.slice(0,4);
-  const slides = bannerItems.map((b,i)=>{
-    const pc = b.image_url || b.image_pc;
-    const mobile = b.mobile_image_url || b.image_mobile || pc;
-    const title = b.title || '北投旅圖';
-    const subtitle = b.subtitle || b.summary || '';
-    const buttonText = b.button_text || '了解更多';
-    const buttonUrl = b.button_url || 'spots.html';
-
-    return `<article class="home-banner-slide ${i===0 ? 'active' : ''}">
-      <picture>
-        <source media="(max-width:700px)" srcset="${mobile}">
-        <img src="${pc}" alt="${title}">
-      </picture>
-      <div class="home-banner-overlay">
-        <div class="container">
-          <div class="home-banner-copy">
-            <div class="kicker">${b.kicker || 'METRO INN GUIDE'}</div>
-            <h1>${title}</h1>
-            <p>${subtitle}</p>
-            ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
-          </div>
-        </div>
-      </div>
-    </article>`;
-  }).join('');
-
-  const dots = bannerItems.map((_,i)=>`<button class="${i===0 ? 'active' : ''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('');
-
-  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${slides}<div class="home-banner-dots">${dots}</div></div>`;
-  setupHomeBannerCarousel();
 }
 
 async function loadHomeBanners(){
   setupHomeBannerCarousel();
 
-  if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined'){
-    return;
-  }
+  if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') return;
 
   try{
     const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?select=*&order=sort_order.asc&limit=4`, {
-      headers:{
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
+      headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
     });
-
     if(!res.ok) return;
 
     const raw = await res.json();

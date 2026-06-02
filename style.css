@@ -113,3 +113,55 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 .trip-step-body .image-source-caption{
   margin-top:8px !important;
 }
+
+
+/* 首頁 Banner 輪播修正：確保 slide 疊放、active 才顯示 */
+.home-banner-carousel{
+  position:relative;
+  overflow:hidden;
+}
+.home-banner-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .8s ease, visibility .8s ease;
+}
+.home-banner-slide.active{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  position:relative;
+  z-index:1;
+}
+.home-banner-slide picture,
+.home-banner-slide img{
+  display:block;
+  width:100%;
+  height:100%;
+}
+.home-banner-slide img{
+  object-fit:cover;
+}
+.home-banner-dots{
+  position:absolute;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  z-index:3;
+  display:flex;
+  gap:8px;
+}
+.home-banner-dots button{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  border:0;
+  padding:0;
+  background:rgba(255,255,255,.55);
+  cursor:pointer;
+}
+.home-banner-dots button.active{
+  background:#fff;
+}

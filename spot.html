@@ -5,28 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script>
+  <script src="data.js"></script></script>
   <script src="supabase-config.js"></script>
-  <script>
-function formatImageSource(text){
-  const t = (text || '').trim();
-  if(!t) return '';
-  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
-}
-function forceStoryImageSource(text){
-  const label = formatImageSource(text);
-  const img = document.getElementById('storyImage');
-  if(!img) return;
-  let caption = document.getElementById('storyImageSource');
-  if(!caption){
-    img.insertAdjacentHTML('afterend','<p id="storyImageSource" class="image-source-caption" style="display:block!important;margin-top:10px!important;font-size:13px!important;line-height:1.7!important;color:#6F7A72!important;"></p>');
-    caption = document.getElementById('storyImageSource');
-  }
-  caption.textContent = label;
-  caption.style.cssText = 'display:' + (label ? 'block' : 'none') + '!important;margin-top:10px!important;font-size:13px!important;line-height:1.7!important;color:#6F7A72!important;';
-}
-
-</script>
 </head>
 
 <body id="top">
@@ -182,7 +162,31 @@ function forceStoryImageSource(text){
       return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
     }
 
-    async function loadSpot() {
+    
+    function showSpotImageSourceFinal(spot){
+      const img = document.getElementById('storyImage');
+      if(!img) return;
+      let el = document.getElementById('storyImageSource');
+      if(!el){
+        el = document.createElement('div');
+        el.id = 'storyImageSource';
+        el.className = 'image-source-caption';
+        img.insertAdjacentElement('afterend', el);
+      }
+      // spot_0001 known source fallback
+      const params = new URLSearchParams(location.search);
+      const fallbackSource = params.get('id') === 'spot_0001' ? '台北旅遊網' : '';
+      const raw = (spot && (spot.cover_image_source || spot.image_source || spot.photo_source || spot.source)) ? String(spot.cover_image_source || spot.image_source || spot.photo_source || spot.source).trim() : fallbackSource;
+      const text = raw ? (raw.startsWith('圖片來源') ? raw : '圖片來源：' + raw) : '';
+      el.textContent = text;
+      el.style.display = text ? 'block' : 'none';
+      el.style.marginTop = '10px';
+      el.style.fontSize = '13px';
+      el.style.lineHeight = '1.7';
+      el.style.color = '#6F7A72';
+    }
+
+async function loadSpot() {
       const id = getParam('id');
 
       if (!id) {
@@ -229,6 +233,7 @@ function forceStoryImageSource(text){
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
+        showSpotImageSourceFinal(spot);
         forceStoryImageSource(imageSourceText);
         const storySourceEl = document.getElementById('storyImageSource');
         if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }

@@ -7,27 +7,6 @@
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
-  <script>
-function formatImageCredit(text){
-  const t = (text || '').trim();
-  if(!t) return '';
-  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
-}
-function forceStoryImageSource(text){
-  const img = document.getElementById('storyImage');
-  if(!img) return;
-  let caption = document.getElementById('storyImageSource');
-  if(!caption){
-    caption = document.createElement('p');
-    caption.id = 'storyImageSource';
-    caption.className = 'image-source-caption';
-    img.insertAdjacentElement('afterend', caption);
-  }
-  const label = formatImageCredit(text);
-  caption.textContent = label;
-  caption.style.display = label ? 'block' : 'none';
-}
-</script>
 </head>
 
 <body id="top">
@@ -181,6 +160,21 @@ function forceStoryImageSource(text){
       return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
     }
 
+    function renderImageCaption(text){
+      const el = document.getElementById('storyImageSource');
+      if(!el) return;
+      const raw = (text || '').trim();
+      if(!raw){
+        el.textContent = '';
+        el.style.display = 'none';
+        return;
+      }
+      el.textContent = raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`;
+      el.style.display = 'block';
+    }
+
+
+
     async function loadFood() {
       const id = getParam('id');
 
@@ -215,8 +209,8 @@ function forceStoryImageSource(text){
 
         const tags = normalizeTags(food.tags);
         const image = food.cover_image || fallbackImage;
-        const imageSourceText = food.cover_image_source || food.image_source || '';
-                const title = food.title || '美食介紹';
+        const imageSourceText = food.cover_image_source || '';
+        const title = food.title || '美食介紹';
         const summary = food.summary || '更多介紹即將補上。';
         const content = food.content || summary;
         const cost = food.average_cost || food.price_range || '依店家公告為準';
@@ -226,7 +220,7 @@ function forceStoryImageSource(text){
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
-        forceStoryImageSource(imageSourceText);
+        renderImageCaption(imageSourceText);
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${food.category || 'FOOD'} · FOOD`);

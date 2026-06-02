@@ -209,7 +209,7 @@
 
         const tags = normalizeTags(food.tags);
         const image = food.cover_image || fallbackImage;
-        const imageSourceText = food.cover_image_source || '';
+        const imageSourceText = food.cover_image_source || food.image_source || '';
         const title = food.title || '美食介紹';
         const summary = food.summary || '更多介紹即將補上。';
         const content = food.content || summary;

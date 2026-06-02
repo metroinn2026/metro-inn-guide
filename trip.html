@@ -127,29 +127,79 @@
     function getParam(name){ return new URLSearchParams(location.search).get(name); }
     function setText(id,value,fallback=''){ const el=document.getElementById(id); if(el) el.textContent=value||fallback; }
 
-    function parseLegacyContent(content){
-      if(!content) return [];
-      return String(content).split(/\n+/).filter(Boolean).map((line,index)=>{
-        const parts = line.split('|').map(x=>x.trim());
-        if(parts.length >= 3){
-          return {time:parts[0], title:parts[1], text:parts.slice(2).join('｜'), image:'', order:index+1};
-        }
-        return {time:'', title:`第 ${index+1} 段`, text:line, image:'', order:index+1};
-      });
-    }
-
     function formatImageCaptionText(text){
       const raw = (text || '').trim();
       if(!raw) return '';
       return raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`;
     }
 
+    function extractImageUrl(text){
+      const raw = String(text || '');
+      const match = raw.match(/https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s<>"']*)?/i)
+        || raw.match(/https?:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath\/[^\s<>"']+/i)
+        || raw.match(/https?:\/\/upload\.wikimedia\.org\/[^\s<>"']+/i)
+        || raw.match(/https?:\/\/images\.unsplash\.com\/[^\s<>"']+/i);
+      return match ? match[0] : '';
+    }
 
+    function cleanTextImageUrl(text, imageUrl){
+      if(!text) return '';
+      let output = String(text);
+      if(imageUrl) output = output.replace(imageUrl, '');
+      return output
+        .replace(/\s*\|\s*$/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    }
+
+    function parseLegacyContent(content){
+      if(!content) return [];
+      return String(content).split(/\n+/).filter(Boolean).map((line,index)=>{
+        const parts = line.split('|').map(x=>x.trim());
+        let time = '';
+        let title = `第 ${index+1} 段`;
+        let text = line;
+        let image = '';
+        let image_source = '';
+
+        if(parts.length >= 3){
+          time = parts[0];
+          title = parts[1];
+          text = parts.slice(2).join('｜');
+        }
+
+        image = extractImageUrl(text);
+        text = cleanTextImageUrl(text, image);
+
+        return {time, title, text, image, image_source, order:index+1};
+      });
+    }
+
+    function normalizeSection(s){
+      const item = Object.assign({}, s || {});
+      let text = item.text || item.content || item.description || '';
+      let image = item.image || item.image_url || item.cover_image || '';
+      let imageSource = item.image_source || item.cover_image_source || item.source || '';
+
+      if(!image){
+        image = extractImageUrl(text);
+        text = cleanTextImageUrl(text, image);
+      }
+
+      return {
+        time: item.time || '',
+        title: item.title || '行程段落',
+        text,
+        image,
+        image_source: imageSource,
+        order: item.order || item.sort_order || 0
+      };
+    }
 
     function renderSections(sections, legacyContent){
       const wrap = document.getElementById('tripSections');
       const list = Array.isArray(sections) && sections.length
-        ? sections.slice().sort((a,b)=>(a.order||0)-(b.order||0))
+        ? sections.slice().sort((a,b)=>(a.order||a.sort_order||0)-(b.order||b.sort_order||0)).map(normalizeSection)
         : parseLegacyContent(legacyContent);
 
       if(!list.length){
@@ -163,8 +213,11 @@
           <div class="trip-step-body">
             ${s.time ? `<div class="trip-time">${s.time}</div>` : ''}
             <h2>${s.title || '行程段落'}</h2>
-            <p>${(s.text || '').replace(/\n/g,'<br>')}</p>
-            ${s.image ? `<img src="${s.image}" alt="${s.title || '行程圖片'}">${s.image_source ? `<p class="image-source-caption">${formatImageCaptionText(s.image_source)}</p>` : ''}` : ''}
+            ${s.text ? `<p>${String(s.text).replace(/\n/g,'<br>')}</p>` : ''}
+            ${s.image ? `
+              <img src="${s.image}" alt="${s.title || '行程圖片'}">
+              ${s.image_source ? `<p class="image-source-caption">${formatImageCaptionText(s.image_source)}</p>` : ''}
+            ` : ''}
           </div>
         </section>
       `).join('');

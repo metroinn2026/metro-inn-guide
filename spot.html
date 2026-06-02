@@ -211,7 +211,7 @@
 
         const tags = normalizeTags(spot.tags);
         const image = spot.cover_image || fallbackImage;
-        const imageSourceText = spot.cover_image_source || '';
+        const imageSourceText = spot.cover_image_source || spot.image_source || '';
         const stationText = spot.station ? `${spot.station}附近` : '捷運資訊請見內文';
         const title = spot.title || '景點介紹';
         const summary = spot.summary || '更多介紹即將補上。';

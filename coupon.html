@@ -169,7 +169,7 @@
         const summary = coupon.summary || '更多優惠說明即將補上。';
         const content = coupon.content || summary;
         const image = coupon.cover_image || fallbackImage;
-        const imageSourceText = coupon.cover_image_source || '';
+        const imageSourceText = coupon.cover_image_source || coupon.image_source || '';
         const range = dateRange(coupon);
 
         document.title = `${title}｜Metro Inn Guide 北投旅圖`;

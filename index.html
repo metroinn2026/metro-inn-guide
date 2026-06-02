@@ -62,47 +62,6 @@ document.getElementById('footer').innerHTML=footer();
 
 let homeBannerAutoTimer = null;
 
-function renderHomeBanners(banners){
-  const section = document.getElementById('homeBannerSection');
-  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
-
-  if(!valid.length){
-    setupHomeBannerCarousel();
-    return;
-  }
-
-  const slides = valid.slice(0,4).map((b,i)=>{
-    const pc = b.image_url || b.image_pc;
-    const mobile = b.mobile_image_url || b.image_mobile || pc;
-    const title = b.title || '北投旅圖';
-    const subtitle = b.subtitle || '';
-    const buttonText = b.button_text || '了解更多';
-    const buttonUrl = b.button_url || 'spots.html';
-
-    return `<article class="home-banner-slide ${i===0 ? 'active' : ''}">
-      <picture>
-        <source media="(max-width:700px)" srcset="${mobile}">
-        <img src="${pc}" alt="${title}">
-      </picture>
-      <div class="home-banner-overlay">
-        <div class="container">
-          <div class="home-banner-copy">
-            <div class="kicker">${b.kicker || 'METRO INN GUIDE'}</div>
-            <h1>${title}</h1>
-            <p>${subtitle}</p>
-            ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
-          </div>
-        </div>
-      </div>
-    </article>`;
-  }).join('');
-
-  const dots = valid.slice(0,4).map((_,i)=>`<button class="${i===0 ? 'active' : ''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('');
-
-  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${slides}<div class="home-banner-dots">${dots}</div></div>`;
-  setupHomeBannerCarousel();
-}
-
 function setupHomeBannerCarousel(){
   const carousel = document.getElementById('homeBannerCarousel');
   if(!carousel) return;
@@ -127,15 +86,53 @@ function setupHomeBannerCarousel(){
 
   show(current);
 
-  dots.forEach((dot,i)=>{
-    dot.addEventListener('click', () => show(i));
-  });
+  dots.forEach((dot,i)=>dot.addEventListener('click', () => show(i)));
 
   if(slides.length > 1){
-    homeBannerAutoTimer = setInterval(() => {
-      show(current + 1);
-    }, 4500);
+    homeBannerAutoTimer = setInterval(() => show(current + 1), 4500);
   }
+}
+
+function renderHomeBanners(banners){
+  const section = document.getElementById('homeBannerSection');
+  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
+
+  if(!valid.length){
+    setupHomeBannerCarousel();
+    return;
+  }
+
+  const bannerItems = valid.slice(0,4);
+  const slides = bannerItems.map((b,i)=>{
+    const pc = b.image_url || b.image_pc;
+    const mobile = b.mobile_image_url || b.image_mobile || pc;
+    const title = b.title || '北投旅圖';
+    const subtitle = b.subtitle || b.summary || '';
+    const buttonText = b.button_text || '了解更多';
+    const buttonUrl = b.button_url || 'spots.html';
+
+    return `<article class="home-banner-slide ${i===0 ? 'active' : ''}">
+      <picture>
+        <source media="(max-width:700px)" srcset="${mobile}">
+        <img src="${pc}" alt="${title}">
+      </picture>
+      <div class="home-banner-overlay">
+        <div class="container">
+          <div class="home-banner-copy">
+            <div class="kicker">${b.kicker || 'METRO INN GUIDE'}</div>
+            <h1>${title}</h1>
+            <p>${subtitle}</p>
+            ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+
+  const dots = bannerItems.map((_,i)=>`<button class="${i===0 ? 'active' : ''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('');
+
+  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${slides}<div class="home-banner-dots">${dots}</div></div>`;
+  setupHomeBannerCarousel();
 }
 
 async function loadHomeBanners(){

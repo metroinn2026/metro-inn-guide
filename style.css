@@ -98,6 +98,108 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 }
 
 
+/* 首頁 Banner 輪播 */
+.home-banner-section{
+  position:relative;
+  background:var(--bg);
+}
+.home-banner-carousel{
+  position:relative;
+  height:calc(100vh - 90px);
+  min-height:560px;
+  max-height:820px;
+  overflow:hidden;
+  background:#1f2b24;
+}
+.home-banner-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .85s ease, visibility .85s ease;
+}
+.home-banner-slide.active{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  z-index:1;
+}
+.home-banner-slide picture,
+.home-banner-slide img{
+  display:block;
+  width:100%;
+  height:100%;
+}
+.home-banner-slide img{
+  object-fit:cover;
+}
+.home-banner-overlay{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  background:linear-gradient(90deg, rgba(18,32,40,.58), rgba(18,32,40,.18) 48%, rgba(18,32,40,.05));
+}
+.home-banner-copy{
+  max-width:560px;
+  color:#fff;
+}
+.home-banner-copy h1{
+  margin:18px 0;
+  font-size:64px;
+  line-height:1.08;
+  letter-spacing:.08em;
+  color:#fff;
+}
+.home-banner-copy p{
+  max-width:520px;
+  font-size:17px;
+  line-height:2;
+  color:rgba(255,255,255,.88);
+  margin:0 0 28px;
+}
+.home-banner-copy .kicker{
+  color:#a9cce8;
+}
+.home-banner-dots{
+  position:absolute;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  z-index:5;
+  display:flex;
+  gap:8px;
+}
+.home-banner-dots button{
+  width:9px;
+  height:9px;
+  border:0;
+  border-radius:999px;
+  padding:0;
+  background:rgba(255,255,255,.52);
+  cursor:pointer;
+}
+.home-banner-dots button.active{
+  background:#fff;
+}
+@media(max-width:760px){
+  .home-banner-carousel{
+    height:620px;
+    min-height:620px;
+  }
+  .home-banner-overlay{
+    align-items:flex-end;
+    padding-bottom:86px;
+    background:linear-gradient(180deg, rgba(18,32,40,.05), rgba(18,32,40,.72));
+  }
+  .home-banner-copy h1{
+    font-size:42px;
+  }
+}
+
+
 /* 圖片來源說明：放在圖片裁切框外側下方，避免被 .story-img overflow:hidden 吃掉 */
 .image-source-caption{
   display:block !important;
@@ -112,56 +214,4 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 }
 .trip-step-body .image-source-caption{
   margin-top:8px !important;
-}
-
-
-/* 首頁 Banner 輪播修正：確保 slide 疊放、active 才顯示 */
-.home-banner-carousel{
-  position:relative;
-  overflow:hidden;
-}
-.home-banner-slide{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transition:opacity .8s ease, visibility .8s ease;
-}
-.home-banner-slide.active{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-  position:relative;
-  z-index:1;
-}
-.home-banner-slide picture,
-.home-banner-slide img{
-  display:block;
-  width:100%;
-  height:100%;
-}
-.home-banner-slide img{
-  object-fit:cover;
-}
-.home-banner-dots{
-  position:absolute;
-  left:50%;
-  bottom:22px;
-  transform:translateX(-50%);
-  z-index:3;
-  display:flex;
-  gap:8px;
-}
-.home-banner-dots button{
-  width:9px;
-  height:9px;
-  border-radius:999px;
-  border:0;
-  padding:0;
-  background:rgba(255,255,255,.55);
-  cursor:pointer;
-}
-.home-banner-dots button.active{
-  background:#fff;
 }

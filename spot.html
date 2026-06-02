@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script></script>
+  <script src="data.js"></script>
   <script src="supabase-config.js"></script>
 </head>
 
@@ -162,31 +162,27 @@
       return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
     }
 
-    
-    function showSpotImageSourceFinal(spot){
-      const img = document.getElementById('storyImage');
-      if(!img) return;
+
+    function showImageSource(spot) {
+      const raw = (spot.cover_image_source || spot.image_source || '').trim();
+      const label = raw ? (raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`) : '';
       let el = document.getElementById('storyImageSource');
-      if(!el){
+      const img = document.getElementById('storyImage');
+
+      if (!el && img) {
         el = document.createElement('div');
         el.id = 'storyImageSource';
         el.className = 'image-source-caption';
         img.insertAdjacentElement('afterend', el);
       }
-      // spot_0001 known source fallback
-      const params = new URLSearchParams(location.search);
-      const fallbackSource = params.get('id') === 'spot_0001' ? '台北旅遊網' : '';
-      const raw = (spot && (spot.cover_image_source || spot.image_source || spot.photo_source || spot.source)) ? String(spot.cover_image_source || spot.image_source || spot.photo_source || spot.source).trim() : fallbackSource;
-      const text = raw ? (raw.startsWith('圖片來源') ? raw : '圖片來源：' + raw) : '';
-      el.textContent = text;
-      el.style.display = text ? 'block' : 'none';
-      el.style.marginTop = '10px';
-      el.style.fontSize = '13px';
-      el.style.lineHeight = '1.7';
-      el.style.color = '#6F7A72';
+
+      if (el) {
+        el.textContent = label;
+        el.style.display = label ? 'block' : 'none';
+      }
     }
 
-async function loadSpot() {
+    async function loadSpot() {
       const id = getParam('id');
 
       if (!id) {
@@ -220,8 +216,6 @@ async function loadSpot() {
 
         const tags = normalizeTags(spot.tags);
         const image = spot.cover_image || fallbackImage;
-        const imageSourceText = spot.cover_image_source || '';
-        const itemImageSource = spot.cover_image_source || '';
         const stationText = spot.station ? `${spot.station}附近` : '捷運資訊請見內文';
         const title = spot.title || '景點介紹';
         const summary = spot.summary || '更多介紹即將補上。';
@@ -233,11 +227,7 @@ async function loadSpot() {
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
-        showSpotImageSourceFinal(spot);
-        forceStoryImageSource(imageSourceText);
-        const storySourceEl = document.getElementById('storyImageSource');
-        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
-        setText('storyImageSource', itemImageSource || '', '');
+        showImageSource(spot);
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${areaText} · SPOT`);

@@ -1,15 +1,16 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script>
-<style id="home-banner-height-fix">
+<style id="home-banner-search-layout-fix">
+/* 首頁 Banner + 搜尋器版面修正 */
 .home-banner-carousel{
-  height:60vh !important;
-  min-height:420px !important;
-  max-height:640px !important;
+  height:56vh !important;
+  min-height:430px !important;
+  max-height:560px !important;
 }
 .home-banner-slide picture,
 .home-banner-slide img{
-  height:60vh !important;
-  min-height:420px !important;
-  max-height:640px !important;
+  height:56vh !important;
+  min-height:430px !important;
+  max-height:560px !important;
 }
 .home-banner-slide img{
   object-fit:cover !important;
@@ -18,30 +19,114 @@
   align-items:center !important;
 }
 .home-banner-copy{
-  padding-top:32px !important;
-  padding-bottom:60px !important;
+  padding-top:18px !important;
+  padding-bottom:76px !important;
 }
+.home-banner-dots{
+  bottom:24px !important;
+  z-index:30 !important;
+}
+
+/* 搜尋器不要蓋住輪播圓點，並降低高度 */
 .search-panel{
   position:relative !important;
-  margin-top:-56px !important;
   z-index:10 !important;
+  margin-top:0 !important;
+  padding:24px 0 18px !important;
 }
-@media (max-width:1024px){
- .home-banner-carousel,
- .home-banner-slide picture,
- .home-banner-slide img{
-   height:52vh !important;
-   min-height:360px !important;
- }
+.search-box{
+  padding:24px 36px 22px !important;
 }
-@media (max-width:700px){
- .home-banner-carousel,
- .home-banner-slide picture,
- .home-banner-slide img{
-   height:45vh !important;
-   min-height:300px !important;
- }
- .search-panel{margin-top:0 !important;}
+.search-box-simple{
+  border-top:4px solid var(--green) !important;
+}
+.quick-search-title{
+  font-size:34px !important;
+  margin:8px 0 18px !important;
+}
+.keyword-row{
+  display:flex !important;
+  gap:16px !important;
+  align-items:stretch !important;
+}
+.keyword-row input{
+  min-height:52px !important;
+  padding:12px 18px !important;
+}
+.keyword-row .button{
+  min-height:52px !important;
+  padding:0 34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.search-tags{
+  margin-top:16px !important;
+  padding-top:0 !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px 18px !important;
+  align-items:center !important;
+  line-height:1.7 !important;
+}
+.search-tags span{
+  font-weight:900 !important;
+  color:var(--blue) !important;
+}
+.search-tags a{
+  white-space:nowrap !important;
+}
+
+/* 修正列表頁上方說明文字被截斷 */
+.page-header,
+.archive-header,
+.hero-copy,
+.hero-content,
+.section-intro,
+.listing-header,
+.section-heading{
+  max-width:1200px !important;
+  width:100% !important;
+}
+.page-header p,
+.archive-header p,
+.hero-copy p,
+.section-intro p{
+  max-width:900px !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+}
+
+@media(max-width:1024px){
+  .home-banner-carousel,
+  .home-banner-slide picture,
+  .home-banner-slide img{
+    height:50vh !important;
+    min-height:380px !important;
+  }
+}
+@media(max-width:700px){
+  .home-banner-carousel,
+  .home-banner-slide picture,
+  .home-banner-slide img{
+    height:44vh !important;
+    min-height:310px !important;
+  }
+  .search-panel{
+    padding:16px 0 !important;
+  }
+  .search-box{
+    padding:22px 20px !important;
+  }
+  .keyword-row{
+    display:block !important;
+  }
+  .keyword-row input,
+  .keyword-row .button{
+    width:100% !important;
+    margin-top:10px !important;
+  }
 }
 </style>
 
@@ -89,7 +174,7 @@
   </div>
 </section>
 
-<section class="search-panel"><div class="container"><div class="search-box search-box-simple"><div class="field keyword-only"><label>KEYWORD SEARCH</label><h2 class="quick-search-title">想去哪裡走走？</h2><div class="keyword-row"><input id="kw" placeholder="搜尋地熱谷、泡湯、咖啡廳、親子景點..."><a class="button" href="#" onclick="const q=document.getElementById('kw').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div></div></div><div class="search-tags"><span>熱門關鍵字：</span><a href="search.html?q=地熱谷">地熱谷</a><a href="search.html?q=北投溫泉">北投溫泉</a><a href="search.html?q=親子景點">親子景點</a><a href="search.html?q=陽明山">陽明山</a><a href="search.html?q=淡水夕陽">淡水夕陽</a><a href="search.html?q=士林夜市">士林夜市</a><a href="search.html?q=泡湯">泡湯</a><a href="search.html?q=咖啡廳">咖啡廳</a><a href="search.html?q=拉麵">拉麵</a><a href="search.html?q=優惠">優惠</a></div></div></section>
+<section class="search-panel"><div class="container"><div class="search-box search-box-simple"><div class="field keyword-only"><label>KEYWORD SEARCH</label><h2 class="quick-search-title">想去哪裡走走？</h2><div class="keyword-row"><input id="kw" placeholder="搜尋地熱谷、泡湯、咖啡廳、親子景點..."><a class="button" href="#" onclick="const q=document.getElementById('kw').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div><div class="search-tags"><span>熱門關鍵字：</span><a href="search.html?q=地熱谷">地熱谷</a><a href="search.html?q=北投溫泉">北投溫泉</a><a href="search.html?q=親子景點">親子景點</a><a href="search.html?q=陽明山">陽明山</a><a href="search.html?q=淡水夕陽">淡水夕陽</a><a href="search.html?q=士林夜市">士林夜市</a><a href="search.html?q=泡湯">泡湯</a><a href="search.html?q=咖啡廳">咖啡廳</a><a href="search.html?q=拉麵">拉麵</a><a href="search.html?q=優惠">優惠</a></div></div></div></div></section>
 
 <section class="section mag-news-wrap" id="news"><div class="container"><div class="section-head compact"><div><div class="kicker">LATEST NEWS</div><h2>最新消息</h2></div><a class="section-link" href="news.html">READ MORE →</a></div><div class="news-line-list"><a class="news-line" href="news-kids.html"><time>2026.06.11</time><span class="news-type">活動</span><strong>捷伴童行親子專案即將開賣</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.06.01</time><span class="news-type">住宿</span><strong>北投溫泉慢旅住房專案上架</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.20</time><span class="news-type">季節</span><strong>陽明山季節散策推薦：從北投出發的半日路線</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.15</time><span class="news-type">合作</span><strong>合作店家優惠陸續上架，出示畫面即可使用</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.08</time><span class="news-type">公告</span><strong>Metro Inn Guide｜北投旅圖試營運內容更新</strong><em>→</em></a></div></div></section>
 

@@ -1,4 +1,51 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script>
+<style id="home-banner-height-fix">
+.home-banner-carousel{
+  height:60vh !important;
+  min-height:420px !important;
+  max-height:640px !important;
+}
+.home-banner-slide picture,
+.home-banner-slide img{
+  height:60vh !important;
+  min-height:420px !important;
+  max-height:640px !important;
+}
+.home-banner-slide img{
+  object-fit:cover !important;
+}
+.home-banner-overlay{
+  align-items:center !important;
+}
+.home-banner-copy{
+  padding-top:32px !important;
+  padding-bottom:60px !important;
+}
+.search-panel{
+  position:relative !important;
+  margin-top:-56px !important;
+  z-index:10 !important;
+}
+@media (max-width:1024px){
+ .home-banner-carousel,
+ .home-banner-slide picture,
+ .home-banner-slide img{
+   height:52vh !important;
+   min-height:360px !important;
+ }
+}
+@media (max-width:700px){
+ .home-banner-carousel,
+ .home-banner-slide picture,
+ .home-banner-slide img{
+   height:45vh !important;
+   min-height:300px !important;
+ }
+ .search-panel{margin-top:0 !important;}
+}
+</style>
+
+</head><body><div id="header"></div>
 <main id="top">
 <section class="home-banner-section" id="homeBannerSection">
   <div class="home-banner-carousel" id="homeBannerCarousel">

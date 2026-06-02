@@ -98,19 +98,18 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 }
 
 
-/* 圖片來源說明：顯示於各單頁主圖/內文圖片下方，不改變原版型 */
+/* 圖片來源說明：放在圖片裁切框外側下方，避免被 .story-img overflow:hidden 吃掉 */
 .image-source-caption{
-  display:block;
-  margin:10px 0 0;
-  font-size:13px;
-  line-height:1.7;
-  color:#7b8580;
-  text-align:right;
-  letter-spacing:.02em;
-}
-.story-img .image-source-caption{
-  width:100%;
+  display:block !important;
+  margin:10px 0 0 !important;
+  font-size:13px !important;
+  line-height:1.7 !important;
+  color:#7b8580 !important;
+  text-align:right !important;
+  letter-spacing:.02em !important;
+  height:auto !important;
+  overflow:visible !important;
 }
 .trip-step-body .image-source-caption{
-  margin-top:8px;
+  margin-top:8px !important;
 }

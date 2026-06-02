@@ -217,7 +217,7 @@
       const item = section || {};
       let text = item.text || item.content || item.description || '';
       let image = item.image || item.image_url || item.cover_image || extractImageUrl(text) || fallbackImage;
-      let image_source = item.image_source || item.cover_image_source || item.source || '';
+      let image_source = item.image_source || item.cover_image_source || item.source || item.photo_source || item.caption || '';
       text = cleanTextImageUrl(text, image);
 
       return {
@@ -391,7 +391,7 @@
             <div class="story-img">
               <img src="${step.image}" alt="${step.title}">
             </div>
-            <p class="image-source-caption">${formatImageCaptionText(step.image_source || '')}</p>
+            <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>
           </section>
         `).join('');
 

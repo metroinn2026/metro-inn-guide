@@ -77,6 +77,16 @@
       background: #eee;
     }
 
+
+    .spot-image-source{
+      margin-top: 8px;
+      color: #7A8588;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: right;
+      letter-spacing: .02em;
+    }
+
     .spot-content-card{
       margin-top: 28px;
       padding-top: 28px;
@@ -158,17 +168,6 @@
       display: none;
     }
 
-    .image-source-caption{
-      display:block;
-      margin-top:10px;
-      margin-bottom:28px;
-      font-size:13px;
-      line-height:1.7;
-      color:#6F7A72;
-      text-align:right;
-      letter-spacing:.02em;
-    }
-
     .spot-loading,
     .spot-error{
       max-width: 1080px;
@@ -213,7 +212,7 @@
     <section id="spotDetail" class="spot-detail-main" style="display:none;">
       <div>
         <img id="spotCover" class="spot-cover" src="" alt="">
-        <div id="spotImageSource" class="image-source-caption"></div>
+        <div id="spotImageSource" class="spot-image-source" style="display:none;"></div>
 
         <article class="spot-content-card">
           <h2>景點介紹</h2>
@@ -307,19 +306,6 @@
       el.textContent = value || fallback;
     }
 
-    function formatImageSourceLabel(value) {
-      const raw = (value || '').trim();
-      if (!raw) return '';
-      return raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`;
-    }
-
-    function setImageSource(value) {
-      if (!els.imageSource) return;
-      const label = formatImageSourceLabel(value);
-      els.imageSource.textContent = label;
-      els.imageSource.style.display = label ? 'block' : 'none';
-    }
-
     function showError(message) {
       els.loading.className = 'spot-error';
       els.loading.textContent = message;
@@ -391,7 +377,16 @@
 
         els.cover.src = spot.cover_image || fallbackImage;
         els.cover.alt = spot.title || '景點圖片';
-        setImageSource(spot.cover_image_source || spot.image_source || '');
+        const sourceRaw = (spot.cover_image_source || spot.image_source || '').trim();
+        const sourceText = sourceRaw
+          ? (sourceRaw.startsWith('圖片來源') ? sourceRaw : `圖片來源：${sourceRaw}`)
+          : '';
+
+        if (els.imageSource) {
+          els.imageSource.textContent = sourceText;
+          els.imageSource.style.display = sourceText ? 'block' : 'none';
+        }
+
 
         setText(els.content, spot.content || spot.summary, '更多介紹即將補上。');
         setText(els.area, spot.area);

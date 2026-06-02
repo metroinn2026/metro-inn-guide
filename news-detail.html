@@ -143,10 +143,13 @@
         }
 
         const image = news.cover_image || fallbackImage;
+        const imageSourceText = news.cover_image_source || '';
 
         document.title = `${news.title || '最新消息'}｜Metro Inn Guide 北投旅圖`;
         document.getElementById('heroImage').src = image;
         document.getElementById('storyImage').src = image;
+        const storySourceEl = document.getElementById('storyImageSource');
+        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
         setText('storyImageSource', news.cover_image_source || '', '');
 
         setText('heroTitle', news.title);

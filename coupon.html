@@ -154,6 +154,7 @@
         const summary = coupon.summary || '更多優惠說明即將補上。';
         const content = coupon.content || summary;
         const image = coupon.cover_image || fallbackImage;
+        const imageSourceText = coupon.cover_image_source || '';
         const itemImageSource = coupon.cover_image_source || '';
         const range = dateRange(coupon);
 
@@ -162,6 +163,8 @@
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
+        const storySourceEl = document.getElementById('storyImageSource');
+        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
         setText('storyImageSource', itemImageSource || '', '');
         document.getElementById('storyImage').alt = title;
 

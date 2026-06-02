@@ -81,18 +81,6 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 .info-head-row h3{margin-top:14px}
 @media(max-width:900px){.route-related-grid{grid-template-columns:1fr}.route-map-head{display:block}.map-embed{height:330px}.numbered-story h2{grid-template-columns:1fr}.step-no{font-size:42px}}
 
-
-/* CMS Banner / dynamic footer additions */
-.home-banner-section{position:relative;overflow:hidden}.home-banner-carousel{position:relative;min-height:520px;background:#eef2f0}.home-banner-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}.home-banner-slide.active{opacity:1;z-index:1}.home-banner-slide picture,.home-banner-slide img{display:block;width:100%;height:100%;min-height:520px}.home-banner-slide img{object-fit:cover}.home-banner-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,32,28,.72),rgba(20,32,28,.12));display:flex;align-items:center;color:#fff}.home-banner-copy{max-width:620px;padding:80px 0}.home-banner-copy h1{font-size:clamp(42px,6vw,76px);margin:12px 0 18px;color:#fff}.home-banner-copy p{font-size:20px;line-height:1.8;color:rgba(255,255,255,.9)}.home-banner-dots{position:absolute;z-index:5;left:50%;bottom:24px;transform:translateX(-50%);display:flex;gap:10px}.home-banner-dots button{width:12px;height:12px;border-radius:99px;border:1px solid #fff;background:rgba(255,255,255,.35);cursor:pointer}.home-banner-dots button.active{background:#fff}.footer-contact{color:rgba(255,255,255,.78);line-height:1.8}.footer-social{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}.footer-social a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
-@media(max-width:700px){.home-banner-carousel{min-height:620px}.home-banner-slide picture,.home-banner-slide img{min-height:620px}.home-banner-overlay{background:linear-gradient(0deg,rgba(20,32,28,.76),rgba(20,32,28,.18))}.home-banner-copy{padding:330px 0 70px}.home-banner-copy p{font-size:16px}.home-banner-copy h1{font-size:40px}}
-
-
-/* banner carousel fix */
-.home-banner-slide{pointer-events:none}.home-banner-slide.active{pointer-events:auto}.home-banner-section{padding:0;background:var(--bg)}
-.home-banner-carousel{height:calc(100vh - 76px);min-height:520px;max-height:760px}
-.home-banner-slide picture,.home-banner-slide img{height:100%;min-height:520px}
-@media(max-width:700px){.home-banner-carousel{height:620px;min-height:620px}.home-banner-slide picture,.home-banner-slide img{height:620px}}
-
 /* Image source caption */
 .image-source-caption{
   margin-top:8px;

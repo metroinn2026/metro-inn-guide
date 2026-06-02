@@ -96,3 +96,112 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   font-size:13px;
   color:#7A8588;
 }
+
+
+/* ==========================================
+   Home Banner Carousel Repair
+   Keeps the same homepage visual style while restoring carousel layout.
+   ========================================== */
+.home-banner-section{
+  position:relative;
+  overflow:hidden;
+  background:#eef2f0;
+}
+.home-banner-carousel{
+  position:relative;
+  min-height:520px;
+  background:#eef2f0;
+}
+.home-banner-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity .6s ease;
+  pointer-events:none;
+}
+.home-banner-slide.active{
+  opacity:1;
+  z-index:1;
+  pointer-events:auto;
+}
+.home-banner-slide picture,
+.home-banner-slide img{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:520px;
+}
+.home-banner-slide img{
+  object-fit:cover;
+}
+.home-banner-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(20,32,28,.72),rgba(20,32,28,.12));
+  display:flex;
+  align-items:center;
+  color:#fff;
+}
+.home-banner-copy{
+  max-width:620px;
+  padding:80px 0;
+}
+.home-banner-copy h1{
+  font-size:clamp(42px,6vw,76px);
+  line-height:1.05;
+  margin:12px 0 18px;
+  color:#fff;
+}
+.home-banner-copy p{
+  font-size:20px;
+  line-height:1.8;
+  color:rgba(255,255,255,.9);
+}
+.home-banner-dots{
+  position:absolute;
+  z-index:5;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+}
+.home-banner-dots button{
+  width:12px;
+  height:12px;
+  border-radius:99px;
+  border:1px solid #fff;
+  background:rgba(255,255,255,.35);
+  cursor:pointer;
+  padding:0;
+}
+.home-banner-dots button.active{
+  background:#fff;
+}
+@media(max-width:700px){
+  .home-banner-carousel{min-height:620px}
+  .home-banner-slide picture,
+  .home-banner-slide img{min-height:620px}
+  .home-banner-overlay{
+    background:linear-gradient(0deg,rgba(20,32,28,.76),rgba(20,32,28,.18));
+    align-items:flex-end;
+  }
+  .home-banner-copy{padding:64px 0 86px}
+  .home-banner-copy p{font-size:17px}
+}
+
+/* Image source caption */
+.image-source-caption{
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.7;
+  color:#7A8588;
+  text-align:left;
+}
+.hero-source-caption{
+  max-width:1120px;
+  margin:8px auto 0;
+  padding:0 24px;
+  font-size:13px;
+  color:#7A8588;
+}

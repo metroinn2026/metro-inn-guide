@@ -60,6 +60,12 @@
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
 
+function formatBannerImageSource(text){
+  const t = (text || '').trim();
+  if(!t) return '';
+  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
+}
+
 function renderHomeBanners(banners){
   const section = document.getElementById('homeBannerSection');
   const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
@@ -72,6 +78,7 @@ function renderHomeBanners(banners){
     const subtitle = b.subtitle || '';
     const buttonText = b.button_text || '了解更多';
     const buttonUrl = b.button_url || 'spots.html';
+    const sourceText = formatBannerImageSource(b.image_pc_source || b.image_mobile_source || b.image_source || '');
     return `<article class="home-banner-slide ${i===0?'active':''}">
       <picture>
         <source media="(max-width:700px)" srcset="${mobile}">
@@ -82,6 +89,7 @@ function renderHomeBanners(banners){
         <h1>${title}</h1>
         <p>${subtitle}</p>
         ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
+        ${sourceText ? `<p class="banner-source-caption">${sourceText}</p>` : ''}
       </div></div></div>
     </article>`;
   }).join('')}<div class="home-banner-dots">${valid.slice(0,4).map((_,i)=>`<button class="${i===0?'active':''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('')}</div></div>`;

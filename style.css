@@ -205,3 +205,19 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   font-size:13px;
   color:#7A8588;
 }
+
+/* Visible photo source labels */
+.image-source-caption{
+  display:block;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.7;
+  color:#6F7A72;
+  text-align:left;
+}
+.banner-source-caption{
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(255,255,255,.78);
+}

@@ -8,6 +8,11 @@
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script>
+function formatImageSource(text){
+  const t = (text || '').trim();
+  if(!t) return '';
+  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
+}
 function forceStoryImageSource(text){
   const img = document.getElementById('storyImage');
   if(!img) return;
@@ -18,8 +23,8 @@ function forceStoryImageSource(text){
     caption.className = 'image-source-caption';
     img.insertAdjacentElement('afterend', caption);
   }
-  caption.textContent = text || '';
-  caption.style.display = text ? 'block' : 'none';
+  caption.textContent = formatImageSource(text);
+  caption.style.display = formatImageSource(text) ? 'block' : 'none';
 }
 </script>
 </head>

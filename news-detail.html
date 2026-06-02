@@ -5,28 +5,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>最新消息｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script>
-  <script src="supabase-config.js"></script>
-  <script>
-function formatImageSource(text){
-  const t = (text || '').trim();
-  if(!t) return '';
-  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
-}
+  <script src="data.js">
+<script>
 function forceStoryImageSource(text){
-  const label = formatImageSource(text);
   const img = document.getElementById('storyImage');
   if(!img) return;
   let caption = document.getElementById('storyImageSource');
   if(!caption){
-    img.insertAdjacentHTML('afterend','<p id="storyImageSource" class="image-source-caption" style="display:block!important;margin-top:10px!important;font-size:13px!important;line-height:1.7!important;color:#6F7A72!important;"></p>');
-    caption = document.getElementById('storyImageSource');
+    caption = document.createElement('p');
+    caption.id = 'storyImageSource';
+    caption.className = 'image-source-caption';
+    img.insertAdjacentElement('afterend', caption);
   }
-  caption.textContent = label;
-  caption.style.cssText = 'display:' + (label ? 'block' : 'none') + '!important;margin-top:10px!important;font-size:13px!important;line-height:1.7!important;color:#6F7A72!important;';
+  caption.textContent = text || '';
+  caption.style.display = text ? 'block' : 'none';
 }
-
 </script>
+  <script src="supabase-config.js"></script>
 </head>
 
 <body id="top">

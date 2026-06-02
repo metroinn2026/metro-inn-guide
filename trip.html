@@ -119,12 +119,6 @@
   <div id="footer"></div>
 
   <script>
-function formatTripImageSource(text){
-  const t = (text || '').trim();
-  if(!t) return '';
-  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
-}
-
     document.getElementById('header').innerHTML = header();
     document.getElementById('footer').innerHTML = footer();
 
@@ -162,7 +156,7 @@ function formatTripImageSource(text){
             ${s.time ? `<div class="trip-time">${s.time}</div>` : ''}
             <h2>${s.title || '行程段落'}</h2>
             <p>${(s.text || '').replace(/\n/g,'<br>')}</p>
-            ${s.image ? `<img src="${s.image}" alt="${s.title || '行程圖片'}">${s.image_source ? `<p class="image-source-caption">${formatTripImageSource(s.image_source)}</p>` : ''}` : ''}
+            ${s.image ? `<img src="${s.image}" alt="${s.title || '行程圖片'}">${s.image_source ? `<p class="image-source-caption">${s.image_source}</p>` : ''}` : ''}
           </div>
         </section>
       `).join('');

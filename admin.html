@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css?v=20260602-super-admin-fix">
+  <link rel="stylesheet" href="admin.css?v=20260602-image-upload">
 
   <style>
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
@@ -119,6 +119,47 @@
     .role-pill.super{background:#FEF3C7;color:#92400E}
     .readonly-note{font-size:13px;color:#6B7280;line-height:1.7;margin-top:8px}
   </style>
+
+  <style>
+    /* IMAGE UPLOAD + EDITOR WIDTH FIX */
+    .editor-grid{display:grid!important;grid-template-columns:1fr!important;gap:18px!important;}
+    .image-side-card{display:none!important;}
+    .image-field-box{
+      border:1px solid #E5E7EB;
+      border-radius:16px;
+      padding:14px;
+      background:#F9FAFB;
+      display:grid;
+      gap:10px;
+    }
+    .image-field-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .image-thumb{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:10px;
+      border:1px solid #E5E7EB;
+      border-radius:14px;
+      background:#fff;
+    }
+    .image-thumb img{
+      width:120px;
+      height:78px;
+      object-fit:cover;
+      border-radius:10px;
+      background:#f3f4f6;
+      flex:0 0 auto;
+    }
+    .image-thumb small{display:block;color:#6B7280;line-height:1.6;word-break:break-all}
+    .source-hint{font-size:12px;color:#6B7280;line-height:1.6}
+    .trip-section-image-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(max-width:760px){.trip-section-image-row{grid-template-columns:1fr}.image-thumb{display:block}.image-thumb img{width:100%;height:160px;margin-bottom:8px}}
+  </style>
+
 </head>
 <body>
   <div class="admin-shell">
@@ -156,7 +197,7 @@
       </header>
 
       <section class="notice">
-        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；Banner 會顯示友善編號 banner_0001。超級管理員可建立帳號與設定權限。
+        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；Banner 會顯示友善編號 banner_0001；圖片欄位支援本機上傳或貼網址，並可管理圖片來源文字。
       </section>
 
       <section class="panel">
@@ -229,7 +270,7 @@
               <p id="formMsg" class="msg"></p>
             </div>
 
-            <div class="card">
+            <div class="card image-side-card">
               <h3>圖片與版面建議</h3>
               <div id="imageTips"></div>
               <div class="image-preview" id="imagePreview">圖片預覽</div>
@@ -264,8 +305,10 @@
           ['id','ID','text','auto'],
           ['title','Banner 標題','text','required'],
           ['subtitle','Banner 副標','textarea'],
-          ['image_pc','桌機 Banner 圖片網址（1920×720）','text'],
-          ['image_mobile','手機 Banner 圖片網址（1080×1350）','text'],
+          ['image_pc','桌機 Banner 圖片（1920×720）','image'],
+          ['image_pc_source','桌機 Banner 圖片來源','text'],
+          ['image_mobile','手機 Banner 圖片（1080×1350）','image'],
+          ['image_mobile_source','手機 Banner 圖片來源','text'],
           ['button_text','按鈕文字','text'],
           ['button_url','按鈕連結','text'],
           ['sort_order','排序（1～4）','number'],
@@ -342,7 +385,7 @@
         hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
-          ['summary','摘要','textarea'],['content','內文','textarea'],['cover_image','封面圖網址（1200×630）','text'],
+          ['summary','摘要','textarea'],['content','內文','textarea'],['cover_image','封面圖（1200×630）','image'],['cover_image_source','封面圖片來源','text'],
           ['publish_date','發布日期','date'],['event_name','活動名稱','text'],['event_date','活動日期','text'],
           ['event_address','活動地點（地址）','text'],['phone','電話','text'],['event_content','活動內容','textarea'],
           ['remark','備註','textarea'],['is_published','狀態','boolean']
@@ -362,7 +405,7 @@
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
           ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
-          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖網址（1600×900）','text'],
+          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
           ['is_published','狀態','boolean']
         ],
         columns:['title','area','is_published'],
@@ -380,7 +423,7 @@
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
           ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
           ['price_range','價格區間','text'],['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
-          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖網址（1200×900）','text'],['is_published','狀態','boolean']
+          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖（1200×900）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
         ],
         columns:['title','category','is_published'],
         subtitle:(x)=>x.category || x.average_cost || '-',
@@ -395,7 +438,7 @@
         hint:'行程改為分段管理。先看列表，點編輯後可自由新增 3 段、4 段或 6 段，每段可填時間、標題、說明與圖片，並可拖曳排序。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
-          ['summary','摘要','textarea'],['google_route','Google路線','text'],['cover_image','封面圖網址（1600×900）','text'],
+          ['summary','摘要','textarea'],['google_route','Google路線','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
           ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
         ],
         columns:['title','duration','is_published'],
@@ -412,7 +455,7 @@
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],
           ['summary','摘要','textarea'],['content','優惠內容','textarea'],['start_date','開始日期','date'],['end_date','結束日期','date'],
-          ['official_website','連結網址','text'],['cover_image','封面圖網址（1080×1080）','text'],['is_published','狀態','boolean']
+          ['official_website','連結網址','text'],['cover_image','封面圖（1080×1080）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
         ],
         columns:['title','end_date','is_published'],
         subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-'),
@@ -526,6 +569,25 @@
       renderList();
     }
 
+
+    function imageFieldTemplate(name,label){
+      return `
+        <div class="form-row">
+          <label>${label}</label>
+          <div class="image-field-box">
+            <input id="f_${name}" type="text" placeholder="可貼圖片網址，或使用下方本機上傳" oninput="updateImagePreview(); updateFieldThumb('${name}')">
+            <div class="image-field-actions">
+              <input id="upload_${name}" type="file" accept="image/*" style="display:none" onchange="uploadImageForField('${name}', this.files[0])">
+              <button type="button" onclick="document.getElementById('upload_${name}').click()">上傳本機圖片</button>
+              <button type="button" onclick="document.getElementById('f_${name}').value=''; updateFieldThumb('${name}'); updateImagePreview();">清除圖片</button>
+            </div>
+            <div class="source-hint">也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。</div>
+            <div id="thumb_${name}" class="image-thumb" style="display:none"></div>
+          </div>
+        </div>`;
+    }
+
+
     function buildForm(){
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
@@ -533,6 +595,7 @@
         if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
         if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
+        if(type === 'image') return imageFieldTemplate(name,label);
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
         if(type === 'boolean') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
         if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
@@ -586,6 +649,7 @@
         else el.value = '';
       });
       if(currentTable === 'trips') renderTripSections([]);
+      refreshAllImageThumbs();
       updateImagePreview();
     }
 
@@ -796,6 +860,7 @@
       document.getElementById('listView').classList.add('hidden');
       document.getElementById('editorView').classList.add('active');
       if(currentTable === 'trips') renderTripSections(item.trip_sections || []);
+      refreshAllImageThumbs();
       updateImagePreview();
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -929,6 +994,7 @@
         title: s.title || '',
         text: s.text || s.description || '',
         image: s.image || s.image_url || '',
+        image_source: s.image_source || s.source || '',
         order: Number(s.order || index + 1)
       })).sort((a,b)=>a.order-b.order);
     }
@@ -968,9 +1034,19 @@
             <label>說明</label>
             <textarea data-field="text" placeholder="這一站的介紹與注意事項" oninput="syncTripSections()">${escapeHtml(s.text)}</textarea>
           </div>
-          <div class="form-row">
-            <label>圖片網址（可留空）</label>
-            <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
+          <div class="trip-section-image-row">
+            <div class="form-row">
+              <label>圖片網址（可留空）</label>
+              <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
+              <div class="image-field-actions">
+                <input id="section_upload_${index}" type="file" accept="image/*" style="display:none" onchange="uploadTripSectionImage(${index}, this.files[0])">
+                <button type="button" onclick="document.getElementById('section_upload_${index}').click()">上傳本機圖片</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>圖片來源文字</label>
+              <input data-field="image_source" value="${escapeHtml(s.image_source || '')}" placeholder="例：圖片來源：臺北市政府觀光傳播局" oninput="syncTripSections()">
+            </div>
           </div>
         </div>
       `).join('');
@@ -985,6 +1061,7 @@
         title: card.querySelector('[data-field="title"]')?.value.trim() || '',
         text: card.querySelector('[data-field="text"]')?.value.trim() || '',
         image: card.querySelector('[data-field="image"]')?.value.trim() || '',
+        image_source: card.querySelector('[data-field="image_source"]')?.value.trim() || '',
         order: index + 1
       })).filter(s=>s.time || s.title || s.text || s.image);
     }
@@ -1005,6 +1082,38 @@
       list.splice(index,1);
       renderTripSections(list);
     }
+
+
+    async function uploadTripSectionImage(index, file){
+      if(!file) return;
+      const msg = document.getElementById('formMsg');
+      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(!allowed.includes(file.type)){
+        alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
+        return;
+      }
+      if(file.size > 3 * 1024 * 1024){
+        alert('圖片建議小於 3MB，請先壓縮後再上傳。');
+        return;
+      }
+      msg.textContent = '分段圖片上傳中...';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const safeId = (document.getElementById('f_id')?.value || 'trip').replaceAll('/','-');
+      const path = `trips/${safeId}/section-${index+1}-${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('site-images').upload(path, file, {cacheControl:'3600',upsert:true,contentType:file.type});
+      if(error){
+        msg.textContent = '分段圖片上傳失敗：' + error.message;
+        return;
+      }
+      const cards = [...document.querySelectorAll('.trip-section-card')];
+      const input = cards[index]?.querySelector('[data-field="image"]');
+      if(input){
+        input.value = publicImageUrl(path);
+        syncTripSections();
+        msg.textContent = '分段圖片已上傳。';
+      }
+    }
+
 
     function bindTripSectionDrag(){
       let fromIndex = null;
@@ -1041,6 +1150,71 @@
         .replaceAll('>','&gt;')
         .replaceAll('"','&quot;')
         .replaceAll("'","&#039;");
+    }
+
+
+
+    function publicImageUrl(path){
+      const { data } = db.storage.from('site-images').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function uploadImageForField(fieldName, file){
+      if(!file) return;
+      const msg = document.getElementById('formMsg');
+      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(!allowed.includes(file.type)){
+        alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
+        return;
+      }
+      if(file.size > 3 * 1024 * 1024){
+        alert('圖片建議小於 3MB，請先壓縮後再上傳。');
+        return;
+      }
+
+      msg.textContent = '圖片上傳中...';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const safeId = (document.getElementById('f_id')?.value || currentTable || 'item').replaceAll('/','-');
+      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName}.${ext}`;
+
+      const { error } = await db.storage.from('site-images').upload(path, file, {
+        cacheControl:'3600',
+        upsert:true,
+        contentType:file.type
+      });
+
+      if(error){
+        console.error(error);
+        msg.textContent = '圖片上傳失敗：' + error.message + '。請確認已建立 site-images bucket 與 Storage Policy。';
+        return;
+      }
+
+      const url = publicImageUrl(path);
+      document.getElementById('f_' + fieldName).value = url;
+      updateFieldThumb(fieldName);
+      updateImagePreview();
+      msg.textContent = '圖片已上傳並帶入網址。';
+    }
+
+    function updateFieldThumb(fieldName){
+      const el = document.getElementById('f_' + fieldName);
+      const thumb = document.getElementById('thumb_' + fieldName);
+      if(!el || !thumb) return;
+      const url = el.value.trim();
+      if(!url){
+        thumb.style.display = 'none';
+        thumb.innerHTML = '';
+        return;
+      }
+      thumb.style.display = 'flex';
+      thumb.innerHTML = `<img src="${url}" onerror="this.style.display='none'"><div><strong>縮圖預覽</strong><small>${url}</small></div>`;
+    }
+
+    function refreshAllImageThumbs(){
+      document.querySelectorAll('[id^="f_"]').forEach(el=>{
+        const name = el.id.replace('f_','');
+        if(document.getElementById('thumb_' + name)) updateFieldThumb(name);
+      });
     }
 
 

@@ -44,6 +44,7 @@
         <p id="storyContent">消息資料載入中...</p>
         <div class="story-img">
           <img id="storyImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
+        <p id="storyImageSource" class="image-source-caption"></p>
         </div>
       </section>
 
@@ -146,6 +147,7 @@
         document.title = `${news.title || '最新消息'}｜Metro Inn Guide 北投旅圖`;
         document.getElementById('heroImage').src = image;
         document.getElementById('storyImage').src = image;
+        setText('storyImageSource', news.cover_image_source || '', '');
 
         setText('heroTitle', news.title);
         setText('heroSubtitle', news.summary);

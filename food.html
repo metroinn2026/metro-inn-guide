@@ -48,6 +48,7 @@
         <p id="storyContent">美食資料載入中...</p>
         <div class="story-img">
           <img id="storyImage" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85" alt="">
+        <p id="storyImageSource" class="image-source-caption"></p>
         </div>
       </section>
 
@@ -193,6 +194,7 @@
 
         const tags = normalizeTags(food.tags);
         const image = food.cover_image || fallbackImage;
+        const itemImageSource = food.cover_image_source || '';
         const title = food.title || '美食介紹';
         const summary = food.summary || '更多介紹即將補上。';
         const content = food.content || summary;
@@ -203,6 +205,7 @@
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
+        setText('storyImageSource', itemImageSource || '', '');
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${food.category || 'FOOD'} · FOOD`);

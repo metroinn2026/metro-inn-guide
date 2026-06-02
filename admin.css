@@ -68,3 +68,6 @@ td small{color:var(--muted)}
   .editor-grid{grid-template-columns:1fr}
   table{min-width:900px}
 }
+
+/* Image upload editor refinement */
+.editor-grid{grid-template-columns:1fr!important}

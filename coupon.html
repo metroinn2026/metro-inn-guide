@@ -50,6 +50,7 @@
         <p id="storyContent">優惠資料載入中...</p>
         <div class="story-img">
           <img id="storyImage" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85" alt="">
+        <p id="storyImageSource" class="image-source-caption"></p>
         </div>
       </section>
 
@@ -153,6 +154,7 @@
         const summary = coupon.summary || '更多優惠說明即將補上。';
         const content = coupon.content || summary;
         const image = coupon.cover_image || fallbackImage;
+        const itemImageSource = coupon.cover_image_source || '';
         const range = dateRange(coupon);
 
         document.title = `${title}｜Metro Inn Guide 北投旅圖`;
@@ -160,6 +162,7 @@
         document.getElementById('heroImage').src = image;
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
+        setText('storyImageSource', itemImageSource || '', '');
         document.getElementById('storyImage').alt = title;
 
         setText('heroTitle', title);

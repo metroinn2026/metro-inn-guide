@@ -48,7 +48,9 @@
       .trip-step-no{font-size:46px}
       .trip-step-body h2{font-size:28px}
     }
-  </style>
+  
+    .image-source-caption{margin-top:8px;font-size:13px;line-height:1.7;color:#7A8588}
+</style>
 </head>
 
 <body id="top">
@@ -154,7 +156,7 @@
             ${s.time ? `<div class="trip-time">${s.time}</div>` : ''}
             <h2>${s.title || '行程段落'}</h2>
             <p>${(s.text || '').replace(/\n/g,'<br>')}</p>
-            ${s.image ? `<img src="${s.image}" alt="${s.title || '行程圖片'}">` : ''}
+            ${s.image ? `<img src="${s.image}" alt="${s.title || '行程圖片'}">${s.image_source ? `<p class="image-source-caption">${s.image_source}</p>` : ''}` : ''}
           </div>
         </section>
       `).join('');

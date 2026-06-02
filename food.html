@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js">
-<script>
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+function formatImageCredit(text){
+  const t = (text || '').trim();
+  if(!t) return '';
+  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
+}
 function forceStoryImageSource(text){
   const img = document.getElementById('storyImage');
   if(!img) return;
@@ -17,11 +23,11 @@ function forceStoryImageSource(text){
     caption.className = 'image-source-caption';
     img.insertAdjacentElement('afterend', caption);
   }
-  caption.textContent = text || '';
-  caption.style.display = text ? 'block' : 'none';
+  const label = formatImageCredit(text);
+  caption.textContent = label;
+  caption.style.display = label ? 'block' : 'none';
 }
 </script>
-  <script src="supabase-config.js"></script>
 </head>
 
 <body id="top">
@@ -209,9 +215,8 @@ function forceStoryImageSource(text){
 
         const tags = normalizeTags(food.tags);
         const image = food.cover_image || fallbackImage;
-        const imageSourceText = food.cover_image_source || '';
-        const itemImageSource = food.cover_image_source || '';
-        const title = food.title || '美食介紹';
+        const imageSourceText = food.cover_image_source || food.image_source || '';
+                const title = food.title || '美食介紹';
         const summary = food.summary || '更多介紹即將補上。';
         const content = food.content || summary;
         const cost = food.average_cost || food.price_range || '依店家公告為準';
@@ -222,9 +227,6 @@ function forceStoryImageSource(text){
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
         forceStoryImageSource(imageSourceText);
-        const storySourceEl = document.getElementById('storyImageSource');
-        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
-        setText('storyImageSource', itemImageSource || '', '');
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${food.category || 'FOOD'} · FOOD`);

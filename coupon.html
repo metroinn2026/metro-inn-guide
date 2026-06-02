@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>優惠介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js">
-<script>
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+function formatImageCredit(text){
+  const t = (text || '').trim();
+  if(!t) return '';
+  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
+}
 function forceStoryImageSource(text){
   const img = document.getElementById('storyImage');
   if(!img) return;
@@ -17,11 +23,11 @@ function forceStoryImageSource(text){
     caption.className = 'image-source-caption';
     img.insertAdjacentElement('afterend', caption);
   }
-  caption.textContent = text || '';
-  caption.style.display = text ? 'block' : 'none';
+  const label = formatImageCredit(text);
+  caption.textContent = label;
+  caption.style.display = label ? 'block' : 'none';
 }
 </script>
-  <script src="supabase-config.js"></script>
 </head>
 <body id="top">
   <div id="header"></div>
@@ -169,9 +175,8 @@ function forceStoryImageSource(text){
         const summary = coupon.summary || '更多優惠說明即將補上。';
         const content = coupon.content || summary;
         const image = coupon.cover_image || fallbackImage;
-        const imageSourceText = coupon.cover_image_source || '';
-        const itemImageSource = coupon.cover_image_source || '';
-        const range = dateRange(coupon);
+        const imageSourceText = coupon.cover_image_source || coupon.image_source || '';
+                const range = dateRange(coupon);
 
         document.title = `${title}｜Metro Inn Guide 北投旅圖`;
 
@@ -179,9 +184,6 @@ function forceStoryImageSource(text){
         document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
         forceStoryImageSource(imageSourceText);
-        const storySourceEl = document.getElementById('storyImageSource');
-        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
-        setText('storyImageSource', itemImageSource || '', '');
         document.getElementById('storyImage').alt = title;
 
         setText('heroTitle', title);

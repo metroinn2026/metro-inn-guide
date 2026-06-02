@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>最新消息｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <script src="data.js">
-<script>
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+function formatImageCredit(text){
+  const t = (text || '').trim();
+  if(!t) return '';
+  return t.startsWith('圖片來源') ? t : '圖片來源：' + t;
+}
 function forceStoryImageSource(text){
   const img = document.getElementById('storyImage');
   if(!img) return;
@@ -17,11 +23,11 @@ function forceStoryImageSource(text){
     caption.className = 'image-source-caption';
     img.insertAdjacentElement('afterend', caption);
   }
-  caption.textContent = text || '';
-  caption.style.display = text ? 'block' : 'none';
+  const label = formatImageCredit(text);
+  caption.textContent = label;
+  caption.style.display = label ? 'block' : 'none';
 }
 </script>
-  <script src="supabase-config.js"></script>
 </head>
 
 <body id="top">
@@ -158,16 +164,12 @@ function forceStoryImageSource(text){
         }
 
         const image = news.cover_image || fallbackImage;
-        const imageSourceText = news.cover_image_source || '';
+        const imageSourceText = news.cover_image_source || news.image_source || '';
 
         document.title = `${news.title || '最新消息'}｜Metro Inn Guide 北投旅圖`;
         document.getElementById('heroImage').src = image;
         document.getElementById('storyImage').src = image;
         forceStoryImageSource(imageSourceText);
-        const storySourceEl = document.getElementById('storyImageSource');
-        if(storySourceEl){ storySourceEl.textContent = imageSourceText; storySourceEl.style.display = imageSourceText ? 'block' : 'none'; }
-        setText('storyImageSource', news.cover_image_source || '', '');
-
         setText('heroTitle', news.title);
         setText('heroSubtitle', news.summary);
         setText('publishDate', news.publish_date ? `發布日期：${news.publish_date}` : '發布日期');

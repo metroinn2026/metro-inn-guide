@@ -88,6 +88,7 @@ function renderHomeBanners(banners){
   setupHomeBannerCarousel();
 }
 
+let homeBannerTimer = null;
 function setupHomeBannerCarousel(){
   const section = document.getElementById('homeBannerSection');
   const slides = [...section.querySelectorAll('.home-banner-slide')];
@@ -102,7 +103,8 @@ function setupHomeBannerCarousel(){
   }
   dots.forEach((d,i)=>d.addEventListener('click',()=>show(i)));
   if(slides.length>1){
-    setInterval(()=>show((idx+1)%slides.length),5000);
+    if(homeBannerTimer) clearInterval(homeBannerTimer);
+    homeBannerTimer = setInterval(()=>show((idx+1)%slides.length),5000);
   }
 }
 

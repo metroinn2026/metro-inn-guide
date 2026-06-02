@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CMS管理後台｜Metro Inn Guide</title>
-  <link rel="stylesheet" href="admin.css?v=20260602-roles">
+  <link rel="stylesheet" href="admin.css?v=20260602-super-admin-fix">
 
   <style>
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
@@ -443,14 +443,39 @@
 
 
     async function loadMyProfile(user){
-      const { data } = await db.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
-      if(data?.role) currentUserRole = data.role;
-      if(!data){
-        await db.from('admin_profiles').upsert({id:user.id,email:user.email,role:'admin',display_name:user.email},{onConflict:'id'});
+      // 第一位超級管理員保底：避免 RLS 或舊表欄位造成選單閃一下又消失
+      if(user.email === 'metroinn2026@gmail.com'){
+        currentUserRole = 'super_admin';
       }
-      if(currentUserRole !== 'super_admin'){
-        const accountLink = document.querySelector('[data-table="admin_profiles"]');
-        if(accountLink) accountLink.style.display = 'none';
+
+      try{
+        const { data } = await db.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+
+        if(data?.role){
+          currentUserRole = data.role;
+        }
+
+        if(!data){
+          await db.from('admin_profiles').upsert({
+            id:user.id,
+            username:'metroinn2026',
+            email:user.email,
+            role:user.email === 'metroinn2026@gmail.com' ? 'super_admin' : 'admin',
+            display_name:user.email
+          },{onConflict:'id'});
+        }
+      }catch(err){
+        console.warn('profile read failed, fallback role used', err);
+      }
+
+      // 再保底一次，避免讀取資料失敗後被當成一般管理員
+      if(user.email === 'metroinn2026@gmail.com'){
+        currentUserRole = 'super_admin';
+      }
+
+      const accountLink = document.querySelector('[data-table="admin_profiles"]');
+      if(accountLink){
+        accountLink.style.display = currentUserRole === 'super_admin' ? '' : 'none';
       }
     }
 

@@ -72,29 +72,45 @@ td small{color:var(--muted)}
 /* Image upload editor refinement */
 .editor-grid{grid-template-columns:1fr!important}
 
-/* ===== Admin UI：與長租抽籤系統一致 ===== */
-:root{--ink:#1F2937;--muted:#64748B;--line:#E2E8F0;--soft:#F4F7FB;--card:#FFF;--blue:#2563EB;--blue2:#1D4ED8;--danger:#DC2626;--ok:#16A34A;--dark:#0F172A;--orange:#F3653B}
-body{background:#F4F7FB}
-.sidebar{background:#0F172A;padding:24px 18px;box-shadow:8px 0 30px rgba(15,23,42,.06)}
-.admin-brand{padding:0 4px 22px}
-.admin-logo-wrap{background:#fff;border-radius:10px;padding:8px 10px;margin-bottom:14px;width:100%;overflow:hidden}
-.admin-logo-wrap img{display:block;width:100%;height:34px;object-fit:contain}
-.sidebar .kicker{color:#93C5FD}.brand-title{font-size:21px;letter-spacing:.02em}
-.side-nav{gap:5px}
-.side-nav a{border-radius:10px;padding:11px 13px;border-left:0;transition:.18s ease}
-.side-nav a.active,.side-nav a:hover{background:#1E293B;color:#fff;border-left:0;transform:translateX(2px)}
-.side-nav a.active{box-shadow:inset 3px 0 0 #60A5FA}
-.main{padding:24px 28px 40px}
-.topbar{border-radius:16px;padding:19px 22px;margin-bottom:18px;box-shadow:0 4px 18px rgba(15,23,42,.035)}
-.topbar h1{font-size:25px}
-.panel{border-radius:16px;padding:22px;box-shadow:0 4px 18px rgba(15,23,42,.025)}
-.table-card{border-radius:14px}
-th{background:#F8FAFC;color:#475569;font-weight:800} th,td{padding:12px}
-input,select,textarea{border-radius:10px;border-color:#CBD5E1}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#60A5FA;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
-button,.button{border-radius:10px;font-weight:700}.primary{background:#2563EB;border-color:#2563EB}
-.notice{border-radius:12px}.status{font-weight:700}
-.login-page{background:linear-gradient(135deg,#EEF4FB 0%,#F8FAFC 100%)}
-.login-card{border-radius:20px;padding:34px 34px 30px}
-.login-logo-wrap{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:20px}
-.login-logo-wrap img{display:block;width:100%;height:46px;object-fit:contain}
+
+/* Metro Inn CMS — light administration system, aligned to long-rental UI */
+:root{--ink:#14243c;--muted:#617188;--line:#d8e3f1;--soft:#f2f7fd;--card:#fff;--blue:#2865c7;--blue2:#1e54ab;--danger:#b93e49;--ok:#24714c;--dark:#14243c;--orange:#2865c7}
+body,.admin-shell{background:#f2f7fd;color:#14243c}
+.admin-shell{grid-template-columns:234px minmax(0,1fr)}
+.sidebar{background:#f8fbff;color:#14243c;border-right:1px solid #d5e1f0;box-shadow:none;padding:22px 18px;position:sticky;top:0;height:100vh}
+.brand{border-bottom:1px solid #d5e1f0;padding-bottom:16px}
+.admin-brand{padding:0 0 16px}
+.admin-logo-wrap{width:155px;max-width:100%;margin:0 0 10px;padding:0;background:transparent;border:0;border-radius:0;overflow:visible}
+.admin-logo-wrap img{display:block;width:155px;max-width:100%;height:25px;object-fit:contain;object-position:left center}
+.sidebar .kicker{color:#71839a;font-size:10px;letter-spacing:.07em;margin:0}
+.brand-title{font-size:17px;color:#14243c;letter-spacing:0;line-height:1.4;margin-top:6px}
+.side-nav{gap:4px;margin-top:18px}
+.side-nav a{position:relative;background:transparent;color:#4d6078;border:1px solid transparent;border-left:1px solid transparent;border-radius:10px;padding:11px 12px;font-size:14px;font-weight:700;transform:none;box-shadow:none}
+.side-nav a:hover{background:#edf4fd;color:#1f58ad;border-color:transparent;transform:none;box-shadow:none}
+.side-nav a.active{background:#fff;color:#205fc2;border:1px solid #d2e2f7;box-shadow:none;transform:none}
+.side-nav a.active:before{content:'';position:absolute;left:-7px;top:8px;bottom:8px;width:3px;border-radius:4px;background:#2865c7}
+.side-bottom a,.side-bottom button{color:#425773;background:#fff;border:1px solid #d3dfef;border-radius:9px;box-shadow:none}
+.side-bottom a:hover,.side-bottom button:hover{background:#edf4fd;color:#205fc2}
+.main{width:100%;max-width:none;min-width:0;padding:0 26px 32px;background:#f2f7fd}
+.topbar{margin:0 -26px 22px;padding:18px 26px;min-height:72px;background:#fff;border:0;border-bottom:1px solid #d5e1f0;border-radius:0;box-shadow:none}
+.topbar h1{font-size:20px;color:#14243c}
+.topbar .kicker,.panel-head .kicker{display:none}
+.panel{padding:20px;background:#fff;border:1px solid #e0e9f4;border-radius:13px;box-shadow:none;margin-bottom:20px}
+.card,.table-card{background:#fff;border:1px solid #dfe8f3;border-radius:11px;box-shadow:none}
+.notice{background:#f7faff;color:#50647d;border:1px solid #d9e6f7;border-left:3px solid #79a7e5;border-radius:10px;font-size:13px;padding:10px 14px}
+.warning{background:#fbfaf6;color:#786b4f;border-color:#e8dfcc;border-left-color:#c7ae79}
+button,.button{border-radius:8px;border-color:#c9d9ee;color:#2865c7;background:#fff;box-shadow:none;font-weight:700}
+button:hover,.button:hover{opacity:1;background:#edf4fd}
+.primary,.primary:hover{background:#2865c7;color:#fff;border-color:#2865c7}
+.orange,.orange:hover{background:#2865c7;border-color:#2865c7;color:#fff}
+.danger{background:#fff;color:#b93e49;border-color:#e6cbd0}
+.ghost{background:#fff;color:#50647d;border-color:#d6e1ee}
+input,select,textarea{border:1px solid #cad9eb;border-radius:8px;background:#fff;color:#14243c;box-shadow:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#77a7e5;box-shadow:0 0 0 3px rgba(40,101,199,.09)}
+th{background:#eaf2fb;color:#435976;border-color:#d7e3f0}td{border-color:#e8eef7}tbody tr:hover td{background:#f8fbff}
+.status.on{background:#edf7f1;color:#286b4c}.status.draft{background:#f0f3f7;color:#627187}
+.badge{background:#f7faff;color:#627187;border-color:#dbe6f2}
+.login-page{background:#f2f7fd}.login-card{border-radius:14px;box-shadow:0 12px 32px rgba(25,54,92,.07)}
+.login-logo-wrap{padding:0;border:0;background:transparent;margin-bottom:16px}.login-logo-wrap img{width:190px;max-width:100%;height:34px;object-fit:contain;object-position:left center}
+@media(max-width:1100px){.admin-shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto;padding:16px}.side-nav{display:flex;flex-wrap:wrap}.side-nav a.active:before{display:none}.main{padding:0 16px 28px}.topbar{margin:0 -16px 18px;padding:15px 16px}.admin-logo-wrap img{height:25px}}
+@media(max-width:600px){.topbar{align-items:flex-start}.topbar h1{font-size:18px}.panel{padding:14px}.sidebar{padding:14px}.side-nav a{padding:9px 10px}}

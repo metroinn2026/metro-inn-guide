@@ -231,9 +231,6 @@
           <div><strong>我的帳號</strong><p id="myAccountInfo">登入帳號資訊</p><small>變更自己的登入密碼，不會修改其他管理員的密碼或權限。</small></div>
           <button type="button" onclick="showChangePassword()">變更密碼</button>
         </section>
-        <section id="contentCountCard" class="content-count-card" hidden aria-live="polite">
-          <span id="contentCountLabel" class="count-label">資料總數</span><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span>
-        </section>
 
         <div id="listView" class="list-view">
           <div class="toolbar">
@@ -258,6 +255,9 @@
             </div>
           </div>
 
+          <div id="contentCountCard" class="content-count-line" hidden aria-live="polite">
+            <span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span>
+          </div>
           <div class="table-card">
             <table>
               <thead id="tableHead"></thead>
@@ -839,7 +839,6 @@
       }
       cache = data || [];
       if(['news','spots','foods','trips','coupons'].includes(currentTable)) {
-        document.getElementById('contentCountLabel').textContent = cfg.label + '總數';
         document.getElementById('contentCountNumber').textContent = count == null ? '—' : count.toLocaleString('zh-TW');
         document.getElementById('contentCountDetail').textContent = '包含已上架及未上架資料';
       }

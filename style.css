@@ -145,3 +145,12 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 .brand-guide-name{font-size:17px;letter-spacing:.08em;color:var(--ink);font-weight:900}
 @media(max-width:900px){.brand-logo-img{height:27px}.brand-guide-name{font-size:15px}}
 @media(max-width:600px){.brand-ci{gap:8px}.brand-logo-img{height:23px}.brand-divider{height:20px}.brand-guide-name{font-size:14px}}
+
+/* CI：compact, transparent image with stable navigation width */
+.brand-ci{gap:9px!important;flex-shrink:0!important}
+.brand-logo-img{height:22px!important;width:auto!important;max-width:170px!important;object-fit:contain!important;object-position:left center!important}
+.brand-divider{height:20px!important}
+.brand-guide-name{font-size:15px!important;letter-spacing:.02em!important}
+.nav{gap:14px!important}.menu{gap:clamp(10px,1.45vw,25px)!important}
+@media(max-width:900px){.brand-logo-img{height:19px!important;max-width:135px!important}.brand-guide-name{font-size:13px!important}}
+@media(max-width:600px){.brand-logo-img{height:17px!important;max-width:118px!important}.brand-ci{gap:6px!important}.brand-divider{height:16px!important}}

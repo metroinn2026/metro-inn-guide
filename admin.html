@@ -165,7 +165,7 @@
   <div class="admin-shell">
     <aside class="sidebar">
       <div class="brand admin-brand">
-        <div class="admin-logo-wrap"><img src="metro-inn-logo.jpg" alt="METRO INN"></div>
+        <div class="admin-logo-wrap"><img src="metro-inn-logo.png" alt="METRO INN"></div>
         <div class="kicker">CONTENT MANAGEMENT</div>
         <div class="brand-title">北投旅圖 CMS</div>
       </div>
@@ -334,7 +334,7 @@
         hint:'這裡管理全站共用資訊，例如 Logo、訂房按鈕、頁尾地址、電話、社群連結。此資料表固定只有 1 筆。',
         fields:[
           ['id','ID','number','fixed1'],
-          ['logo_url','Logo 圖片網址（SVG或PNG）','text'],
+          ['logo_url','網站 CI／Logo（建議透明 PNG 或 WEBP）','image'],
           ['booking_text','訂房按鈕文字','text'],
           ['booking_url','訂房按鈕連結','text'],
           ['footer_title','頁尾標題','text'],
@@ -586,7 +586,7 @@
               <button type="button" onclick="document.getElementById('upload_${name}').click()">上傳本機圖片</button>
               <button type="button" onclick="document.getElementById('f_${name}').value=''; updateFieldThumb('${name}'); updateImagePreview();">清除圖片</button>
             </div>
-            <div class="source-hint">也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。</div>
+            <div class="source-hint">${name === 'logo_url' ? '建議透明 PNG／WEBP、橫式比例，畫面顯示高度約 22px。上傳後請按「儲存」，前台重新整理才會生效。' : '也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。'}</div>
             <div id="thumb_${name}" class="image-thumb" style="display:none"></div>
           </div>
         </div>`;
@@ -1093,6 +1093,9 @@
       if(!file) return;
       const msg = document.getElementById('formMsg');
       const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(fieldName === 'logo_url' && !['image/png','image/webp'].includes(file.type)){
+        msg.textContent = '網站 CI 請上傳透明背景 PNG 或 WEBP。'; return;
+      }
       if(!allowed.includes(file.type)){
         alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
         return;
@@ -1168,6 +1171,9 @@
       if(!file) return;
       const msg = document.getElementById('formMsg');
       const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(fieldName === 'logo_url' && !['image/png','image/webp'].includes(file.type)){
+        msg.textContent = '網站 CI 請上傳透明背景 PNG 或 WEBP。'; return;
+      }
       if(!allowed.includes(file.type)){
         alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
         return;

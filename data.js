@@ -17,7 +17,7 @@ coffee:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format
 river:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85',
 shop:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85'
 };
-function header(active='') {return `<header class="topbar"><div class="container nav"><a class="brand brand-ci" href="index.html" aria-label="Metro Inn 北投旅圖首頁"><img class="brand-logo-img" src="metro-inn-logo.jpg" alt="METRO INN"><span class="brand-divider"></span><span id="siteLogoText" class="brand-guide-name">北投旅圖</span></a><nav class="menu"><a href="news.html">最新消息</a><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a><a href="submit.html">投稿分享</a><a id="hotelLink" href="https://btresort.metro.taipei/" target="_blank">北投會館</a></nav><a id="bookingLink" class="nav-book" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div></header>`}
+function header(active='') {return `<header class="topbar"><div class="container nav"><a class="brand brand-ci" href="index.html" aria-label="Metro Inn 北投旅圖首頁"><img class="brand-logo-img" id="siteLogoImage" src="metro-inn-logo.png" alt="METRO INN"><span class="brand-divider"></span><span id="siteLogoText" class="brand-guide-name">北投旅圖</span></a><nav class="menu"><a href="news.html">最新消息</a><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a><a href="submit.html">投稿分享</a><a id="hotelLink" href="https://btresort.metro.taipei/" target="_blank">北投會館</a></nav><a id="bookingLink" class="nav-book" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div></header>`}
 function footer(){return `<footer class="footer"><div class="container"><div class="footer-grid"><div><h2 id="footerTitle">Metro Inn Guide｜北投旅圖</h2><p id="footerDescription">住進台北的剛剛好，從一間舒服的旅店開始，慢慢走向你喜歡的城市風景。</p><p id="footerContact" class="footer-contact"></p><div id="footerSocial" class="footer-social"></div></div><div class="footer-links"><a href="news.html">最新消息</a><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a><a id="footerBooking" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房</a><a href="#top">回到頂端</a></div></div><p id="footerCopy" class="copy">© 2026 Metro Inn. Local Travel Guide Demo.</p></div></footer>`}
 
 
@@ -57,6 +57,8 @@ async function loadSiteSettings(){
     const setText=(id,val)=>{const el=document.getElementById(id); if(el && val) el.textContent=val;};
     const setHref=(id,val)=>{const el=document.getElementById(id); if(el && val) el.href=val;};
     setText('siteLogoText', s.logo_text || '北投旅圖');
+    const logo = document.getElementById('siteLogoImage');
+    if(logo && typeof s.logo_url === 'string' && /^https:\/\//i.test(s.logo_url.trim())) logo.src = s.logo_url.trim();
     setText('footerTitle', s.site_title);
     setText('footerDescription', s.footer_description || s.site_subtitle);
     setText('footerCopy', s.footer_copyright);

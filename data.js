@@ -51,7 +51,7 @@ function showShareToast(text){
 async function loadSiteSettings(){
   if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') return;
   try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.site_0001&select=*`, {headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=*`, {cache:'no-store',headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
     if(!res.ok) return;
     const data = await res.json();
     const s = data && data[0];
@@ -61,7 +61,7 @@ async function loadSiteSettings(){
     setText('siteLogoText', s.logo_text || '北投旅圖');
     const logo = document.getElementById('siteLogoImage');
     if(logo && typeof s.logo_url === 'string' && /^https:\/\//i.test(s.logo_url.trim())) logo.src = s.logo_url.trim();
-    setText('footerTitle', s.site_title);
+    setText('footerTitle', s.footer_title || s.site_title);
     setText('footerDescription', s.footer_description || s.site_subtitle);
     // 版權採全站統一的正式文字，避免舊後台設定覆蓋為 Demo。
     setText('bookingLink', s.booking_text);
@@ -74,6 +74,7 @@ async function loadSiteSettings(){
     if(s.footer_phone) contact.push(`電話：${s.footer_phone}`);
     if(s.footer_email) contact.push(`Email：${s.footer_email}`);
     setText('footerContact', contact.join('｜'));
+    setText('footerCopy', s.copyright_text);
     const social=document.getElementById('footerSocial');
     if(social){
       social.innerHTML = [

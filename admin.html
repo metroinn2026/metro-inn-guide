@@ -270,13 +270,13 @@
               <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
               <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
             </div>
+            <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:8px 0 0;flex-basis:100%"></p>
           </div>
 
           <div class="editor-grid">
             <div class="card">
               <div id="formFields"></div>
               <div class="actions">
-                <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
                 <button onclick="clearForm()">清空</button>
                 <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
               </div>
@@ -1037,6 +1037,7 @@
         return;
       }
       msg.textContent = '儲存中...';
+      document.getElementById('formMsgTop').textContent = msg.textContent;
       if(['spots','foods'].includes(currentTable)){
         if(!['draft','publish'].includes(mode)){msg.textContent='請選擇「儲存草稿」或「儲存並上架」。';return;}
         payload.is_published=mode==='publish';
@@ -1044,10 +1045,12 @@
         if(mode==='publish'&&!confirm('已確認資料內容、來源及圖片使用權，確定公開上架？'))return;
       }
       const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
-      if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; return; }
+      if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; document.getElementById('formMsgTop').textContent=msg.textContent; return; }
       msg.textContent = '已儲存。';
+      document.getElementById('formMsgTop').textContent=msg.textContent;
       await loadCurrentTable();
       editItem(payload.id);
+      document.getElementById('formMsgTop').textContent='儲存成功，資料已更新。';
     }
 
     async function toggleItem(id){

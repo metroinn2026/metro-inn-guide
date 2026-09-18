@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CMS管理後台｜Metro Inn Guide</title>
+  <title>北投旅圖管理後台</title>
   <link rel="stylesheet" href="admin.css?v=20260602-image-superadmin-fix">
 
   <style>
@@ -159,6 +159,13 @@
     }
     @media(max-width:760px){.trip-section-image-row{grid-template-columns:1fr}.image-thumb{display:block}.image-thumb img{width:100%;height:160px;margin-bottom:8px}}
   </style>
+  <style>
+    /* Align the signed-in name and logout button on the same baseline. */
+    .topbar .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:nowrap;margin-left:auto;}
+    .topbar #userDisplayName{display:inline-flex;align-items:center;line-height:1.4;font-size:14px;color:#4D4D4D;font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .topbar .top-actions button{flex:0 0 auto;margin:0;}
+    @media(max-width:600px){.topbar .top-actions{margin-left:0;max-width:100%;}.topbar #userDisplayName{max-width:160px;}}
+  </style>
 
 </head>
 <body>
@@ -166,21 +173,21 @@
     <aside class="sidebar">
       <div class="brand admin-brand">
         <div class="admin-logo-wrap"><img src="metro-inn-logo.png" alt="METRO INN"></div>
-        <div class="brand-title">北投旅圖 CMS</div>
+        <div class="brand-title">北投旅圖管理後台</div>
       </div>
       <nav class="side-nav" id="sideNav" aria-label="後台功能選單">
+        <div class="nav-group"><div class="nav-group-title">網站管理</div>
+          <a class="active" data-table="banners">首頁輪播管理</a>
+          <a data-table="featured_picks">首頁精選管理</a>
+          <a data-table="featured_topics">精選分類管理</a>
+          <a data-table="site_settings">頁首頁尾設定</a>
+        </div>
         <div class="nav-group"><div class="nav-group-title">內容管理</div>
           <a data-table="news">最新消息</a>
           <a data-table="spots">景點管理</a>
           <a data-table="foods">美食管理</a>
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
-        </div>
-        <div class="nav-group"><div class="nav-group-title">網站管理</div>
-          <a class="active" data-table="banners">首頁輪播管理</a>
-          <a data-table="featured_picks">首頁精選管理</a>
-          <a data-table="featured_topics">精選分類管理</a>
-          <a data-table="site_settings">頁首頁尾設定</a>
         </div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
           <a data-table="admin_profiles">帳號權限</a>
@@ -195,10 +202,10 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <h1>北投旅圖內容管理中心</h1>
+          <h1>北投旅圖管理後台</h1>
         </div>
         <div class="top-actions">
-          <span id="userEmail">檢查登入中...</span>
+          <span id="userDisplayName" aria-label="目前登入使用者">檢查登入中...</span>
           <button onclick="logout()">登出</button>
         </div>
       </header>
@@ -383,7 +390,7 @@
           ['id','User ID','text','auto'],
           ['email','Email','text','required'],
           ['role','權限角色','role'],
-          ['display_name','顯示名稱','text'],
+          ['display_name','暱稱／姓名（顯示於右上角）','text'],
           ['password','建立新帳號密碼（新增時必填，編輯時留空即可）','password']
         ],
         columns:['email','role','display_name'],
@@ -492,7 +499,7 @@
     async function checkLogin(){
       const { data } = await db.auth.getSession();
       if(!data.session){ location.href = 'admin-login.html'; return; }
-      document.getElementById('userEmail').textContent = data.session.user.email;
+      document.getElementById('userDisplayName').textContent = '管理員';
       await loadMyProfile(data.session.user);
       switchTable('banners');
     }
@@ -516,6 +523,10 @@
         if(!error && data?.role){
           currentUserRole = data.role;
         }
+        const preferredName = String(data?.display_name || '').trim();
+        const fallbackName = String(user.user_metadata?.full_name || user.user_metadata?.name || '').trim();
+        const emailPrefix = String(user.email || '').split('@')[0];
+        document.getElementById('userDisplayName').textContent = (preferredName && preferredName !== user.email) ? preferredName : (fallbackName || emailPrefix || '管理員');
 
         if(!data){
           await db.from('admin_profiles').upsert({
@@ -523,7 +534,7 @@
             username:user.email === 'metroinn2026@gmail.com' ? 'metroinn2026' : user.email,
             email:user.email,
             role:user.email === 'metroinn2026@gmail.com' ? 'super_admin' : 'admin',
-            display_name:user.email
+            display_name:String(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || '管理員')
           },{onConflict:'id'});
         }
       }catch(err){
@@ -922,7 +933,11 @@
       if(id && id !== '建立後自動產生'){
         const { error } = await db.from('admin_profiles').upsert({id,email,role,display_name},{onConflict:'id'});
         if(error){ msg.textContent = '更新失敗：' + error.message; return; }
-        msg.textContent = '已更新權限。';
+        msg.textContent = '已更新帳號資料。';
+        const {data: ownSession} = await db.auth.getSession();
+        if(ownSession?.session?.user?.id === id){
+          document.getElementById('userDisplayName').textContent = display_name || email.split('@')[0] || '管理員';
+        }
         await loadCurrentTable();
         editItem(id);
         return;

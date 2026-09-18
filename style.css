@@ -242,3 +242,46 @@ body:has(.editor-picks) .search-panel{background:#fff}
 .picks-controls{display:flex;align-items:center;gap:22px;margin-top:26px;color:#73777a;font-size:13px}.picks-progress{height:3px;flex:1;background:#e1e1e1;position:relative}.picks-progress span{position:absolute;top:0;left:0;height:100%;background:#444;transition:width .2s}
 .home-journey{background:#f5f5f5!important}.home-news{background:#fff}.home-subscribe{background:#303438;color:#fff;padding:28px 0}.home-subscribe-inner{display:flex;justify-content:space-between;align-items:center;gap:20px}.home-subscribe h2{font-size:19px;margin:0 0 5px;color:#fff}.home-subscribe p{margin:0;font-size:13px;color:#ddd}.home-subscribe form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.home-subscribe label{font-size:13px}.home-subscribe input{padding:10px;border:1px solid #bbb;background:#fff;min-width:190px}.home-subscribe button{padding:11px 18px;background:#fff;color:#303438;border:0}.home-subscribe small{font-size:11px;color:#ddd}
 @media(max-width:760px){.editor-picks{padding:44px 0}.picks-heading{align-items:start}.picks-heading h2{font-size:27px}.picks-more{font-size:13px}.picks-topics button{padding:9px 13px}.picks-card{flex-basis:82%}.picks-photo{aspect-ratio:1.12}.picks-arrow{width:36px;height:36px;font-size:24px}.picks-arrow.prev{left:-10px}.picks-arrow.next{right:-10px}.home-subscribe-inner{align-items:start;flex-direction:column}}
+
+/* 2026-09 首頁首屏微調：縮小 CI、清楚導覽、讓搜尋在首屏露出。僅作用於首頁。 */
+body:has(.editor-picks) .topbar{height:72px;background:#fff}
+body:has(.editor-picks) .topbar .container{width:min(1360px,calc(100% - 48px))}
+body:has(.editor-picks) .topbar .nav{gap:24px;flex-wrap:nowrap}
+body:has(.editor-picks) .topbar .brand-ci{display:flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto;font-size:16px;white-space:nowrap}
+body:has(.editor-picks) .topbar .brand-logo-img{display:block;width:auto!important;height:34px!important;max-width:215px!important;object-fit:contain!important;flex:none}
+body:has(.editor-picks) .topbar .brand-divider{display:block;width:1px;height:25px;background:#d6d6d6;flex:none}
+body:has(.editor-picks) .topbar .brand-guide-name{font-size:16px;letter-spacing:.02em;font-weight:800;white-space:nowrap}
+body:has(.editor-picks) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.55vw,24px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0}
+body:has(.editor-picks) .topbar .menu a{white-space:nowrap;word-break:keep-all;flex:none}
+body:has(.editor-picks) .topbar .nav-book{flex:none;font-size:14px;padding:11px 15px}
+body:has(.editor-picks) .home-banner-carousel{height:clamp(350px,48vh,490px);min-height:0;max-height:490px}
+body:has(.editor-picks) .home-banner-copy h1{font-size:clamp(32px,3.5vw,48px);margin:12px 0}
+body:has(.editor-picks) .home-banner-copy p{font-size:15px;line-height:1.7;margin-bottom:20px}
+body:has(.editor-picks) .home-banner-dots{bottom:15px}
+body:has(.editor-picks) .search-panel{padding:12px 0 18px}
+body:has(.editor-picks) .search-box{padding:14px 0 8px;border-top:0}
+body:has(.editor-picks) .quick-search-title{font-size:25px;color:#303438;margin:0 0 12px}
+body:has(.editor-picks) .keyword-row input{height:48px}
+body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
+@media(max-width:1150px){
+ body:has(.editor-picks) .topbar .menu{gap:12px;font-size:14px}
+ body:has(.editor-picks) .topbar .brand-logo-img{height:28px!important;max-width:175px!important}
+ body:has(.editor-picks) .topbar .brand-guide-name{font-size:14px}
+ body:has(.editor-picks) .topbar .nav{gap:14px}
+}
+@media(max-width:980px){
+ body:has(.editor-picks) .topbar .menu,body:has(.editor-picks) .topbar .nav-book{display:none}
+ body:has(.editor-picks) .topbar .brand-logo-img{height:30px!important;max-width:190px!important}
+}
+@media(max-width:760px){
+ body:has(.editor-picks) .topbar{height:64px}
+ body:has(.editor-picks) .topbar .container{width:calc(100% - 32px)}
+ body:has(.editor-picks) .topbar .brand-logo-img{height:25px!important;max-width:150px!important}
+ body:has(.editor-picks) .topbar .brand-guide-name{font-size:14px}
+ body:has(.editor-picks) .home-banner-carousel{height:clamp(300px,43vh,420px);min-height:0;max-height:420px}
+ body:has(.editor-picks) .home-banner-overlay{padding-bottom:34px}
+ body:has(.editor-picks) .home-banner-copy h1{font-size:32px}
+ body:has(.editor-picks) .home-banner-copy p{font-size:13px;line-height:1.6;margin-bottom:12px}
+ body:has(.editor-picks) .home-banner-dots{bottom:9px}
+ body:has(.editor-picks) .quick-search-title{font-size:22px}
+}

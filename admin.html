@@ -931,15 +931,34 @@
       msg.textContent = '儲存管理員帳號中...';
 
       if(id && id !== '建立後自動產生'){
-        const { error } = await db.from('admin_profiles').upsert({id,email,role,display_name},{onConflict:'id'});
-        if(error){ msg.textContent = '更新失敗：' + error.message; return; }
-        msg.textContent = '已更新帳號資料。';
-        const {data: ownSession} = await db.auth.getSession();
-        if(ownSession?.session?.user?.id === id){
-          document.getElementById('userDisplayName').textContent = display_name || email.split('@')[0] || '管理員';
+        // Existing profiles have UPDATE (own row) RLS, but no INSERT policy.
+        // Do not use upsert here: it requires INSERT permission even for an existing row.
+        const { data: authResult, error: authError } = await db.auth.getUser();
+        const signedInUser = authResult?.user;
+        if(authError || !signedInUser){
+          msg.textContent = '登入狀態已失效，請重新登入後再試。';
+          return;
         }
+        if(signedInUser.id !== id){
+          msg.textContent = '目前資料庫僅允許修改自己的帳號資料；其他管理員的權限與暱稱需透過具權限的後端管理功能修改。';
+          return;
+        }
+        const existing = cache.find(item => String(item.id) === String(id));
+        if(!existing){ msg.textContent = '找不到原有帳號資料，請重新讀取後再試。'; return; }
+        if(email !== existing.email || role !== existing.role || password){
+          msg.textContent = '此處目前僅支援修改自己的暱稱；Email、角色及密碼需使用獨立的安全帳號管理流程。請還原其他欄位並將密碼留空。';
+          return;
+        }
+        const { data: updated, error } = await db.from('admin_profiles')
+          .update({display_name})
+          .eq('id', signedInUser.id)
+          .select('id, display_name');
+        if(error){ msg.textContent = '更新失敗：' + error.message; return; }
+        if(!updated?.length){ msg.textContent = '沒有更新到資料，請確認帳號權限後重試。'; return; }
+        document.getElementById('userDisplayName').textContent = display_name || email.split('@')[0] || '管理員';
         await loadCurrentTable();
         editItem(id);
+        document.getElementById('formMsg').textContent = '暱稱已更新。';
         return;
       }
 

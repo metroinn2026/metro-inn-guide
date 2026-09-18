@@ -246,7 +246,9 @@
             <button onclick="clearFilters()">清除篩選</button>
           </div>
 
-          <div id="adminBulkBar" style="display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;background:#f3f8ff;border:1px solid #d6e2f2;margin:12px 0"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span></div>
+          <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span>
+            <div id="contentCountCard" class="content-count-line" hidden aria-live="polite"><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span></div>
+          </div>
           <div id="sortSaveBar" class="sort-save-bar">
             <span>排序已變更。請按「儲存排序」寫入資料庫，前台排序才會同步更新。</span>
             <div class="actions">
@@ -255,9 +257,6 @@
             </div>
           </div>
 
-          <div id="contentCountCard" class="content-count-line" hidden aria-live="polite">
-            <span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span>
-          </div>
           <div class="table-card">
             <table>
               <thead id="tableHead"></thead>

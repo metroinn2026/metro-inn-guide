@@ -361,7 +361,7 @@
         hint:'這裡管理全站共用資訊，例如 Logo、訂房按鈕、頁尾地址、電話、社群連結。此資料表固定只有 1 筆。',
         fields:[
           ['id','ID','number','fixed1'],
-          ['logo_url','網站 CI／Logo（建議透明 PNG 或 WEBP）','image'],
+          ['logo_url','網站 CI／Logo（支援 SVG、透明 PNG 或 WEBP）','image'],
           ['booking_text','訂房按鈕文字','text'],
           ['booking_url','訂房按鈕連結','text'],
           ['footer_title','頁尾標題','text'],
@@ -644,11 +644,11 @@
           <div class="image-field-box">
             <input id="f_${name}" type="text" placeholder="可貼圖片網址，或使用下方本機上傳" oninput="updateImagePreview(); updateFieldThumb('${name}')">
             <div class="image-field-actions">
-              <input id="upload_${name}" type="file" accept="image/*" style="display:none" onchange="uploadImageForField('${name}', this.files[0])">
+              <input id="upload_${name}" type="file" accept="${name === 'logo_url' ? 'image/svg+xml,image/png,image/webp' : 'image/*'}" style="display:none" onchange="uploadImageForField('${name}', this.files[0])">
               <button type="button" onclick="document.getElementById('upload_${name}').click()">上傳本機圖片</button>
               <button type="button" onclick="document.getElementById('f_${name}').value=''; updateFieldThumb('${name}'); updateImagePreview();">清除圖片</button>
             </div>
-            <div class="source-hint">${name === 'logo_url' ? '建議透明 PNG／WEBP、橫式比例，畫面顯示高度約 22px。上傳後請按「儲存」，前台重新整理才會生效。' : '也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。'}</div>
+            <div class="source-hint">${name === 'logo_url' ? '建議使用原始向量 SVG（或透明 PNG／WEBP），保留橫式比例。上傳後請按右上角「儲存」；若 SVG 上傳失敗，請確認 Supabase site-images 儲存桶允許 image/svg+xml。' : '也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。'}</div>
             <div id="thumb_${name}" class="image-thumb" style="display:none"></div>
           </div>
         </div>`;
@@ -1199,9 +1199,6 @@
       if(!file) return;
       const msg = document.getElementById('formMsg');
       const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
-      if(fieldName === 'logo_url' && !['image/png','image/webp'].includes(file.type)){
-        msg.textContent = '網站 CI 請上傳透明背景 PNG 或 WEBP。'; return;
-      }
       if(!allowed.includes(file.type)){
         alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
         return;
@@ -1276,33 +1273,42 @@
     async function uploadImageForField(fieldName, file){
       if(!file) return;
       const msg = document.getElementById('formMsg');
-      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
-      if(fieldName === 'logo_url' && !['image/png','image/webp'].includes(file.type)){
-        msg.textContent = '網站 CI 請上傳透明背景 PNG 或 WEBP。'; return;
-      }
-      if(!allowed.includes(file.type)){
-        alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
+      const isLogo = fieldName === 'logo_url';
+      const allowed = isLogo ? ['image/svg+xml','image/png','image/webp'] : ['image/jpeg','image/png','image/webp','image/gif'];
+      const isSvg = isLogo && (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name));
+      if(!allowed.includes(file.type) && !isSvg){
+        msg.textContent = isLogo ? '網站 CI 僅接受 SVG、PNG 或 WEBP。' : '請上傳 JPG、PNG、WEBP 或 GIF 圖片。';
         return;
       }
       if(file.size > 3 * 1024 * 1024){
-        alert('圖片建議小於 3MB，請先壓縮後再上傳。');
+        msg.textContent = '檔案不可超過 3MB。';
         return;
+      }
+      // Browser-side checks improve feedback only; Storage policy/server must also restrict uploads.
+      if(isSvg){
+        const svgText = await file.text();
+        const xml = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+        const bad = /<parsererror|<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<iframe\b|<object\b|<embed\b|<image\b|\bon[a-z]+\s*=|\b(?:href|xlink:href)\s*=\s*["']\s*(?:https?:|data:|javascript:)|url\s*\(\s*["']?\s*(?:https?:|data:|javascript:)/i;
+        if(xml.querySelector('parsererror') || xml.documentElement.localName !== 'svg' || bad.test(svgText)){
+          msg.textContent = 'SVG 含有不支援的外部資源或動態內容，請改用純向量路徑的 SVG。';
+          return;
+        }
       }
 
       msg.textContent = '圖片上傳中...';
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const ext = isSvg ? 'svg' : (file.name.split('.').pop() || 'jpg').toLowerCase();
       const safeId = (document.getElementById('f_id')?.value || currentTable || 'item').replaceAll('/','-');
       const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName}.${ext}`;
 
       const { error } = await db.storage.from('site-images').upload(path, file, {
         cacheControl:'3600',
         upsert:true,
-        contentType:file.type
+        contentType:isSvg ? 'image/svg+xml' : file.type
       });
 
       if(error){
         console.error(error);
-        msg.textContent = '圖片上傳失敗：' + error.message + '。請確認已建立 site-images bucket 與 Storage Policy。';
+        msg.textContent = '圖片上傳失敗：' + error.message + (isSvg ? '。請確認 Supabase site-images 儲存桶允許 image/svg+xml，並確認上傳權限。' : '。請確認 site-images 儲存桶與上傳權限。');
         return;
       }
 

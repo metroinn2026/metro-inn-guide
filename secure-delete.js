@@ -1,6 +1,6 @@
 /* Batch deletion: never trust client-side role checks. SQL RPC enforces permissions. */
 async function secureBulkDelete(db, table, ids, description) {
-  if (!['spots','foods','trips','travel_submissions'].includes(table)) throw Error('不支援的資料類型');
+  if (!['spots','foods','trips','coupons','news','travel_submissions'].includes(table)) throw Error('不支援的資料類型');
   if (!ids.length || ids.length > 100) throw Error('單次只能刪除 1～100 筆');
   const {data:{user},error:userError}=await db.auth.getUser();
   if(userError || !user?.email) throw Error('請重新登入');

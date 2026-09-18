@@ -211,7 +211,6 @@
         </div>
         <div class="top-actions">
           <span id="userDisplayName" aria-label="目前登入使用者">檢查登入中...</span>
-          <button onclick="showChangePassword()">變更密碼</button>
           <button onclick="logout()">登出</button>
         </div>
       </header>
@@ -228,6 +227,14 @@
         </div>
 
         <div id="sectionHint" class="notice warning"></div>
+        <section id="myAccountCard" class="account-self-card" hidden aria-label="我的帳號">
+          <div><strong>我的帳號</strong><p id="myAccountInfo">登入帳號資訊</p><small>變更自己的登入密碼，不會修改其他管理員的密碼或權限。</small></div>
+          <button type="button" onclick="showChangePassword()">變更密碼</button>
+        </section>
+        <section id="contentCountCard" class="content-count-card" hidden aria-live="polite">
+          <span id="contentCountLabel">資料總數</span><strong><span id="contentCountNumber">—</span><small> 筆</small></strong>
+          <span id="contentCountDetail">包含已上架及未上架資料</span>
+        </section>
 
         <div id="listView" class="list-view">
           <div class="toolbar">
@@ -600,7 +607,7 @@
 
       const accountLink = document.querySelector('[data-table="admin_profiles"]');
       if(accountLink){
-        accountLink.style.display = currentUserRole === 'super_admin' ? '' : 'none';
+        accountLink.style.display = '';
       }
     }
 
@@ -647,15 +654,27 @@
 
     function switchTable(table){
       if(location.hash)history.replaceState(null,'',location.pathname+location.search);
-      if(table === 'admin_profiles' && !requireSuperAdmin()) return;
+      
       document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
       currentTable = table;
+      const isAccount = table === 'admin_profiles';
+      const accountCard = document.getElementById('myAccountCard');
+      accountCard.hidden = !isAccount;
+      if(isAccount){
+        db.auth.getUser().then(({data})=>{
+          document.getElementById('myAccountInfo').textContent = data?.user?.email || '目前登入帳號';
+        });
+      }
+      const manageAccounts = !isAccount || currentUserRole === 'super_admin';
+      document.getElementById('listView').style.display = manageAccounts ? '' : 'none';
+      document.getElementById('newBtn').style.display = manageAccounts ? '' : 'none';
+      document.getElementById('contentCountCard').hidden = !['news','spots','foods','trips','coupons'].includes(table);
       const cfg = configs[currentTable];
       // 已移除裝飾性英文分類標題。
       adminSelectionReset();
       document.getElementById('currentTitle').textContent = cfg.label;
       document.getElementById('sectionHint').textContent = cfg.hint;
-      document.getElementById('newBtn').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
+      document.getElementById('newBtn').style.display = currentTable === 'site_settings' || (currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') ? 'none' : 'inline-flex';
       const manual=['spots','foods'].includes(currentTable);
       document.querySelectorAll('.normal-save').forEach(b=>b.style.display=manual?'none':'');
       document.querySelectorAll('.draft-save,.publish-save').forEach(b=>b.style.display=manual?'':'none');
@@ -663,7 +682,7 @@
       buildForm();
       setupFilters();
       backToList(false);
-      loadCurrentTable();
+      if(manageAccounts) loadCurrentTable();
     }
 
     function setupFilters(){
@@ -806,19 +825,25 @@
     }
 
     async function loadCurrentTable(){
+      if(currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') return;
       buildHead();
       const tbody = document.getElementById('listBody');
       tbody.innerHTML = '<tr><td colspan="6">資料載入中...</td></tr>';
       const cfg = configs[currentTable];
       const orderCol = cfg.order || 'sort_order';
       const ascending = currentTable !== 'news';
-      const { data, error } = await db.from(cfg.table).select('*').order(orderCol, { ascending });
+      const { data, error, count } = await db.from(cfg.table).select('*', {count:'exact'}).order(orderCol, { ascending });
       if(error){
         console.error(error);
         tbody.innerHTML = `<tr><td colspan="6">讀取失敗：${error.message}</td></tr>`;
         return;
       }
       cache = data || [];
+      if(['news','spots','foods','trips','coupons'].includes(currentTable)) {
+        document.getElementById('contentCountLabel').textContent = cfg.label + '總數';
+        document.getElementById('contentCountNumber').textContent = count == null ? '—' : count.toLocaleString('zh-TW');
+        document.getElementById('contentCountDetail').textContent = '包含已上架及未上架資料';
+      }
       renderList();
     }
 
@@ -858,6 +883,11 @@
       });
 
       currentList = list;
+      const detail = document.getElementById('contentCountDetail');
+      if(!document.getElementById('contentCountCard').hidden) {
+        const filtering = keyword || status !== 'all' || type !== 'all';
+        detail.textContent = filtering ? `目前符合條件 ${list.length} 筆（已載入清單）` : '包含已上架及未上架資料';
+      }
       updateAdminBulk();
       const tbody = document.getElementById('listBody');
       document.getElementById('sortSaveBar').classList.remove('active');

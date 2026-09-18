@@ -232,8 +232,7 @@
           <button type="button" onclick="showChangePassword()">變更密碼</button>
         </section>
         <section id="contentCountCard" class="content-count-card" hidden aria-live="polite">
-          <span id="contentCountLabel">資料總數</span><strong><span id="contentCountNumber">—</span><small> 筆</small></strong>
-          <span id="contentCountDetail">包含已上架及未上架資料</span>
+          <span id="contentCountLabel" class="count-label">資料總數</span><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span>
         </section>
 
         <div id="listView" class="list-view">
@@ -886,7 +885,7 @@
       const detail = document.getElementById('contentCountDetail');
       if(!document.getElementById('contentCountCard').hidden) {
         const filtering = keyword || status !== 'all' || type !== 'all';
-        detail.textContent = filtering ? `目前符合條件 ${list.length} 筆（已載入清單）` : '包含已上架及未上架資料';
+        detail.textContent = filtering ? `符合條件 ${list.length} 筆（已載入清單）` : (list.length ? `顯示第 1–${list.length} 筆` : '目前沒有資料');
       }
       updateAdminBulk();
       const tbody = document.getElementById('listBody');

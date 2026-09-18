@@ -147,11 +147,13 @@ th{background:#eaf2fb;color:#435976;border-color:#d7e3f0}td{border-color:#e8eef7
 @media(max-width:1100px){.side-nav{flex-direction:column!important;flex-wrap:nowrap!important;gap:2px!important}}
 
 /* Compact content totals and self-service password management */
-.content-count-card{border:1px solid #d6e2f2;border-top:3px solid #2878d8;background:#fff;padding:15px 18px;margin:14px 0;display:flex;flex-direction:column;gap:5px;max-width:340px}
+/* Compact one-line counts above the management list; no statistic cards. */
+.content-count-card{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:8px 0 10px;padding:0;border:0;background:transparent;max-width:none;color:#64748b;font-size:13px;line-height:1.6}
 .content-count-card[hidden],.account-self-card[hidden]{display:none!important}
-.content-count-card>span:first-child{color:#64748b;font-size:13px;font-weight:600}
-.content-count-card strong{color:#17365d;font-size:30px;line-height:1.2}
-.content-count-card strong small{font-size:13px;font-weight:400;color:#64748b}
-.content-count-card>span:last-child{font-size:12px;color:#64748b}
+.content-count-card .count-label{font-weight:500;margin-right:5px}
+.content-count-card .count-main{font-weight:400}
+.content-count-card .count-main strong{font-size:inherit;line-height:inherit;color:inherit;font-weight:600}
+.content-count-card #contentCountDetail::before,.content-count-card #submissionStatDetail::before{content:'，'}
+.content-count-card>span:last-child{font-size:inherit;color:inherit}
 .account-self-card{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;border:1px solid #d6e2f2;border-top:3px solid #2878d8;background:#fff;padding:20px;margin:14px 0 20px}
 .account-self-card p{margin:7px 0;color:#334155;overflow-wrap:anywhere}.account-self-card small{color:#64748b}

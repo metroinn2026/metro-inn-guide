@@ -178,6 +178,7 @@
         </div>
         <div class="nav-group"><div class="nav-group-title">網站管理</div>
           <a class="active" data-table="banners">首頁輪播管理</a>
+          <a data-table="featured_picks">首頁精選管理</a>
           <a data-table="site_settings">頁首頁尾設定</a>
         </div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
@@ -297,6 +298,13 @@
       </ul>`;
 
     const configs = {
+      featured_picks:{
+        label:'首頁精選管理',kicker:'FEATURED',table:'featured_picks',preview:'index.html#picks',
+        hint:'最多啟用 10 筆，拖曳排序後按「儲存排序」。請填寫已上架景點／美食／行程的資料編號及其封面圖片網址。',
+        fields:[['id','ID','text','auto'],['sort_order','顯示順序','number'],['title','精選標題','text','required'],['category','內容類型（spot／food／trip）','text','required'],['content_id','對應內容 ID（例如 spot_0001）','text','required'],['summary','簡短介紹','textarea'],['cover_image','封面圖片網址','image'],['topics','分類標籤（以逗號分隔：first,family,culture,food,nature）','text'],['is_active','狀態','booleanActive']],
+        columns:['title','category','is_active'],subtitle:x=>x.category+' / '+x.content_id,statusKey:'is_active',typeOptions:[['all','全部類別'],['spot','景點'],['food','美食'],['trip','行程']],order:'sort_order',idPrefix:'pick',
+        tips:'<ul class="tip-list"><li>最多 10 筆啟用精選；建議封面 1600×900。</li><li>內容類型填 spot、food 或 trip；內容 ID 必須是已上架的資料。</li><li>分類標籤可留空，或填 first,family 等英文代碼，逗號分隔。</li><li>首次使用請先執行隨包附上的 featured_picks.sql。</li></ul>'
+      },
       banners: {
         label:'Banner 管理', kicker:'BANNER', table:'banners', preview:'index.html',
         hint:'首頁上方 Banner 最多建議 4 張輪播。排序請填 1～4；若超過 4 張，前台只會優先顯示排序最前面的啟用項目。',
@@ -879,6 +887,7 @@
         else payload[name] = String(el.value || '').trim();
       });
       if(!payload.id) payload.id = nextId();
+      if(currentTable==='featured_picks'){payload.category=String(payload.category||'').toLowerCase();if(!['spot','food','trip'].includes(payload.category)){document.getElementById('formMsg').textContent='內容類型請填 spot、food 或 trip。';return null;}if(!payload.content_id){document.getElementById('formMsg').textContent='請填寫對應內容 ID。';return null;}payload.topics=String(payload.topics||'').split(',').map(t=>t.trim()).filter(t=>['first','family','culture','food','nature'].includes(t)).join(',');}
       if('slug' in payload && !payload.slug && payload.title) payload.slug = slugify(payload.title);
       Object.keys(payload).forEach(k=>{ if(payload[k]==='') payload[k]=null; });
       return payload;
@@ -940,6 +949,8 @@
       if(currentTable === 'admin_profiles') return saveAdminProfile();
       const msg = document.getElementById('formMsg');
       const payload = formPayload();
+      if(!payload)return;
+      if(currentTable==='featured_picks' && payload.is_active && cache.filter(x=>x.is_active && x.id!==payload.id).length>=10){msg.textContent='最多只能啟用 10 筆精選，請先停用其他項目。';return;}
       if(configs[currentTable].fields.some(f=>f[3]==='required') && !payload.title){
         msg.textContent = '請輸入標題 / 名稱。';
         return;
@@ -955,6 +966,7 @@
     async function toggleItem(id){
       const item = cache.find(x=>String(x.id)===String(id));
       if(!item) return;
+      if(currentTable==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;}
       const key = configs[currentTable].statusKey;
       const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
       if(error){ alert('更新失敗：' + error.message); return; }

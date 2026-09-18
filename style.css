@@ -414,3 +414,15 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 .footer .copy{margin-top:20px;padding-top:13px;border-top:1px solid #BDBDBD;font-size:12px;color:#f0f0f0}
 .footer .footer-social a{color:#fff}
 @media(max-width:650px){.footer .footer-compact{grid-template-columns:1fr;gap:12px}.footer,body:not(:has(.editor-picks)) .footer{padding:28px 0 20px}}
+
+/* 精選輪播下方雙入口 */
+.picks-destinations{display:flex;justify-content:center;align-items:center;gap:36px;flex-wrap:wrap;margin-top:24px}
+.picks-destinations a{color:#287f88;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
+.picks-destinations a:hover,.picks-destinations a:focus-visible{border-bottom-color:currentColor}
+@media(max-width:600px){.picks-destinations{gap:20px}.picks-destinations a{font-size:14px}}
+
+/* 精選輪播下方雙入口 */
+.picks-destinations{display:flex;justify-content:center;align-items:center;gap:36px;flex-wrap:wrap;margin-top:24px}
+.picks-destinations a{color:#287f88;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
+.picks-destinations a:hover,.picks-destinations a:focus-visible{border-bottom-color:currentColor}
+@media(max-width:600px){.picks-destinations{gap:20px}.picks-destinations a{font-size:14px}}

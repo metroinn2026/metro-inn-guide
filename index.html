@@ -47,12 +47,13 @@
 <section class="section home-news" id="news"><div class="container"><div class="section-head compact"><div><h2>最新消息</h2></div><a class="section-link" href="news.html">查看全部 →</a></div><div class="news-line-list" id="homeNewsList" aria-live="polite"><a class="news-line" href="news.html"><time>最新消息</time><strong>查看北投旅圖最新活動與旅遊資訊</strong><span class="news-chevron" aria-hidden="true">›</span></a></div><div class="home-news-bottom"><a href="news.html">查看更多消息 →</a></div></div></section>
 
 <section class="editor-picks section" id="picks"><div class="container">
-  <div class="picks-heading"><div><h2>找到你的北投旅行方式</h2><p>從溫泉、散步到在地美食，探索適合自己的旅行體驗。</p></div><a class="picks-more" id="picksMore" href="spots.html">更多精選 ↗</a></div>
+  <div class="picks-heading"><div><h2>找到你的北投旅行方式</h2><p>從溫泉、散步到在地美食，探索適合自己的旅行體驗。</p></div></div>
   <div class="picks-topics" role="group" aria-label="選擇旅遊主題">
     <button type="button" class="active" data-topic="all" aria-pressed="true">人氣精選</button><button type="button" data-topic="first">初訪北投</button><button type="button" data-topic="family">親子樂</button><button type="button" data-topic="culture">文化深度遊</button><button type="button" data-topic="food">美食愛好者</button><button type="button" data-topic="nature">自然漫遊</button>
   </div>
   <div class="picks-carousel"><button class="picks-arrow prev" type="button" aria-label="上一組推薦">‹</button><div class="picks-track" id="picksTrack" tabindex="0" aria-label="推薦內容，左右滑動瀏覽"></div><button class="picks-arrow next" type="button" aria-label="下一組推薦">›</button></div>
-  <div class="picks-controls"><div class="picks-progress" aria-hidden="true"><span id="picksProgress"></span></div><span id="picksCount" aria-live="polite">01 / 09</span></div>
+  <div class="picks-controls"><div class="picks-progress" aria-hidden="true"><span id="picksProgress"></span></div><span id="picksCount" aria-live="polite">01 / 10</span></div>
+  <div class="picks-destinations"><a href="spots.html">探索所有景點 ↗</a><a href="foods.html">探索在地美食 ↗</a></div>
 </div></section>
 <section class="section home-journey"><div class="container mag-feature"><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt="北投地熱風景" loading="lazy"></div><div class="mag-feature-copy"><h2>搭捷運，去旅行。</h2><p>從北捷行旅出發，沿著捷運探索溫泉文化與在地風景，安排一趟不趕路的城市散策。</p><a class="button" href="trips.html">探索推薦行程 →</a></div></div></section>
 
@@ -61,7 +62,7 @@
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
 // 首頁主題推薦：沿用現有內頁連結；日後可改由後台提供推薦資料。
-const pickItems=[
+let pickItems=[
  {title:'地熱谷',type:'景點・溫泉',desc:'感受北投獨特的地熱風景。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20in%20Beitou.jpg',href:'spot.html?id=spot_0001',tags:['all','first','nature']},
  {title:'北投圖書館',type:'景點・建築',desc:'在綠意中探索特色建築。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg',href:'spots.html',tags:['all','first','family','culture']},
  {title:'北投溫泉博物館',type:'景點・文化',desc:'走進北投的溫泉歷史。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Hot%20Spring%20Museum.jpg',href:'spots.html',tags:['all','first','family','culture']},
@@ -72,19 +73,30 @@ const pickItems=[
  {title:'在地餐桌提案',type:'美食・探索',desc:'品嚐北投旅途中的好味道。',img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85',href:'foods.html',tags:['all','food']},
  {title:'搭捷運去旅行',type:'行程・大眾運輸',desc:'從北捷行旅出發探索城市。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg',href:'trips.html',tags:['all','nature','culture','family']}
 ];
-const pickMore={all:'spots.html',first:'spots.html',family:'spots.html',culture:'spots.html',food:'foods.html',nature:'spots.html'};
+
 function initPicks(){
  const track=document.getElementById('picksTrack'),progress=document.getElementById('picksProgress'),count=document.getElementById('picksCount');
  if(!track)return;
  let active='all';
  function update(){const max=Math.max(1,track.scrollWidth-track.clientWidth);const ratio=track.scrollLeft/max;const cards=[...track.children];let index=cards.length?cards.reduce((best,el,i)=>Math.abs(el.offsetLeft-track.offsetLeft-track.scrollLeft)<Math.abs(cards[best].offsetLeft-track.offsetLeft-track.scrollLeft)?i:best,0):0;progress.style.width=`${Math.min(100,Math.max(12,(track.clientWidth/track.scrollWidth)*100+ratio*(100-track.clientWidth/track.scrollWidth*100)))}%`;count.textContent=`${String(index+1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;}
- function render(){const selected=pickItems.filter(item=>item.tags.includes(active)).slice(0,9);track.innerHTML=selected.map(item=>`<a class="picks-card" href="${item.href}"><div class="picks-photo"><img loading="lazy" src="${item.img}" alt="${item.title}"><div class="picks-caption"><span>${item.type}</span><h3>${item.title}</h3><p>${item.desc}</p></div></div></a>`).join('');track.scrollLeft=0;document.getElementById('picksMore').href=pickMore[active];update();}
+ function render(){const selected=pickItems.filter(item=>item.tags.includes(active)).slice(0,10);track.replaceChildren();selected.forEach(item=>{const a=document.createElement('a');a.className='picks-card';a.href=item.href;const photo=document.createElement('div');photo.className='picks-photo';const img=document.createElement('img');img.loading='lazy';img.src=item.img;img.alt=item.title;const caption=document.createElement('div');caption.className='picks-caption';const type=document.createElement('span');type.textContent=item.type;const title=document.createElement('h3');title.textContent=item.title;const desc=document.createElement('p');desc.textContent=item.desc;caption.append(type,title,desc);photo.append(img,caption);a.append(photo);track.append(a);});track.scrollLeft=0;update();}
  document.querySelectorAll('.picks-topics button').forEach(button=>button.addEventListener('click',()=>{active=button.dataset.topic;document.querySelectorAll('.picks-topics button').forEach(b=>{const on=b===button;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});render();}));
  document.querySelectorAll('.picks-arrow').forEach(button=>button.addEventListener('click',()=>{const card=track.querySelector('.picks-card');if(card)track.scrollBy({left:(button.classList.contains('next')?1:-1)*(card.getBoundingClientRect().width+20),behavior:'smooth'});}));
- track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);render();
+ track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);render();window.refreshFeaturedPicks=render;window.refreshFeaturedPicks=render;
 }
-document.addEventListener('DOMContentLoaded',initPicks);
-if(document.readyState!=='loading')initPicks();
+async function loadFeaturedPicks(){
+ if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined')return;
+ try{
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/featured_picks?select=*&is_active=eq.true&order=sort_order.asc&limit=10`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+  if(!response.ok)throw new Error(`精選資料讀取失敗 ${response.status}`);
+  const rows=await response.json();
+  if(!rows.length){pickItems=[];window.refreshFeaturedPicks?.();return;}
+  pickItems=rows.map(row=>({title:row.title,type:row.category==='food'?'美食・精選':row.category==='trip'?'行程・精選':'景點・精選',desc:row.summary||'',img:row.cover_image||'',href:(row.category==='food'?'food.html':row.category==='trip'?'trip.html':'spot.html')+'?id='+encodeURIComponent(row.content_id),tags:['all',...String(row.topics||'').split(',').filter(Boolean)]}));
+  window.refreshFeaturedPicks?.();
+ }catch(error){console.warn('精選資料未載入；若尚未執行 featured_picks.sql，暫顯示原有推薦',error);}
+}
+document.addEventListener('DOMContentLoaded',()=>{initPicks();loadFeaturedPicks();});
+if(document.readyState!=='loading'){initPicks();loadFeaturedPicks();}
 
 
 let homeBannerAutoTimer = null;

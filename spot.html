@@ -88,17 +88,27 @@
       </div>
 
       <div class="sidebox compact fill travel-from-hotel">
-        <div class="kicker">TRAVEL FROM METRO INN</div>
+        <div class="kicker">METRO INN GUIDE</div>
         <h3>從北捷行旅怎麼去？</h3>
         <p class="travel-endpoints"><strong>北捷行旅</strong><span aria-hidden="true"> → </span><strong id="travelDestination">目的地載入中</strong></p>
-        <div class="travel-modes" role="group" aria-label="選擇交通方式">
-          <button type="button" class="travel-mode active" data-mode="transit" aria-pressed="true">🚇 大眾運輸</button>
-          <button type="button" class="travel-mode" data-mode="driving" aria-pressed="false">🚗 開車</button>
-          <button type="button" class="travel-mode" data-mode="walking" aria-pressed="false">🚶 步行</button>
+        <div class="travel-route-card">
+          <div class="travel-route-heading"><strong>🚇 大眾運輸優先</strong><span class="travel-lowcarbon">低碳旅遊</span></div>
+          <p id="travelMetro" class="travel-route-text">路線資訊整理中，請使用下方即時導航。</p>
         </div>
-        <p id="travelDescription" class="travel-description">路線與預估時間請以即時導航為準。</p>
-        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">查看路線與預估時間 ↗</a>
-        <p class="travel-disclaimer">從北捷行旅出發；路線、班次及車程以 Google 地圖即時資訊為準。</p>
+        <div id="travelBusCard" class="travel-route-card" hidden>
+          <div class="travel-route-heading"><strong>🚌 公車及轉乘</strong></div>
+          <p id="travelBus" class="travel-route-text"></p>
+        </div>
+        <div class="travel-route-card">
+          <div class="travel-route-heading"><strong>📍 景點鄰近捷運站</strong></div>
+          <p id="travelNearbyStation" class="travel-route-text">資料整理中</p>
+        </div>
+        <div id="travelCarCard" class="travel-route-card" hidden>
+          <div class="travel-route-heading"><strong>🚗 自行開車</strong></div>
+          <p id="travelCar" class="travel-route-text"></p>
+        </div>
+        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 查看即時路線 ↗</a>
+        <p class="travel-disclaimer"><strong>旅圖小編提醒：</strong>以上交通路線及時間僅供參考，實際班次、行駛時間及路況可能有所變動，出發前請以交通運輸業者最新公告及即時資訊為準。</p>
       </div>
 
       <div class="sidebox compact dark">
@@ -184,37 +194,25 @@
 
 
 
-    // 使用固定的旅館起點，避免錯把景點的「附近捷運站」當成出發站。
-    // Google Maps 即時計算站數、轉乘與時間；未經查證不在網站硬填數字。
+    // 交通欄位可在 Supabase 補充；尚未查核的路線不顯示虛構站數與時間。
     const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
     function setupHotelRoutes(spot) {
       const destination = [spot.title, spot.address].filter(Boolean).join(' ');
       setText('travelDestination', spot.title || '景點');
-      const link = document.getElementById('travelMapLink');
-      const description = document.getElementById('travelDescription');
-      const labels = {
-        transit: '以捷運、公車及步行規劃路線；站數、轉乘與時間請查看即時導航。',
-        driving: '查看開車路線與即時預估車程；出發前請確認停車資訊。',
-        walking: '查看步行路線及預估時間；遠距離景點建議優先搭乘大眾運輸。'
-      };
-      function setMode(mode) {
-        const url = new URL('https://www.google.com/maps/dir/');
-        url.searchParams.set('api', '1');
-        url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
-        url.searchParams.set('destination', destination || spot.title || '北投');
-        url.searchParams.set('travelmode', mode);
-        link.href = url.toString();
-        description.textContent = labels[mode];
-        document.querySelectorAll('.travel-mode').forEach(button => {
-          const active = button.dataset.mode === mode;
-          button.classList.toggle('active', active);
-          button.setAttribute('aria-pressed', String(active));
-        });
-      }
-      document.querySelectorAll('.travel-mode').forEach(button => {
-        button.addEventListener('click', () => setMode(button.dataset.mode));
-      });
-      setMode('transit');
+      setText('travelNearbyStation', spot.station ? spot.station : '鄰近車站待查核');
+      setText('travelMetro', spot.transport_metro || '捷運路線、站數及時間待查核；可先使用下方即時導航。');
+      const bus = (spot.transport_bus || '').trim();
+      const car = (spot.transport_car || '').trim();
+      document.getElementById('travelBusCard').hidden = !bus;
+      document.getElementById('travelCarCard').hidden = !car;
+      setText('travelBus', bus);
+      setText('travelCar', car);
+      const url = new URL('https://www.google.com/maps/dir/');
+      url.searchParams.set('api', '1');
+      url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
+      url.searchParams.set('destination', destination || spot.title || '北投');
+      url.searchParams.set('travelmode', 'transit');
+      document.getElementById('travelMapLink').href = url.toString();
     }
 
     async function loadSpot() {

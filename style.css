@@ -301,3 +301,86 @@ body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
 .home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #ddd;border-radius:999px;padding:9px 23px;font-size:13px;color:#303438}
 .home-news-bottom a:hover{border-color:#287f88;color:#287f88}
 @media(max-width:600px){.home-news{padding:38px 0 42px!important}.home-news .section-head.compact{display:flex}.home-news .section-head h2{font-size:25px}.home-news .news-line{grid-template-columns:82px minmax(0,1fr) 12px;gap:9px;min-height:52px;padding:9px 0}.home-news .news-line time{font-size:11px}.home-news .news-line strong{font-size:14px}.home-news .news-chevron{font-size:17px}}
+
+
+/* 內頁視覺統一：白底、深灰、少量湖水藍；首頁維持既有設定 */
+body:not(:has(.editor-picks)){
+ --bg:#fff;--paper:#fff;--ink:#303438;--muted:#666d70;
+ --green:#303438;--blue:#287f88;--orange:#287f88;
+ --line:#e7e7e7;--soft:#f5f5f5;
+ background:#fff;color:#303438;
+}
+body:not(:has(.editor-picks)) .topbar{height:72px;background:#fff;border-bottom:1px solid #e8e8e8;backdrop-filter:none}
+body:not(:has(.editor-picks)) .topbar .container{width:min(1360px,calc(100% - 48px))}
+body:not(:has(.editor-picks)) .topbar .nav{gap:22px;flex-wrap:nowrap;min-width:0}
+body:not(:has(.editor-picks)) .topbar .brand,
+body:not(:has(.editor-picks)) .topbar .brand-ci{display:flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto;font-size:16px;line-height:1.3;white-space:nowrap}
+/* 修正內頁 CI：原本 img{width:100%;height:100%} 導致標誌被放大 */
+body:not(:has(.editor-picks)) .topbar .brand img,
+body:not(:has(.editor-picks)) .topbar .brand-ci img,
+body:not(:has(.editor-picks)) .topbar .brand-logo-img{display:block!important;width:auto!important;height:34px!important;max-width:215px!important;max-height:34px!important;object-fit:contain!important;flex:0 0 auto}
+body:not(:has(.editor-picks)) .topbar .brand-divider{width:1px;height:25px;background:#d6d6d6;flex:none}
+body:not(:has(.editor-picks)) .topbar .brand-guide-name{font-size:16px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+body:not(:has(.editor-picks)) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.4vw,22px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0;color:#303438}
+body:not(:has(.editor-picks)) .topbar .menu a{white-space:nowrap;word-break:keep-all;flex:none}
+body:not(:has(.editor-picks)) .topbar .menu a:hover{color:#287f88}
+body:not(:has(.editor-picks)) .topbar .nav-book{flex:none;background:#303438;border-color:#303438;color:#fff;padding:11px 15px;font-size:14px}
+body:not(:has(.editor-picks)) .topbar .nav-book:hover{background:#fff;color:#303438}
+/* 頁首及內容：減少舊版暖色大底塊、讓照片和字級成為視覺主角 */
+body:not(:has(.editor-picks)) .directory-hero{padding:52px 0 34px;background:#fff;border-bottom:1px solid #ededed}
+body:not(:has(.editor-picks)) .directory-hero h1{font-size:clamp(32px,3.2vw,46px);color:#303438;letter-spacing:.02em}
+body:not(:has(.editor-picks)) .directory-hero p{line-height:1.75;color:#666d70}
+body:not(:has(.editor-picks)) .section{background:#fff}
+body:not(:has(.editor-picks)) .section-head h2,
+body:not(:has(.editor-picks)) .title-line{color:#303438}
+body:not(:has(.editor-picks)) .kicker,
+body:not(:has(.editor-picks)) .meta{color:#73777a;letter-spacing:.1em}
+body:not(:has(.editor-picks)) .directory-grid{gap:38px 24px}
+body:not(:has(.editor-picks)) .directory-card,
+body:not(:has(.editor-picks)) .card{background:transparent;border:0;box-shadow:none}
+body:not(:has(.editor-picks)) .directory-body{padding-top:15px}
+body:not(:has(.editor-picks)) .directory-body h3{font-size:clamp(19px,1.6vw,24px);margin:7px 0}
+body:not(:has(.editor-picks)) .directory-body p{line-height:1.65}
+body:not(:has(.editor-picks)) .directory-card:hover h3,
+body:not(:has(.editor-picks)) .card:hover h3{color:#287f88}
+body:not(:has(.editor-picks)) .filter-pills{gap:20px}
+body:not(:has(.editor-picks)) .pill.active,
+body:not(:has(.editor-picks)) .pill:hover{color:#303438;border-color:#303438}
+body:not(:has(.editor-picks)) .tag{border-color:#e7e7e7;color:#555;background:#fff;font-weight:600}
+body:not(:has(.editor-picks)) .tag.dark{background:#303438;border-color:#303438;color:#fff}
+body:not(:has(.editor-picks)) .sidebox{border:1px solid #e7e7e7;background:#fff;box-shadow:none}
+body:not(:has(.editor-picks)) .sidebox.fill{background:#f5f5f5;border:0}
+body:not(:has(.editor-picks)) .sidebox.dark{background:#303438;color:#fff}
+body:not(:has(.editor-picks)) .wide-banner{background:#f5f5f5;color:#303438}
+body:not(:has(.editor-picks)) .button,
+body:not(:has(.editor-picks)) .nav-book{border-radius:0}
+body:not(:has(.editor-picks)) .button{background:#303438;border-color:#303438;color:#fff}
+body:not(:has(.editor-picks)) .button:hover{background:#fff;color:#303438}
+body:not(:has(.editor-picks)) .button.outline{background:transparent;color:#303438;border-color:#303438}
+body:not(:has(.editor-picks)) .section-link,
+body:not(:has(.editor-picks)) .mini-link{color:#287f88}
+/* 內頁頁尾統一深灰，原有功能與連結不改動 */
+body:not(:has(.editor-picks)) .footer{background:#303438;color:#fff}
+body:not(:has(.editor-picks)) .footer a:hover{color:#a5d4d7}
+@media(max-width:1150px){
+ body:not(:has(.editor-picks)) .topbar .menu{gap:11px;font-size:14px}
+ body:not(:has(.editor-picks)) .topbar .brand img,
+ body:not(:has(.editor-picks)) .topbar .brand-ci img,
+ body:not(:has(.editor-picks)) .topbar .brand-logo-img{height:28px!important;max-height:28px!important;max-width:175px!important}
+ body:not(:has(.editor-picks)) .topbar .brand-guide-name{font-size:14px}
+ body:not(:has(.editor-picks)) .topbar .nav{gap:12px}
+}
+@media(max-width:980px){
+ body:not(:has(.editor-picks)) .topbar .menu,
+ body:not(:has(.editor-picks)) .topbar .nav-book{display:none}
+ body:not(:has(.editor-picks)) .topbar .container{width:calc(100% - 36px)}
+}
+@media(max-width:600px){
+ body:not(:has(.editor-picks)) .topbar{height:64px}
+ body:not(:has(.editor-picks)) .topbar .brand img,
+ body:not(:has(.editor-picks)) .topbar .brand-ci img,
+ body:not(:has(.editor-picks)) .topbar .brand-logo-img{height:25px!important;max-height:25px!important;max-width:150px!important}
+ body:not(:has(.editor-picks)) .topbar .brand-guide-name{font-size:13px}
+ body:not(:has(.editor-picks)) .directory-hero{padding:35px 0 26px}
+ body:not(:has(.editor-picks)) .directory-hero h1{font-size:32px}
+}

@@ -87,11 +87,18 @@
         <p id="sideStation">捷運資訊載入中</p>
       </div>
 
-      <div class="sidebox compact fill">
-        <div class="kicker">NEARBY STATION</div>
-        <h3>附近捷運站</h3>
-        <p id="nearbyStation1">🚇 捷運站資訊載入中</p>
-        <p id="nearbyStation2"></p>
+      <div class="sidebox compact fill travel-from-hotel">
+        <div class="kicker">TRAVEL FROM METRO INN</div>
+        <h3>從北捷行旅怎麼去？</h3>
+        <p class="travel-endpoints"><strong>北捷行旅</strong><span aria-hidden="true"> → </span><strong id="travelDestination">目的地載入中</strong></p>
+        <div class="travel-modes" role="group" aria-label="選擇交通方式">
+          <button type="button" class="travel-mode active" data-mode="transit" aria-pressed="true">🚇 大眾運輸</button>
+          <button type="button" class="travel-mode" data-mode="driving" aria-pressed="false">🚗 開車</button>
+          <button type="button" class="travel-mode" data-mode="walking" aria-pressed="false">🚶 步行</button>
+        </div>
+        <p id="travelDescription" class="travel-description">路線與預估時間請以即時導航為準。</p>
+        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">查看路線與預估時間 ↗</a>
+        <p class="travel-disclaimer">從北捷行旅出發；路線、班次及車程以 Google 地圖即時資訊為準。</p>
       </div>
 
       <div class="sidebox compact dark">
@@ -177,6 +184,39 @@
 
 
 
+    // 使用固定的旅館起點，避免錯把景點的「附近捷運站」當成出發站。
+    // Google Maps 即時計算站數、轉乘與時間；未經查證不在網站硬填數字。
+    const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
+    function setupHotelRoutes(spot) {
+      const destination = [spot.title, spot.address].filter(Boolean).join(' ');
+      setText('travelDestination', spot.title || '景點');
+      const link = document.getElementById('travelMapLink');
+      const description = document.getElementById('travelDescription');
+      const labels = {
+        transit: '以捷運、公車及步行規劃路線；站數、轉乘與時間請查看即時導航。',
+        driving: '查看開車路線與即時預估車程；出發前請確認停車資訊。',
+        walking: '查看步行路線及預估時間；遠距離景點建議優先搭乘大眾運輸。'
+      };
+      function setMode(mode) {
+        const url = new URL('https://www.google.com/maps/dir/');
+        url.searchParams.set('api', '1');
+        url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
+        url.searchParams.set('destination', destination || spot.title || '北投');
+        url.searchParams.set('travelmode', mode);
+        link.href = url.toString();
+        description.textContent = labels[mode];
+        document.querySelectorAll('.travel-mode').forEach(button => {
+          const active = button.dataset.mode === mode;
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+      }
+      document.querySelectorAll('.travel-mode').forEach(button => {
+        button.addEventListener('click', () => setMode(button.dataset.mode));
+      });
+      setMode('transit');
+    }
+
     async function loadSpot() {
       const id = getParam('id');
 
@@ -252,8 +292,7 @@
         setText('sideHours', spot.business_hours || '營業時間依公告為準');
         setText('sideStayTime', spot.stay_time ? `建議停留 ${spot.stay_time}` : '建議停留依行程安排');
         setText('sideStation', stationText);
-        setText('nearbyStation1', spot.station ? `🚇 ${spot.station}｜可依 Google Map 導航` : '🚇 捷運資訊請見 Google Map');
-        setText('nearbyStation2', spot.area ? `📍 ${spot.area}` : '');
+        setupHotelRoutes(spot);
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

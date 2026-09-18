@@ -53,7 +53,7 @@
   <div class="picks-controls"><div class="picks-progress" aria-hidden="true"><span id="picksProgress"></span></div><span id="picksCount" aria-live="polite">01 / 09</span></div>
 </div></section>
 <section class="section home-journey"><div class="container mag-feature"><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt="北投地熱風景" loading="lazy"></div><div class="mag-feature-copy"><h2>搭捷運，去旅行。</h2><p>從北捷行旅出發，沿著捷運探索溫泉文化與在地風景，安排一趟不趕路的城市散策。</p><a class="button" href="trips.html">探索推薦行程 →</a></div></div></section>
-<section class="section home-news" id="news"><div class="container"><div class="section-head compact"><div><h2>最新消息</h2></div><a class="section-link" href="news.html">全部消息 →</a></div><div class="news-line-list"><a class="news-line" href="news.html"><span class="news-type">活動與公告</span><strong>查看北投旅圖最新活動與旅遊資訊</strong><em>→</em></a></div></div></section>
+<section class="section home-news" id="news"><div class="container"><div class="section-head compact"><div><h2>最新消息</h2></div><a class="section-link" href="news.html">查看全部 →</a></div><div class="news-line-list" id="homeNewsList" aria-live="polite"><a class="news-line" href="news.html"><time>最新消息</time><strong>查看北投旅圖最新活動與旅遊資訊</strong><span class="news-chevron" aria-hidden="true">›</span></a></div><div class="home-news-bottom"><a href="news.html">查看更多消息 →</a></div></div></section>
 <section class="home-subscribe"><div class="container"><div class="home-subscribe-inner"><div><h2>住客優惠與活動提醒</h2><p>最新住宿優惠及旅遊活動資訊。</p></div><form onsubmit="return false"><label for="homeSubscribeEmail">電子郵件</label><input id="homeSubscribeEmail" type="email" placeholder="輸入電子郵件" aria-label="電子郵件"><button type="submit">訂閱</button><small>訂閱功能尚未開通</small></form></div></div></section>
 </main><div id="footer"></div><script>
 
@@ -190,4 +190,32 @@ async function loadHomeBanners(){
 document.addEventListener('DOMContentLoaded', loadHomeBanners);
 if(document.readyState !== 'loading') loadHomeBanners();
 
+
+// 最新消息：直接讀取既有 news 資料，首頁只顯示最新三筆；讀取失敗保留原有列表入口。
+async function loadHomeNews(){
+ const list=document.getElementById('homeNewsList');
+ if(!list || typeof SUPABASE_URL==='undefined' || typeof SUPABASE_ANON_KEY==='undefined') return;
+ try{
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/news?select=id,title,publish_date,is_published&is_published=eq.true&order=publish_date.desc&limit=3`,{
+   headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+  });
+  if(!response.ok) return;
+  const items=await response.json();
+  if(!Array.isArray(items)||!items.length) return;
+  list.replaceChildren();
+  items.forEach(item=>{
+   const link=document.createElement('a');link.className='news-line';
+   link.href='news-detail.html?id='+encodeURIComponent(item.id);
+   const time=document.createElement('time');
+   const date=item.publish_date?new Date(item.publish_date+'T00:00:00'):null;
+   time.textContent=date&&!Number.isNaN(date.getTime())?`${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`:'最新消息';
+   if(item.publish_date)time.dateTime=item.publish_date;
+   const title=document.createElement('strong');title.textContent=item.title||'最新消息';
+   const arrow=document.createElement('span');arrow.className='news-chevron';arrow.setAttribute('aria-hidden','true');arrow.textContent='›';
+   link.append(time,title,arrow);list.append(link);
+  });
+ }catch(error){console.warn('首頁最新消息讀取失敗，保留列表入口',error);}
+}
+document.addEventListener('DOMContentLoaded',loadHomeNews);
+if(document.readyState!=='loading')loadHomeNews();
 </script></body></html>

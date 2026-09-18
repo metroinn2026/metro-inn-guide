@@ -185,6 +185,7 @@
         <div class="nav-group"><div class="nav-group-title">內容管理</div>
           <a data-table="news">最新消息</a>
           <a data-table="spots">景點管理</a>
+          <a href="submissions-review.html">民眾投稿審核 ↗</a>
           <a data-table="foods">美食管理</a>
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
@@ -563,6 +564,7 @@
 
     document.querySelectorAll('#sideNav a').forEach(a=>{
       a.addEventListener('click',()=>{
+        if(!a.dataset.table) return;
         document.querySelectorAll('#sideNav a').forEach(x=>x.classList.remove('active'));
         a.classList.add('active');
         switchTable(a.dataset.table);

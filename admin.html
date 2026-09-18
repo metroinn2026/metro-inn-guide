@@ -242,6 +242,7 @@
             <button onclick="clearFilters()">清除篩選</button>
           </div>
 
+          <div id="adminBulkBar" style="display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;background:#f3f8ff;border:1px solid #d6e2f2;margin:12px 0"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span></div>
           <div id="sortSaveBar" class="sort-save-bar">
             <span>排序已變更。請按「儲存排序」寫入資料庫，前台排序才會同步更新。</span>
             <div class="actions">
@@ -297,6 +298,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="secure-delete.js"></script>
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -608,6 +610,7 @@
       currentTable = table;
       const cfg = configs[currentTable];
       // 已移除裝飾性英文分類標題。
+      adminSelectionReset();
       document.getElementById('currentTitle').textContent = cfg.label;
       document.getElementById('sectionHint').textContent = cfg.hint;
       document.getElementById('newBtn').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
@@ -671,6 +674,31 @@
       clearForm();
     }
 
+    const bulkTables=new Set(['spots','foods','trips']);
+    let adminChecked=new Set(),adminBusy=false;
+    function adminSelectionReset(){adminChecked.clear();updateAdminBulk();}
+    function updateAdminBulk(){
+      const active=bulkTables.has(currentTable);
+      const bar=document.getElementById('adminBulkBar');if(!bar)return;
+      bar.style.display=active?'flex':'none';
+      document.getElementById('adminSelectedCount').textContent=`已選 ${adminChecked.size} 筆`;
+      const all=document.getElementById('adminSelectAll');
+      all.checked=!!currentList.length&&currentList.every(x=>adminChecked.has(String(x.id)));
+      all.indeterminate=!all.checked&&currentList.some(x=>adminChecked.has(String(x.id)));
+      all.disabled=adminBusy||!currentList.length;
+      document.getElementById('adminBulkDelete').disabled=adminBusy||!adminChecked.size;
+    }
+    function toggleAdminAll(checked){currentList.forEach(x=>checked?adminChecked.add(String(x.id)):adminChecked.delete(String(x.id)));renderList();}
+    function toggleAdminRow(id,checked){checked?adminChecked.add(String(id)):adminChecked.delete(String(id));updateAdminBulk();}
+    async function adminBulkDelete(){
+      if(adminBusy||!adminChecked.size)return;
+      const table=currentTable,ids=[...adminChecked];
+      adminBusy=true;updateAdminBulk();
+      const msg=document.getElementById('adminBulkMsg');msg.textContent='等待身分驗證…';
+      try{const result=await secureBulkDelete(db,table,ids,configs[table].label);if(result){msg.textContent=`成功刪除 ${result.deleted} 筆`;adminChecked.clear();await loadCurrentTable();}}
+      catch(e){msg.textContent='刪除失敗：'+e.message;alert(msg.textContent);}
+      finally{adminBusy=false;updateAdminBulk();}
+    }
     function buildHead(){
       const cfg = configs[currentTable];
       let second = currentTable==='banners' ? '排序' :
@@ -679,8 +707,9 @@
                    currentTable==='foods' ? '類型 / 價格' :
                    currentTable==='trips' ? '建議時間' :
                    currentTable==='coupons' ? '期限' : '日期';
+      const selectHead=bulkTables.has(currentTable)?'<th style="width:38px">勾選</th>':'';
       const sortHead = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : '<th style="width:56px">排序</th>';
-      document.getElementById('tableHead').innerHTML = `<tr>${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
+      document.getElementById('tableHead').innerHTML = `<tr>${selectHead}${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
     }
 
     function nextId(){
@@ -787,10 +816,11 @@
       });
 
       currentList = list;
+      updateAdminBulk();
       const tbody = document.getElementById('listBody');
       document.getElementById('sortSaveBar').classList.remove('active');
 
-      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">沒有符合條件的資料。</td></tr>'; return; }
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="7">沒有符合條件的資料。</td></tr>'; return; }
 
       tbody.innerHTML = list.map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
@@ -805,6 +835,7 @@
           </td>`;
         return `
           <tr data-id="${item.id}" draggable="${(currentTable === 'site_settings' || currentTable === 'admin_profiles') ? 'false' : 'true'}">
+            ${bulkTables.has(currentTable)?`<td><input type="checkbox" aria-label="選取資料 ${item.id}" ${adminChecked.has(String(item.id))?'checked':''} onchange="toggleAdminRow('${item.id}',this.checked)"></td>`:''}
             ${sortCell}
             <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
             <td><strong>${title || '未命名'}</strong></td>
@@ -875,6 +906,7 @@
         const previewHref = ['spots','foods'].includes(currentTable) && !item.is_published ? cfg.preview + encodeURIComponent(item.id)+'&admin_preview=1' : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
         return `
           <tr data-id="${item.id}" draggable="true">
+            ${bulkTables.has(currentTable)?`<td><input type="checkbox" aria-label="選取資料 ${item.id}" ${adminChecked.has(String(item.id))?'checked':''} onchange="toggleAdminRow('${item.id}',this.checked)"></td>`:''}
             <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
             <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
             <td><strong>${title || '未命名'}</strong></td>
@@ -1071,8 +1103,13 @@
 
     async function deleteItem(id){
       if(!confirm('確定要刪除這筆資料嗎？')) return;
-      const { error } = await db.from(configs[currentTable].table).delete().eq('id',id);
-      if(error){ alert('刪除失敗：' + error.message); return; }
+      if(bulkTables.has(currentTable)){
+        try{const result=await secureBulkDelete(db,currentTable,[String(id)],configs[currentTable].label);if(!result)return;}
+        catch(e){alert('刪除失敗：'+e.message);return;}
+      }else{
+        const {error}=await db.from(configs[currentTable].table).delete().eq('id',id);
+        if(error){alert('刪除失敗：'+error.message);return;}
+      }
       await loadCurrentTable();
       backToList();
     }

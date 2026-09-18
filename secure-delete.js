@@ -15,16 +15,19 @@ async function secureBulkDelete(db, table, ids, description) {
     auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
     global:{headers:{'X-Client-Info':'metro-inn-reauth'}}
   });
-  let verified=false;
-  try{
+  // Important: the RPC checks JWT iat <= 120 seconds. Execute it with the
+  // freshly authenticated isolated client, not the older CMS client token.
+  try {
     const {data:auth,error:authError}=await verificationClient.auth.signInWithPassword({email:user.email,password});
-    verified=!authError && auth?.user?.id===user.id;
-  }finally{await verificationClient.auth.signOut({scope:'local'}).catch(()=>{});}
-  if(!verified) throw Error('密碼驗證失敗；請確認使用目前登入帳號的密碼，或先使用忘記密碼重設');
-  const {data:current,error:sessionError}=await db.auth.getUser();
-  if(sessionError || current?.user?.id!==user.id) throw Error('登入狀態已變更，請重新登入');
-  const {data,error}=await db.rpc('admin_secure_bulk_delete',{p_table:table,p_ids:ids.map(String)});
-  if(error) throw Error(error.message);
-  if(!data || data.deleted!==ids.length) throw Error('資料庫回報筆數不一致，請重新讀取確認');
-  return data;
+    if(authError || auth?.user?.id!==user.id) throw Error('密碼驗證未通過，請確認目前登入帳號與密碼');
+    const {data:current,error:sessionError}=await db.auth.getUser();
+    if(sessionError || current?.user?.id!==user.id) throw Error('後台登入狀態已變更，請重新登入');
+    const {data,error}=await verificationClient.rpc('admin_secure_bulk_delete',{p_table:table,p_ids:ids.map(String)});
+    if(error) throw Error('資料庫刪除失敗：'+error.message+'（請確認已依部署說明安裝刪除 SQL）');
+    if(!data || data.deleted!==ids.length) throw Error('資料庫回報筆數不一致，請重新讀取確認');
+    return data;
+  } finally {
+    // Only sign out the isolated client. The CMS session remains unchanged.
+    await verificationClient.auth.signOut({scope:'local'}).catch(()=>{});
+  }
 }

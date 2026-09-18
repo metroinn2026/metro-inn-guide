@@ -138,3 +138,10 @@ th{background:#eaf2fb;color:#435976;border-color:#d7e3f0}td{border-color:#e8eef7
 /* 分組導覽在窄螢幕也保留標題及排列 */
 @media(max-width:1100px){.side-nav{display:flex!important;flex-direction:row!important;gap:14px!important;flex-wrap:wrap!important;overflow:visible!important}.nav-group{min-width:160px;flex:1;margin-bottom:0}.nav-group-last{margin-top:0!important}.side-bottom{margin-top:14px!important}}
 @media(max-width:600px){.side-nav{flex-direction:column!important}.nav-group{width:100%;min-width:0}.topbar h1{font-size:18px!important}}
+
+/* Flat sidebar: remove every category heading and its separator/extra spacing. */
+.side-nav{gap:2px!important}
+.side-nav .nav-group{display:contents!important}
+.side-nav .nav-group-title{display:none!important}
+.side-nav .nav-group a{margin:0!important}
+@media(max-width:1100px){.side-nav{flex-direction:column!important;flex-wrap:nowrap!important;gap:2px!important}}

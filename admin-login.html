@@ -15,12 +15,26 @@
     <div class="form-row"><label>帳號 Email</label><input id="email" type="email" placeholder="admin@example.com" autocomplete="username"></div>
     <div class="form-row"><label>密碼</label><input id="password" type="password" placeholder="請輸入密碼" autocomplete="current-password"></div>
     <button class="primary full" onclick="login()">登入後台</button>
+    <div style="text-align:right;margin-top:12px"><button type="button" id="forgotButton" onclick="forgotPassword()" style="background:none;border:0;color:#1759a7;cursor:pointer;text-decoration:underline">忘記密碼？</button></div>
     <div id="msg" class="msg"></div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    async function forgotPassword(){
+      const email=document.getElementById('email').value.trim();
+      const msg=document.getElementById('msg');
+      if(!email || !document.getElementById('email').checkValidity()) {msg.textContent='請先輸入有效的管理員 Email。';return;}
+      const btn=document.getElementById('forgotButton');btn.disabled=true;
+      try{
+        const redirectTo=new URL('reset-password.html',location.href).href;
+        const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+        if(error) throw error;
+        msg.textContent='若此 Email 已註冊，將收到密碼重設信件。請查看收件匣及垃圾郵件。';
+      }catch(e){msg.textContent='目前無法寄送重設信件，請稍後再試或聯絡管理員。';console.error('Password reset request failed',e);}
+      finally{btn.disabled=false;}
+    }
     async function login(){
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;

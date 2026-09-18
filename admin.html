@@ -211,6 +211,7 @@
         </div>
         <div class="top-actions">
           <span id="userDisplayName" aria-label="目前登入使用者">檢查登入中...</span>
+          <button onclick="showChangePassword()">變更密碼</button>
           <button onclick="logout()">登出</button>
         </div>
       </header>
@@ -296,6 +297,16 @@
     </main>
   </div>
 
+  <dialog id="changePasswordDialog" style="width:min(440px,calc(100% - 32px));border:1px solid #d6e2f2;border-radius:12px;padding:24px">
+    <form id="changePasswordForm" onsubmit="changeMyPassword(event)">
+      <h2>變更自己的登入密碼</h2><p>需驗證目前密碼。此功能不會修改其他管理員帳號。</p>
+      <div class="form-row"><label for="oldPassword">目前密碼</label><input id="oldPassword" type="password" autocomplete="current-password" required></div>
+      <div class="form-row"><label for="newPassword">新密碼（至少 8 碼）</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+      <div class="form-row"><label for="confirmPassword">確認新密碼</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+      <p id="changePasswordMsg" role="status" aria-live="polite"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" onclick="closeChangePassword()">取消</button><button type="submit" id="changePasswordSubmit" class="primary">確認變更</button></div>
+    </form>
+  </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="secure-delete.js"></script>
@@ -514,6 +525,37 @@
       if(initialWorkspace==='#review')openWorkspace('review');else if(initialWorkspace==='#submissions')openWorkspace('submissions');
     }
 
+    function showChangePassword(){
+      document.getElementById('changePasswordForm').reset();
+      document.getElementById('changePasswordMsg').textContent='';
+      document.getElementById('changePasswordDialog').showModal();
+    }
+    function closeChangePassword(){document.getElementById('changePasswordDialog').close();}
+    async function changeMyPassword(event){
+      event.preventDefault();
+      const msg=document.getElementById('changePasswordMsg');
+      const btn=document.getElementById('changePasswordSubmit');
+      const oldPassword=document.getElementById('oldPassword').value;
+      const next=document.getElementById('newPassword').value;
+      if(next.length<8 || next!==document.getElementById('confirmPassword').value){msg.textContent='新密碼至少 8 碼，且兩次輸入必須一致。';return;}
+      if(oldPassword===next){msg.textContent='新密碼不可與舊密碼相同。';return;}
+      btn.disabled=true;msg.textContent='正在驗證目前密碼…';
+      try{
+        const {data:{user},error:userError}=await db.auth.getUser();
+        if(userError || !user?.email) throw Error('請重新登入');
+        const verifier=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+        let ok=false;
+        try{const {data,error}=await verifier.auth.signInWithPassword({email:user.email,password:oldPassword});ok=!error&&data?.user?.id===user.id;}
+        finally{await verifier.auth.signOut({scope:'local'}).catch(()=>{});}
+        if(!ok) throw Error('目前密碼驗證失敗');
+        msg.textContent='正在更新密碼…';
+        const {error}=await db.auth.updateUser({password:next});
+        if(error) throw error;
+        document.getElementById('changePasswordForm').reset();
+        msg.textContent='密碼已更新。請使用新密碼進行後續驗證。';
+      }catch(e){msg.textContent='變更失敗：'+e.message;}
+      finally{btn.disabled=false;}
+    }
     async function logout(){ await db.auth.signOut(); location.href='admin-login.html'; }
 
 

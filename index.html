@@ -1,28 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script><style>
-/* 首頁專用頁尾電子報：維持現有共用頁尾及其他頁面不變 */
-#footer .footer{background:#303438;padding:36px 0 22px}
-#footer .footer-compact{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:32px;align-items:start;color:#fff}
-#footer .footer-compact h2{margin:0 0 9px;font-size:23px}
-#footer .footer-compact p{margin:0 0 8px;line-height:1.7;color:#e2e2e2}
-#footer .footer-contact{font-style:normal;font-size:14px;line-height:1.9;color:#e2e2e2}
-#footer .footer-contact a{color:#fff;text-decoration:underline;text-underline-offset:3px}
-#footer .footer .copy{margin-top:20px;padding-top:13px;border-top:1px solid rgba(255,255,255,.2);font-size:12px}
-@media(max-width:650px){#footer .footer-compact{grid-template-columns:1fr;gap:12px}#footer .footer{padding:28px 0 20px}}
-
-#footer .footer-newsletter{color:#fff}
-#footer .footer-newsletter-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;background:transparent;border:0;color:#fff;font:inherit;font-size:16px;font-weight:700;text-align:left;cursor:pointer}
-#footer .footer-newsletter-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
-#footer .footer-newsletter-chevron{font-size:23px;font-weight:400;line-height:1}
-#footer .footer-newsletter-panel[hidden]{display:none}
-#footer .footer-newsletter-panel{padding:6px 0 12px;max-width:560px}
-#footer .footer-newsletter-panel p{margin:0 0 12px;color:#dedede}
-#footer .footer-newsletter-panel label{display:block;font-size:13px;margin-bottom:7px}
-#footer .footer-newsletter-fields{display:flex;gap:9px}
-#footer .footer-newsletter-fields input{min-width:0;flex:1;height:42px;padding:0 12px;border:1px solid #c9c9c9;background:#fff;color:#303438;font-size:14px}
-#footer .footer-newsletter-fields button{height:42px;padding:0 22px;border:1px solid #fff;background:#fff;color:#303438;font-size:14px;cursor:pointer}
-#footer .footer-newsletter-panel small{display:block;margin-top:9px;color:#ddd;font-size:12px}
-@media(max-width:480px){#footer .footer-newsletter-fields{flex-wrap:wrap}#footer .footer-newsletter-fields input{flex-basis:100%}}
-</style></head><body><div id="header"></div>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
 <main id="top">
 <section class="home-banner-section" id="homeBannerSection">
   <div class="home-banner-carousel" id="homeBannerCarousel">
@@ -84,46 +60,6 @@
 
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
-// 首頁專用：電子報入口收合於現有頁尾，不修改其他頁面共用的 footer()。
-(function initFooterNewsletter(){
-  const footerEl=document.querySelector('#footer .footer');
-  if(!footerEl || footerEl.querySelector('.footer-newsletter')) return;
-  const container=footerEl.querySelector('.container');
-  if(!container) return;
-  // 首頁限定：以單一資訊區取代重複的網站導覽，其他頁面的共用 footer() 不變。
-  container.innerHTML=`<div class="footer-compact">
-    <div class="footer-about"><h2>北投旅圖</h2>
-      <p>從一間舒服的旅店開始，慢慢走向你喜歡的城市風景。</p>
-      <address class="footer-contact">北捷行旅（捷運北投會館）<br>
-        地址：<a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8F%B0%E5%8C%97%E5%B8%82%E5%8C%97%E6%8A%95%E5%8D%80%E5%A4%A7%E6%A5%AD%E8%B7%AF527%E5%B7%B788%E8%99%9F" target="_blank" rel="noopener noreferrer">台北市北投區大業路527巷88號</a>（捷運北投園區內）<br>
-        訂房專線：<a href="tel:+886228921485">02-2892-1485</a>（24小時）
-      </address>
-    </div><div class="footer-newsletter-slot"></div></div>
-    <div class="copy">© 2026 臺北大眾捷運股份有限公司。版權所有。</div>`;
-  const slot=container.querySelector('.footer-newsletter-slot');
-  const section=document.createElement('section');
-  section.className='footer-newsletter';
-  section.innerHTML=`<button class="footer-newsletter-toggle" type="button" aria-expanded="false" aria-controls="footerNewsletterPanel"><span>✉　訂閱電子報</span><span class="footer-newsletter-chevron" aria-hidden="true">＋</span></button>
-    <div class="footer-newsletter-panel" id="footerNewsletterPanel" hidden>
-      <p>掌握住宿優惠與旅遊活動資訊。</p>
-      <form id="footerNewsletterForm"><label for="footerNewsletterEmail">電子郵件</label><div class="footer-newsletter-fields"><input id="footerNewsletterEmail" type="email" autocomplete="email" placeholder="請輸入電子郵件" required><button type="submit">訂閱</button></div><small id="footerNewsletterStatus" role="status">訂閱服務尚未開通，目前無法送出資料。</small></form>
-    </div>`;
-  slot.appendChild(section);
-  const toggle=section.querySelector('.footer-newsletter-toggle');
-  const panel=section.querySelector('.footer-newsletter-panel');
-  toggle.addEventListener('click',()=>{
-    const open=toggle.getAttribute('aria-expanded')!=='true';
-    toggle.setAttribute('aria-expanded',String(open));
-    panel.hidden=!open;
-    section.querySelector('.footer-newsletter-chevron').textContent=open?'－':'＋';
-    if(open) section.querySelector('#footerNewsletterEmail').focus();
-  });
-  section.querySelector('form').addEventListener('submit',event=>{
-    event.preventDefault();
-    section.querySelector('#footerNewsletterStatus').textContent='訂閱服務尚未開通，目前無法送出資料。';
-  });
-})();
-
 // 首頁主題推薦：沿用現有內頁連結；日後可改由後台提供推薦資料。
 const pickItems=[
  {title:'地熱谷',type:'景點・溫泉',desc:'感受北投獨特的地熱風景。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20in%20Beitou.jpg',href:'spot.html?id=spot_0001',tags:['all','first','nature']},

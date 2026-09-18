@@ -217,17 +217,17 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 }
 
 /* 北投旅圖首頁：白底、照片導向、三張橫向推薦 */
-body:has(.editor-picks){background:#fff;color:#303438}
+body:has(.editor-picks){background:#fff;color:#4D4D4D}
 body:has(.editor-picks) .section.alt{background:#fff}
 body:has(.editor-picks) .home-banner-copy .kicker{display:none}
 body:has(.editor-picks) .search-panel{background:#fff}
 .editor-picks{background:#fff;padding:68px 0 70px}
 .picks-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:28px}
-.picks-heading h2{font-size:clamp(28px,3vw,42px);line-height:1.25;color:#303438;margin:0 0 12px;letter-spacing:.025em}
+.picks-heading h2{font-size:clamp(28px,3vw,42px);line-height:1.25;color:#4D4D4D;margin:0 0 12px;letter-spacing:.025em}
 .picks-heading p{color:#73777a;margin:0;line-height:1.8}
 .picks-more{white-space:nowrap;color:#287f88;text-decoration:none;font-weight:700;border-bottom:1px solid #287f88;padding-bottom:8px}
 .picks-topics{display:flex;gap:9px;overflow-x:auto;padding:0 0 24px;scrollbar-width:thin}
-.picks-topics button{flex:none;white-space:nowrap;border:1px solid #dddfe2;background:#f7f7f8;color:#303438;border-radius:12px;padding:12px 19px;font-size:15px;cursor:pointer}
+.picks-topics button{flex:none;white-space:nowrap;border:1px solid #dddfe2;background:#f7f7f8;color:#4D4D4D;border-radius:12px;padding:12px 19px;font-size:15px;cursor:pointer}
 .picks-topics button.active{border-color:#287f88;background:#fff;color:#216d75;font-weight:700}
 .picks-carousel{position:relative}
 .picks-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;padding-bottom:3px}
@@ -238,9 +238,9 @@ body:has(.editor-picks) .search-panel{background:#fff}
 .picks-card:hover img{transform:scale(1.025)}
 .picks-caption{position:absolute;inset:auto 0 0;padding:48px 22px 22px;background:linear-gradient(transparent,rgba(0,0,0,.76));color:#fff}
 .picks-caption span{font-size:13px;opacity:.9}.picks-caption h3{font-size:clamp(19px,1.7vw,27px);margin:7px 0 5px;color:#fff}.picks-caption p{font-size:13px;margin:0;line-height:1.5;color:#fff}
-.picks-arrow{position:absolute;z-index:2;top:43%;transform:translateY(-50%);border:0;border-radius:50%;background:#fff;box-shadow:0 2px 18px #0002;width:48px;height:48px;font-size:32px;cursor:pointer;color:#303438}.picks-arrow.prev{left:-23px}.picks-arrow.next{right:-23px}
+.picks-arrow{position:absolute;z-index:2;top:43%;transform:translateY(-50%);border:0;border-radius:50%;background:#fff;box-shadow:0 2px 18px #0002;width:48px;height:48px;font-size:32px;cursor:pointer;color:#4D4D4D}.picks-arrow.prev{left:-23px}.picks-arrow.next{right:-23px}
 .picks-controls{display:flex;align-items:center;gap:22px;margin-top:26px;color:#73777a;font-size:13px}.picks-progress{height:3px;flex:1;background:#e1e1e1;position:relative}.picks-progress span{position:absolute;top:0;left:0;height:100%;background:#444;transition:width .2s}
-.home-journey{background:#f5f5f5!important}.home-news{background:#fff}.home-subscribe{background:#303438;color:#fff;padding:28px 0}.home-subscribe-inner{display:flex;justify-content:space-between;align-items:center;gap:20px}.home-subscribe h2{font-size:19px;margin:0 0 5px;color:#fff}.home-subscribe p{margin:0;font-size:13px;color:#ddd}.home-subscribe form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.home-subscribe label{font-size:13px}.home-subscribe input{padding:10px;border:1px solid #bbb;background:#fff;min-width:190px}.home-subscribe button{padding:11px 18px;background:#fff;color:#303438;border:0}.home-subscribe small{font-size:11px;color:#ddd}
+.home-journey{background:#f5f5f5!important}.home-news{background:#fff}.home-subscribe{background:#4D4D4D;color:#fff;padding:28px 0}.home-subscribe-inner{display:flex;justify-content:space-between;align-items:center;gap:20px}.home-subscribe h2{font-size:19px;margin:0 0 5px;color:#fff}.home-subscribe p{margin:0;font-size:13px;color:#ddd}.home-subscribe form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.home-subscribe label{font-size:13px}.home-subscribe input{padding:10px;border:1px solid #bbb;background:#fff;min-width:190px}.home-subscribe button{padding:11px 18px;background:#fff;color:#4D4D4D;border:0}.home-subscribe small{font-size:11px;color:#ddd}
 @media(max-width:760px){.editor-picks{padding:44px 0}.picks-heading{align-items:start}.picks-heading h2{font-size:27px}.picks-more{font-size:13px}.picks-topics button{padding:9px 13px}.picks-card{flex-basis:82%}.picks-photo{aspect-ratio:1.12}.picks-arrow{width:36px;height:36px;font-size:24px}.picks-arrow.prev{left:-10px}.picks-arrow.next{right:-10px}.home-subscribe-inner{align-items:start;flex-direction:column}}
 
 /* 2026-09 首頁首屏微調：縮小 CI、清楚導覽、讓搜尋在首屏露出。僅作用於首頁。 */
@@ -260,7 +260,7 @@ body:has(.editor-picks) .home-banner-copy p{font-size:15px;line-height:1.7;margi
 body:has(.editor-picks) .home-banner-dots{bottom:15px}
 body:has(.editor-picks) .search-panel{padding:12px 0 18px}
 body:has(.editor-picks) .search-box{padding:14px 0 8px;border-top:0}
-body:has(.editor-picks) .quick-search-title{font-size:25px;color:#303438;margin:0 0 12px}
+body:has(.editor-picks) .quick-search-title{font-size:25px;color:#4D4D4D;margin:0 0 12px}
 body:has(.editor-picks) .keyword-row input{height:48px}
 body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
 @media(max-width:1150px){
@@ -289,26 +289,26 @@ body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
 /* 首頁最新消息：緊湊型文字列表，限定首頁避免影響其他頁面 */
 .home-news{padding:48px 0 52px!important;background:#fff!important}
 .home-news .section-head.compact{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:17px}
-.home-news .section-head h2{font-size:30px;line-height:1.3;margin:0;color:#303438}
-.home-news .section-link{font-size:14px;color:#303438;border-bottom:0;padding:0;white-space:nowrap}
+.home-news .section-head h2{font-size:30px;line-height:1.3;margin:0;color:#4D4D4D}
+.home-news .section-link{font-size:14px;color:#4D4D4D;border-bottom:0;padding:0;white-space:nowrap}
 .home-news .news-line-list{border-top:1px solid #dedede}
-.home-news .news-line{display:grid;grid-template-columns:112px minmax(0,1fr) 18px;gap:18px;align-items:center;min-height:54px;padding:10px 4px;border-bottom:1px solid #ebebeb;color:#303438}
+.home-news .news-line{display:grid;grid-template-columns:112px minmax(0,1fr) 18px;gap:18px;align-items:center;min-height:54px;padding:10px 4px;border-bottom:1px solid #ebebeb;color:#4D4D4D}
 .home-news .news-line time{font-size:13px;white-space:nowrap;color:#777;font-variant-numeric:tabular-nums}
 .home-news .news-line strong{font-size:15px;line-height:1.45;font-weight:500;min-width:0}
 .home-news .news-chevron{font-size:21px;line-height:1;color:#888;text-align:right}
 .home-news .news-line:hover strong,.home-news .news-line:focus-visible strong{color:#287f88}
 .home-news-bottom{text-align:center;margin-top:18px}
-.home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #ddd;border-radius:999px;padding:9px 23px;font-size:13px;color:#303438}
+.home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #ddd;border-radius:999px;padding:9px 23px;font-size:13px;color:#4D4D4D}
 .home-news-bottom a:hover{border-color:#287f88;color:#287f88}
 @media(max-width:600px){.home-news{padding:38px 0 42px!important}.home-news .section-head.compact{display:flex}.home-news .section-head h2{font-size:25px}.home-news .news-line{grid-template-columns:82px minmax(0,1fr) 12px;gap:9px;min-height:52px;padding:9px 0}.home-news .news-line time{font-size:11px}.home-news .news-line strong{font-size:14px}.home-news .news-chevron{font-size:17px}}
 
 
 /* 內頁視覺統一：白底、深灰、少量湖水藍；首頁維持既有設定 */
 body:not(:has(.editor-picks)){
- --bg:#fff;--paper:#fff;--ink:#303438;--muted:#666d70;
- --green:#303438;--blue:#287f88;--orange:#287f88;
+ --bg:#fff;--paper:#fff;--ink:#4D4D4D;--muted:#666d70;
+ --green:#4D4D4D;--blue:#287f88;--orange:#287f88;
  --line:#e7e7e7;--soft:#f5f5f5;
- background:#fff;color:#303438;
+ background:#fff;color:#4D4D4D;
 }
 body:not(:has(.editor-picks)) .topbar{height:72px;background:#fff;border-bottom:1px solid #e8e8e8;backdrop-filter:none}
 body:not(:has(.editor-picks)) .topbar .container{width:min(1360px,calc(100% - 48px))}
@@ -321,18 +321,18 @@ body:not(:has(.editor-picks)) .topbar .brand-ci img,
 body:not(:has(.editor-picks)) .topbar .brand-logo-img{display:block!important;width:auto!important;height:34px!important;max-width:215px!important;max-height:34px!important;object-fit:contain!important;flex:0 0 auto}
 body:not(:has(.editor-picks)) .topbar .brand-divider{width:1px;height:25px;background:#d6d6d6;flex:none}
 body:not(:has(.editor-picks)) .topbar .brand-guide-name{font-size:16px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
-body:not(:has(.editor-picks)) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.4vw,22px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0;color:#303438}
+body:not(:has(.editor-picks)) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.4vw,22px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0;color:#4D4D4D}
 body:not(:has(.editor-picks)) .topbar .menu a{white-space:nowrap;word-break:keep-all;flex:none}
 body:not(:has(.editor-picks)) .topbar .menu a:hover{color:#287f88}
-body:not(:has(.editor-picks)) .topbar .nav-book{flex:none;background:#303438;border-color:#303438;color:#fff;padding:11px 15px;font-size:14px}
-body:not(:has(.editor-picks)) .topbar .nav-book:hover{background:#fff;color:#303438}
+body:not(:has(.editor-picks)) .topbar .nav-book{flex:none;background:#4D4D4D;border-color:#4D4D4D;color:#fff;padding:11px 15px;font-size:14px}
+body:not(:has(.editor-picks)) .topbar .nav-book:hover{background:#fff;color:#4D4D4D}
 /* 頁首及內容：減少舊版暖色大底塊、讓照片和字級成為視覺主角 */
 body:not(:has(.editor-picks)) .directory-hero{padding:52px 0 34px;background:#fff;border-bottom:1px solid #ededed}
-body:not(:has(.editor-picks)) .directory-hero h1{font-size:clamp(32px,3.2vw,46px);color:#303438;letter-spacing:.02em}
+body:not(:has(.editor-picks)) .directory-hero h1{font-size:clamp(32px,3.2vw,46px);color:#4D4D4D;letter-spacing:.02em}
 body:not(:has(.editor-picks)) .directory-hero p{line-height:1.75;color:#666d70}
 body:not(:has(.editor-picks)) .section{background:#fff}
 body:not(:has(.editor-picks)) .section-head h2,
-body:not(:has(.editor-picks)) .title-line{color:#303438}
+body:not(:has(.editor-picks)) .title-line{color:#4D4D4D}
 body:not(:has(.editor-picks)) .kicker,
 body:not(:has(.editor-picks)) .meta{color:#73777a;letter-spacing:.1em}
 body:not(:has(.editor-picks)) .directory-grid{gap:38px 24px}
@@ -345,22 +345,22 @@ body:not(:has(.editor-picks)) .directory-card:hover h3,
 body:not(:has(.editor-picks)) .card:hover h3{color:#287f88}
 body:not(:has(.editor-picks)) .filter-pills{gap:20px}
 body:not(:has(.editor-picks)) .pill.active,
-body:not(:has(.editor-picks)) .pill:hover{color:#303438;border-color:#303438}
+body:not(:has(.editor-picks)) .pill:hover{color:#4D4D4D;border-color:#4D4D4D}
 body:not(:has(.editor-picks)) .tag{border-color:#e7e7e7;color:#555;background:#fff;font-weight:600}
-body:not(:has(.editor-picks)) .tag.dark{background:#303438;border-color:#303438;color:#fff}
+body:not(:has(.editor-picks)) .tag.dark{background:#4D4D4D;border-color:#4D4D4D;color:#fff}
 body:not(:has(.editor-picks)) .sidebox{border:1px solid #e7e7e7;background:#fff;box-shadow:none}
 body:not(:has(.editor-picks)) .sidebox.fill{background:#f5f5f5;border:0}
-body:not(:has(.editor-picks)) .sidebox.dark{background:#303438;color:#fff}
-body:not(:has(.editor-picks)) .wide-banner{background:#f5f5f5;color:#303438}
+body:not(:has(.editor-picks)) .sidebox.dark{background:#4D4D4D;color:#fff}
+body:not(:has(.editor-picks)) .wide-banner{background:#f5f5f5;color:#4D4D4D}
 body:not(:has(.editor-picks)) .button,
 body:not(:has(.editor-picks)) .nav-book{border-radius:0}
-body:not(:has(.editor-picks)) .button{background:#303438;border-color:#303438;color:#fff}
-body:not(:has(.editor-picks)) .button:hover{background:#fff;color:#303438}
-body:not(:has(.editor-picks)) .button.outline{background:transparent;color:#303438;border-color:#303438}
+body:not(:has(.editor-picks)) .button{background:#4D4D4D;border-color:#4D4D4D;color:#fff}
+body:not(:has(.editor-picks)) .button:hover{background:#fff;color:#4D4D4D}
+body:not(:has(.editor-picks)) .button.outline{background:transparent;color:#4D4D4D;border-color:#4D4D4D}
 body:not(:has(.editor-picks)) .section-link,
 body:not(:has(.editor-picks)) .mini-link{color:#287f88}
 /* 內頁頁尾統一深灰，原有功能與連結不改動 */
-body:not(:has(.editor-picks)) .footer{background:#303438;color:#fff}
+body:not(:has(.editor-picks)) .footer{background:#4D4D4D;color:#fff}
 body:not(:has(.editor-picks)) .footer a:hover{color:#a5d4d7}
 @media(max-width:1150px){
  body:not(:has(.editor-picks)) .topbar .menu{gap:11px;font-size:14px}
@@ -384,3 +384,33 @@ body:not(:has(.editor-picks)) .footer a:hover{color:#a5d4d7}
  body:not(:has(.editor-picks)) .directory-hero{padding:35px 0 26px}
  body:not(:has(.editor-picks)) .directory-hero h1{font-size:32px}
 }
+
+/* 2026-09 全站視覺規範：橘色主按鈕，灰階輔助色；首頁及內頁一致 */
+:root{--brand-dark:#4D4D4D;--aux-gray:#BDBDBD;--aux-light:#D7D7D7;--aux-ice:#E5F2F7;--brand-cta:#F3653B;--ink:#4D4D4D;--orange:#F3653B;--line:#D7D7D7}
+body,body:has(.editor-picks),body:not(:has(.editor-picks)){--ink:#4D4D4D;--orange:#F3653B;--line:#D7D7D7;color:#4D4D4D}
+.topbar .menu,body:not(:has(.editor-picks)) .topbar .menu{color:#4D4D4D}
+.topbar .menu a:hover,body:not(:has(.editor-picks)) .topbar .menu a:hover{color:#F3653B}
+.nav-book,body:not(:has(.editor-picks)) .topbar .nav-book,.button,body:not(:has(.editor-picks)) .button{background:#F3653B;border-color:#F3653B;color:#fff}
+.nav-book:hover,body:not(:has(.editor-picks)) .topbar .nav-book:hover,.button:hover,body:not(:has(.editor-picks)) .button:hover{background:#fff;border-color:#F3653B;color:#F3653B}
+.button.outline,body:not(:has(.editor-picks)) .button.outline{background:transparent;color:#4D4D4D;border-color:#4D4D4D}
+.button.outline:hover,body:not(:has(.editor-picks)) .button.outline:hover{border-color:#F3653B;color:#F3653B}
+body:not(:has(.editor-picks)) .directory-hero h1,body:not(:has(.editor-picks)) .section-head h2,body:not(:has(.editor-picks)) .title-line{color:#4D4D4D}
+body:not(:has(.editor-picks)) .tag.dark,body:not(:has(.editor-picks)) .sidebox.dark{background:#4D4D4D;border-color:#4D4D4D}
+body:not(:has(.editor-picks)) .pill.active,body:not(:has(.editor-picks)) .pill:hover{color:#4D4D4D;border-color:#4D4D4D}
+body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-banner{background:#E5F2F7}
+.footer,body:not(:has(.editor-picks)) .footer{background:#4D4D4D;color:#fff;padding:36px 0 22px}
+.footer .footer-compact{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr);gap:32px;align-items:start}
+.footer .footer-compact h2{margin:0 0 9px;font-size:23px;color:#fff}
+.footer .footer-compact p{margin:0 0 8px;line-height:1.7;color:#f0f0f0}
+.footer .footer-contact{font-style:normal;font-size:14px;line-height:1.9;color:#f0f0f0}
+.footer .footer-contact a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.footer .footer-newsletter-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;background:transparent;border:0;color:#fff;font:inherit;font-size:16px;font-weight:700;text-align:left;cursor:pointer}
+.footer .footer-newsletter-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.footer .footer-newsletter-chevron{font-size:23px;font-weight:400;line-height:1}
+.footer .footer-newsletter-panel[hidden]{display:none}
+.footer .footer-newsletter-panel{padding:6px 0 12px;max-width:560px}
+.footer .footer-newsletter-panel p{margin:0 0 12px;color:#f0f0f0}
+.footer .footer-newsletter-unavailable{font-size:13px}
+.footer .copy{margin-top:20px;padding-top:13px;border-top:1px solid #BDBDBD;font-size:12px;color:#f0f0f0}
+.footer .footer-social a{color:#fff}
+@media(max-width:650px){.footer .footer-compact{grid-template-columns:1fr;gap:12px}.footer,body:not(:has(.editor-picks)) .footer{padding:28px 0 20px}}

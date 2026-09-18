@@ -1,4 +1,20 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script><style>
+/* 首頁專用頁尾電子報：維持現有共用頁尾及其他頁面不變 */
+#footer .footer{background:#303438}
+#footer .footer-newsletter{border-bottom:1px solid rgba(255,255,255,.24);padding:0 0 22px;margin-top:20px;color:#fff}
+#footer .footer-newsletter-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;background:transparent;border:0;color:#fff;font:inherit;font-size:16px;font-weight:700;text-align:left;cursor:pointer}
+#footer .footer-newsletter-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#footer .footer-newsletter-chevron{font-size:23px;font-weight:400;line-height:1}
+#footer .footer-newsletter-panel[hidden]{display:none}
+#footer .footer-newsletter-panel{padding:6px 0 12px;max-width:560px}
+#footer .footer-newsletter-panel p{margin:0 0 12px;color:#dedede}
+#footer .footer-newsletter-panel label{display:block;font-size:13px;margin-bottom:7px}
+#footer .footer-newsletter-fields{display:flex;gap:9px}
+#footer .footer-newsletter-fields input{min-width:0;flex:1;height:42px;padding:0 12px;border:1px solid #c9c9c9;background:#fff;color:#303438;font-size:14px}
+#footer .footer-newsletter-fields button{height:42px;padding:0 22px;border:1px solid #fff;background:#fff;color:#303438;font-size:14px;cursor:pointer}
+#footer .footer-newsletter-panel small{display:block;margin-top:9px;color:#ddd;font-size:12px}
+@media(max-width:480px){#footer .footer-newsletter-fields{flex-wrap:wrap}#footer .footer-newsletter-fields input{flex-basis:100%}}
+</style></head><body><div id="header"></div>
 <main id="top">
 <section class="home-banner-section" id="homeBannerSection">
   <div class="home-banner-carousel" id="homeBannerCarousel">
@@ -56,11 +72,39 @@
 </div></section>
 <section class="section home-journey"><div class="container mag-feature"><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt="北投地熱風景" loading="lazy"></div><div class="mag-feature-copy"><h2>搭捷運，去旅行。</h2><p>從北捷行旅出發，沿著捷運探索溫泉文化與在地風景，安排一趟不趕路的城市散策。</p><a class="button" href="trips.html">探索推薦行程 →</a></div></div></section>
 
-<section class="home-subscribe"><div class="container"><div class="home-subscribe-inner"><div><h2>住客優惠與活動提醒</h2><p>最新住宿優惠及旅遊活動資訊。</p></div><form onsubmit="return false"><label for="homeSubscribeEmail">電子郵件</label><input id="homeSubscribeEmail" type="email" placeholder="輸入電子郵件" aria-label="電子郵件"><button type="submit">訂閱</button><small>訂閱功能尚未開通</small></form></div></div></section>
 </main><div id="footer"></div><script>
 
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
+// 首頁專用：電子報入口收合於現有頁尾，不修改其他頁面共用的 footer()。
+(function initFooterNewsletter(){
+  const footerEl=document.querySelector('#footer .footer');
+  if(!footerEl || footerEl.querySelector('.footer-newsletter')) return;
+  const container=footerEl.querySelector('.container');
+  const copyright=container && container.querySelector('.copy');
+  if(!container) return;
+  const section=document.createElement('section');
+  section.className='footer-newsletter';
+  section.innerHTML=`<button class="footer-newsletter-toggle" type="button" aria-expanded="false" aria-controls="footerNewsletterPanel"><span>✉　訂閱電子報</span><span class="footer-newsletter-chevron" aria-hidden="true">＋</span></button>
+    <div class="footer-newsletter-panel" id="footerNewsletterPanel" hidden>
+      <p>掌握住宿優惠與旅遊活動資訊。</p>
+      <form id="footerNewsletterForm"><label for="footerNewsletterEmail">電子郵件</label><div class="footer-newsletter-fields"><input id="footerNewsletterEmail" type="email" autocomplete="email" placeholder="請輸入電子郵件" required><button type="submit">訂閱</button></div><small id="footerNewsletterStatus" role="status">訂閱服務尚未開通，目前無法送出資料。</small></form>
+    </div>`;
+  if(copyright) container.insertBefore(section,copyright); else container.appendChild(section);
+  const toggle=section.querySelector('.footer-newsletter-toggle');
+  const panel=section.querySelector('.footer-newsletter-panel');
+  toggle.addEventListener('click',()=>{
+    const open=toggle.getAttribute('aria-expanded')!=='true';
+    toggle.setAttribute('aria-expanded',String(open));
+    panel.hidden=!open;
+    section.querySelector('.footer-newsletter-chevron').textContent=open?'－':'＋';
+    if(open) section.querySelector('#footerNewsletterEmail').focus();
+  });
+  section.querySelector('form').addEventListener('submit',event=>{
+    event.preventDefault();
+    section.querySelector('#footerNewsletterStatus').textContent='訂閱服務尚未開通，目前無法送出資料。';
+  });
+})();
 
 // 首頁主題推薦：沿用現有內頁連結；日後可改由後台提供推薦資料。
 const pickItems=[

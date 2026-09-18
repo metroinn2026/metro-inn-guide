@@ -185,6 +185,7 @@
         <div class="nav-group"><div class="nav-group-title">內容管理</div>
           <a data-table="news">最新消息</a>
           <a data-table="spots">景點管理</a>
+          <a href="spots-review.html">景點審稿與批次匯入 ↗</a>
           <a href="submissions-review.html">民眾投稿審核 ↗</a>
           <a data-table="foods">美食管理</a>
           <a data-table="trips">行程管理</a>
@@ -429,7 +430,7 @@
           ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
           ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
-          ['is_published','狀態','boolean']
+          ['review_status','審稿狀態（pending／needs_changes／approved）','text'],['source_urls','資料來源網址（每行一筆）','textarea'],['review_note','審稿備註','textarea'],['is_published','狀態','boolean']
         ],
         columns:['title','area','is_published'],
         subtitle:(x)=>x.area || x.station || '-',
@@ -761,7 +762,7 @@
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
           : `<span class="badge">固定設定</span>`);
-        const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
+        const previewHref = currentTable === 'spots' && !item.is_published ? 'spots-review.html?id=' + encodeURIComponent(item.id) : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
         const sortCell = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : `
           <td>
             <span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span>
@@ -836,7 +837,7 @@
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
           : `<span class="badge">固定設定</span>`);
-        const previewHref = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview;
+        const previewHref = currentTable === 'spots' && !item.is_published ? 'spots-review.html?id=' + encodeURIComponent(item.id) : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
         return `
           <tr data-id="${item.id}" draggable="true">
             <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
@@ -1001,6 +1002,7 @@
         return;
       }
       msg.textContent = '儲存中...';
+      if(currentTable==='spots'){if(payload.is_published && payload.review_status!=='approved'){msg.textContent='請先將審稿狀態設為 approved，才能上架。';return;}if(!payload.review_status)payload.review_status='pending';}
       const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
       if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; return; }
       msg.textContent = '已儲存。';
@@ -1013,6 +1015,7 @@
       if(!item) return;
       if(currentTable==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;}
       const key = configs[currentTable].statusKey;
+      if(currentTable==='spots' && !item.is_published && item.review_status!=='approved'){alert('請先到景點審稿中心確認內容並審核通過。');return;}
       const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
       if(error){ alert('更新失敗：' + error.message); return; }
       await loadCurrentTable();

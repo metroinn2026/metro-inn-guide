@@ -166,18 +166,23 @@
     <aside class="sidebar">
       <div class="brand admin-brand">
         <div class="admin-logo-wrap"><img src="metro-inn-logo.png" alt="METRO INN"></div>
-        <div class="kicker">CONTENT MANAGEMENT</div>
         <div class="brand-title">北投旅圖 CMS</div>
       </div>
-      <nav class="side-nav" id="sideNav">
-        <a class="active" data-table="banners">Banner 管理</a>
-        <a data-table="site_settings">頁首頁尾設定</a>
-        <a data-table="admin_profiles">管理員帳號</a>
-        <a data-table="news">最新消息</a>
-        <a data-table="spots">景點管理</a>
-        <a data-table="foods">美食管理</a>
-        <a data-table="trips">行程管理</a>
-        <a data-table="coupons">優惠管理</a>
+      <nav class="side-nav" id="sideNav" aria-label="後台功能選單">
+        <div class="nav-group"><div class="nav-group-title">內容管理</div>
+          <a data-table="news">最新消息</a>
+          <a data-table="spots">景點管理</a>
+          <a data-table="foods">美食管理</a>
+          <a data-table="trips">行程管理</a>
+          <a data-table="coupons">優惠管理</a>
+        </div>
+        <div class="nav-group"><div class="nav-group-title">網站管理</div>
+          <a class="active" data-table="banners">首頁輪播管理</a>
+          <a data-table="site_settings">頁首頁尾設定</a>
+        </div>
+        <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
+          <a data-table="admin_profiles">帳號權限</a>
+        </div>
       </nav>
       <div class="side-bottom">
         <a class="button" href="index.html" target="_blank">開啟前台預覽 ↗</a>
@@ -188,7 +193,6 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <p class="kicker">METRO INN · ADMIN CENTER</p>
           <h1>北投旅圖內容管理中心</h1>
         </div>
         <div class="top-actions">
@@ -197,14 +201,9 @@
         </div>
       </header>
 
-      <section class="notice">
-        已調整為「先看全部資料 → 點編輯進入下一層修改」。列表含資料編號，可用搜尋／篩選快速找到資料；Banner 會顯示友善編號 banner_0001；圖片欄位支援本機上傳或貼網址，並可管理圖片來源文字。
-      </section>
-
       <section class="panel">
         <div class="panel-head">
           <div>
-            <p class="kicker" id="currentKicker">BANNER</p>
             <h2 id="currentTitle">Banner 管理</h2>
           </div>
           <div class="actions">
@@ -250,7 +249,6 @@
         <div id="editorView" class="editor-view">
           <div class="panel-head">
             <div>
-              <p class="kicker">EDIT</p>
               <h2 id="formTitle">編輯內容</h2>
             </div>
             <div class="actions">
@@ -363,7 +361,7 @@
       },
 
       admin_profiles: {
-        label:'管理員帳號', kicker:'ADMINS', table:'admin_profiles', preview:'admin.html',
+        label:'帳號權限', kicker:'ADMINS', table:'admin_profiles', preview:'admin.html',
         hint:'只有超級管理員可建立帳號與調整權限。一般管理員可管理內容，但不能新增管理員帳號。',
         fields:[
           ['id','User ID','text','auto'],
@@ -548,7 +546,7 @@
       if(table === 'admin_profiles' && !requireSuperAdmin()) return;
       currentTable = table;
       const cfg = configs[currentTable];
-      document.getElementById('currentKicker').textContent = cfg.kicker;
+      // 已移除裝飾性英文分類標題。
       document.getElementById('currentTitle').textContent = cfg.label;
       document.getElementById('sectionHint').textContent = cfg.hint;
       document.getElementById('newBtn').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';

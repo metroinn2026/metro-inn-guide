@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="admin.css?v=20260602-image-superadmin-fix">
 
   <style>
+    #workspacePanel[hidden]{display:none!important} #cmsPanel[hidden]{display:none!important}
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
     .panel{display:block!important;}
     .list-view{display:block!important;}
@@ -185,12 +186,14 @@
         <div class="nav-group"><div class="nav-group-title">內容管理</div>
           <a data-table="news">最新消息</a>
           <a data-table="spots">景點管理</a>
-          <a href="spots-review.html">景點審稿與批次匯入 ↗</a>
-          <a href="submissions-review.html">民眾投稿審核 ↗</a>
+          
+          
           <a data-table="foods">美食管理</a>
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
         </div>
+        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核中心</a></div>
+        <div class="nav-group"><div class="nav-group-title">投稿管理</div><a href="#submissions" data-workspace="submissions">民眾投稿審核</a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
           <a data-table="admin_profiles">帳號權限</a>
         </div>
@@ -212,7 +215,7 @@
         </div>
       </header>
 
-      <section class="panel">
+      <section class="panel" id="cmsPanel">
         <div class="panel-head">
           <div>
             <h2 id="currentTitle">Banner 管理</h2>
@@ -264,7 +267,7 @@
             </div>
             <div class="actions">
               <button class="ghost" onclick="backToList()">← 回列表</button>
-              <button class="primary" onclick="saveItem()">儲存</button>
+              <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
               <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
             </div>
           </div>
@@ -273,7 +276,7 @@
             <div class="card">
               <div id="formFields"></div>
               <div class="actions">
-                <button class="primary" onclick="saveItem()">儲存</button>
+                <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
                 <button onclick="clearForm()">清空</button>
                 <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
               </div>
@@ -288,6 +291,7 @@
           </div>
         </div>
       </section>
+      <section class="panel" id="workspacePanel" hidden style="display:none"><div class="panel-head"><h2 id="workspaceTitle">內容審核中心</h2></div><iframe id="workspaceFrame" title="後台工作區" style="width:100%;height:calc(100vh - 175px);min-height:660px;border:0;background:#fff" loading="lazy"></iframe></section>
     </main>
   </div>
 
@@ -430,7 +434,7 @@
           ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
           ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
-          ['review_status','審稿狀態（pending／needs_changes／approved）','text'],['source_urls','資料來源網址（每行一筆）','textarea'],['review_note','審稿備註','textarea'],['is_published','狀態','boolean']
+          ['is_published','狀態','boolean']
         ],
         columns:['title','area','is_published'],
         subtitle:(x)=>x.area || x.station || '-',
@@ -503,7 +507,9 @@
       if(!data.session){ location.href = 'admin-login.html'; return; }
       document.getElementById('userDisplayName').textContent = '管理員';
       await loadMyProfile(data.session.user);
+      const initialWorkspace=location.hash;
       switchTable('banners');
+      if(initialWorkspace==='#review')openWorkspace('review');else if(initialWorkspace==='#submissions')openWorkspace('submissions');
     }
 
     async function logout(){ await db.auth.signOut(); location.href='admin-login.html'; }
@@ -563,6 +569,29 @@
     }
 
 
+    function openWorkspace(kind, query=''){
+      history.replaceState(null,'','#'+kind);
+      document.getElementById('cmsPanel').hidden=true;
+      const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
+      document.getElementById('workspaceTitle').textContent=kind==='review'?'內容審核中心':'民眾投稿審核';
+      const url=kind==='review'?'content-review.html':'submissions-review.html';
+      const target=url+(kind==='review'?'?embedded=1'+(query?'&'+query:''):'?embedded=1');
+      const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
+      document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
+      window.scrollTo({top:0});
+    }
+    document.querySelectorAll('#sideNav a[data-workspace]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();openWorkspace(link.dataset.workspace);}));
+    window.addEventListener('message',event=>{
+      if(event.origin!==location.origin||event.source!==document.getElementById('workspaceFrame').contentWindow)return;
+      if(event.data?.type==='metro-edit'&&['spots','foods'].includes(event.data.table)){
+        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===event.data.table));
+        switchTable(event.data.table);
+        // Load the selected record after the database query finishes.
+        const target=event.data.id;
+        const timer=setInterval(()=>{if(cache.some(r=>r.id===target)){clearInterval(timer);editItem(target);}},100);
+        setTimeout(()=>clearInterval(timer),5000);
+      }
+    });
     document.querySelectorAll('#sideNav a').forEach(a=>{
       a.addEventListener('click',()=>{
         if(!a.dataset.table) return;
@@ -573,13 +602,18 @@
     });
 
     function switchTable(table){
+      if(location.hash)history.replaceState(null,'',location.pathname+location.search);
       if(table === 'admin_profiles' && !requireSuperAdmin()) return;
+      document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
       currentTable = table;
       const cfg = configs[currentTable];
       // 已移除裝飾性英文分類標題。
       document.getElementById('currentTitle').textContent = cfg.label;
       document.getElementById('sectionHint').textContent = cfg.hint;
       document.getElementById('newBtn').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
+      const manual=['spots','foods'].includes(currentTable);
+      document.querySelectorAll('.normal-save').forEach(b=>b.style.display=manual?'none':'');
+      document.querySelectorAll('.draft-save,.publish-save').forEach(b=>b.style.display=manual?'':'none');
       document.getElementById('imageTips').innerHTML = cfg.tips || imageTipsDefault;
       buildForm();
       setupFilters();
@@ -630,7 +664,7 @@
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
         if(type === 'image') return imageFieldTemplate(name,label);
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
-        if(type === 'boolean') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        if(type === 'boolean') return `<div class="form-row" ${['spots','foods'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
         if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
         return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'||flag==='fixed1'?'readonly':''} oninput="updateImagePreview()"></div>`;
       }).join('');
@@ -677,7 +711,8 @@
         else if(name==='role') el.value = 'admin';
         else if(name==='password') el.value = '';
         else if(name==='sort_order') el.value = String((cache.map(x=>Number(x.sort_order||0)).reduce((a,b)=>Math.max(a,b),0) || cache.length) + 1);
-        else if(name==='is_published' || name==='is_active') el.value = 'true';
+        else if(name==='is_published') el.value = ['spots','foods'].includes(currentTable)?'false':'true';
+        else if(name==='is_active') el.value='true';
         else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
         else el.value = '';
       });
@@ -762,7 +797,7 @@
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
           : `<span class="badge">固定設定</span>`);
-        const previewHref = currentTable === 'spots' && !item.is_published ? 'spots-review.html?id=' + encodeURIComponent(item.id) : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
+        const previewHref = ['spots','foods'].includes(currentTable) && !item.is_published ? cfg.preview + encodeURIComponent(item.id)+'&admin_preview=1' : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
         const sortCell = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : `
           <td>
             <span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span>
@@ -837,7 +872,7 @@
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
           : `<span class="badge">固定設定</span>`);
-        const previewHref = currentTable === 'spots' && !item.is_published ? 'spots-review.html?id=' + encodeURIComponent(item.id) : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
+        const previewHref = ['spots','foods'].includes(currentTable) && !item.is_published ? cfg.preview + encodeURIComponent(item.id)+'&admin_preview=1' : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
         return `
           <tr data-id="${item.id}" draggable="true">
             <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
@@ -991,7 +1026,7 @@
     }
 
 
-    async function saveItem(){
+    async function saveItem(mode){
       if(currentTable === 'admin_profiles') return saveAdminProfile();
       const msg = document.getElementById('formMsg');
       const payload = formPayload();
@@ -1002,7 +1037,12 @@
         return;
       }
       msg.textContent = '儲存中...';
-      if(currentTable==='spots'){if(payload.is_published && payload.review_status!=='approved'){msg.textContent='請先將審稿狀態設為 approved，才能上架。';return;}if(!payload.review_status)payload.review_status='pending';}
+      if(['spots','foods'].includes(currentTable)){
+        if(!['draft','publish'].includes(mode)){msg.textContent='請選擇「儲存草稿」或「儲存並上架」。';return;}
+        payload.is_published=mode==='publish';
+        payload.review_status=mode==='publish'?'approved':'pending';
+        if(mode==='publish'&&!confirm('已確認資料內容、來源及圖片使用權，確定公開上架？'))return;
+      }
       const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
       if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; return; }
       msg.textContent = '已儲存。';
@@ -1015,7 +1055,12 @@
       if(!item) return;
       if(currentTable==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;}
       const key = configs[currentTable].statusKey;
-      if(currentTable==='spots' && !item.is_published && item.review_status!=='approved'){alert('請先到景點審稿中心確認內容並審核通過。');return;}
+      if(['spots','foods'].includes(currentTable)&&!item.is_published){
+        if(!confirm('已確認此筆資料內容與圖片使用權，確定直接上架？'))return;
+        const {error}=await db.from(configs[currentTable].table).update({is_published:true,review_status:'approved'}).eq('id',id);
+        if(error){alert('上架失敗：'+error.message);return;}
+        await loadCurrentTable();return;
+      }
       const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
       if(error){ alert('更新失敗：' + error.message); return; }
       await loadCurrentTable();

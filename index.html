@@ -82,7 +82,7 @@ function initPicks(){
  function render(){const selected=pickItems.filter(item=>item.tags.includes(active)).slice(0,10);track.replaceChildren();selected.forEach(item=>{const a=document.createElement('a');a.className='picks-card';a.href=item.href;const photo=document.createElement('div');photo.className='picks-photo';const img=document.createElement('img');img.loading='lazy';img.src=item.img;img.alt=item.title;const caption=document.createElement('div');caption.className='picks-caption';const type=document.createElement('span');type.textContent=item.type;const title=document.createElement('h3');title.textContent=item.title;const desc=document.createElement('p');desc.textContent=item.desc;caption.append(type,title,desc);photo.append(img,caption);a.append(photo);track.append(a);});track.scrollLeft=0;update();}
  document.querySelectorAll('.picks-topics button').forEach(button=>button.addEventListener('click',()=>{active=button.dataset.topic;document.querySelectorAll('.picks-topics button').forEach(b=>{const on=b===button;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});render();}));
  document.querySelectorAll('.picks-arrow').forEach(button=>button.addEventListener('click',()=>{const card=track.querySelector('.picks-card');if(card)track.scrollBy({left:(button.classList.contains('next')?1:-1)*(card.getBoundingClientRect().width+20),behavior:'smooth'});}));
- track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);render();window.refreshFeaturedPicks=render;window.refreshFeaturedPicks=render;
+ track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);render();window.refreshFeaturedPicks=render;window.setFeaturedTopic=topic=>{active=topic;render();};
 }
 async function loadFeaturedPicks(){
  if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined')return;
@@ -91,12 +91,33 @@ async function loadFeaturedPicks(){
   if(!response.ok)throw new Error(`精選資料讀取失敗 ${response.status}`);
   const rows=await response.json();
   if(!rows.length){pickItems=[];window.refreshFeaturedPicks?.();return;}
-  pickItems=rows.map(row=>({title:row.title,type:row.category==='food'?'美食・精選':row.category==='trip'?'行程・精選':'景點・精選',desc:row.summary||'',img:row.cover_image||'',href:(row.category==='food'?'food.html':row.category==='trip'?'trip.html':'spot.html')+'?id='+encodeURIComponent(row.content_id),tags:['all',...String(row.topics||'').split(',').filter(Boolean)]}));
+  pickItems=rows.map(row=>({title:row.title,type:row.category==='food'?'美食・精選':row.category==='trip'?'行程・精選':'景點・精選',desc:row.summary||'',img:row.cover_image||'',href:(row.category==='food'?'food.html':row.category==='trip'?'trip.html':'spot.html')+'?id='+encodeURIComponent(row.content_id),tags:['all',...String(row.topics||'').split(',').map(t=>t.trim()).filter(Boolean)]}));
   window.refreshFeaturedPicks?.();
  }catch(error){console.warn('精選資料未載入；若尚未執行 featured_picks.sql，暫顯示原有推薦',error);}
 }
-document.addEventListener('DOMContentLoaded',()=>{initPicks();loadFeaturedPicks();});
-if(document.readyState!=='loading'){initPicks();loadFeaturedPicks();}
+async function loadFeaturedTopics(){
+ try{
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/featured_topics?select=id,title&is_active=eq.true&order=sort_order.asc`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+  if(!response.ok)throw new Error(`主題讀取失敗 ${response.status}`);
+  const rows=await response.json();
+  const wrapper=document.querySelector('.picks-topics');
+  if(!wrapper)return;
+  wrapper.replaceChildren();
+  rows.forEach((row,index)=>{
+   const button=document.createElement('button');button.type='button';button.dataset.topic=row.id;
+   button.textContent=row.title;button.classList.toggle('active',index===0);
+   button.setAttribute('aria-pressed',String(index===0));wrapper.append(button);
+  });
+  // 主題更新後重新綁定點擊事件；不重建輪播本體。
+  wrapper.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{
+   wrapper.querySelectorAll('button').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
+   window.setFeaturedTopic?.(button.dataset.topic);
+  }));
+  window.setFeaturedTopic?.(rows[0]?.id||'all');
+ }catch(error){console.warn('主題設定未載入，使用原有預設標籤',error);}
+}
+function startFeatured(){initPicks();loadFeaturedPicks();loadFeaturedTopics();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startFeatured,{once:true});else startFeatured();
 
 
 let homeBannerAutoTimer = null;

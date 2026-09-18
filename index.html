@@ -1,136 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script>
-<style id="home-banner-search-layout-fix">
-/* 首頁 Banner + 搜尋器版面修正 */
-.home-banner-carousel{
-  height:56vh !important;
-  min-height:430px !important;
-  max-height:560px !important;
-}
-.home-banner-slide picture,
-.home-banner-slide img{
-  height:56vh !important;
-  min-height:430px !important;
-  max-height:560px !important;
-}
-.home-banner-slide img{
-  object-fit:cover !important;
-}
-.home-banner-overlay{
-  align-items:center !important;
-}
-.home-banner-copy{
-  padding-top:18px !important;
-  padding-bottom:76px !important;
-}
-.home-banner-dots{
-  bottom:24px !important;
-  z-index:30 !important;
-}
-
-/* 搜尋器不要蓋住輪播圓點，並降低高度 */
-.search-panel{
-  position:relative !important;
-  z-index:10 !important;
-  margin-top:0 !important;
-  padding:24px 0 18px !important;
-}
-.search-box{
-  padding:24px 36px 22px !important;
-}
-.search-box-simple{
-  border-top:4px solid var(--green) !important;
-}
-.quick-search-title{
-  font-size:34px !important;
-  margin:8px 0 18px !important;
-}
-.keyword-row{
-  display:flex !important;
-  gap:16px !important;
-  align-items:stretch !important;
-}
-.keyword-row input{
-  min-height:52px !important;
-  padding:12px 18px !important;
-}
-.keyword-row .button{
-  min-height:52px !important;
-  padding:0 34px !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-.search-tags{
-  margin-top:16px !important;
-  padding-top:0 !important;
-  display:flex !important;
-  flex-wrap:wrap !important;
-  gap:10px 18px !important;
-  align-items:center !important;
-  line-height:1.7 !important;
-}
-.search-tags span{
-  font-weight:900 !important;
-  color:var(--blue) !important;
-}
-.search-tags a{
-  white-space:nowrap !important;
-}
-
-/* 修正列表頁上方說明文字被截斷 */
-.page-header,
-.archive-header,
-.hero-copy,
-.hero-content,
-.section-intro,
-.listing-header,
-.section-heading{
-  max-width:1200px !important;
-  width:100% !important;
-}
-.page-header p,
-.archive-header p,
-.hero-copy p,
-.section-intro p{
-  max-width:900px !important;
-  white-space:normal !important;
-  overflow:visible !important;
-  text-overflow:unset !important;
-}
-
-@media(max-width:1024px){
-  .home-banner-carousel,
-  .home-banner-slide picture,
-  .home-banner-slide img{
-    height:50vh !important;
-    min-height:380px !important;
-  }
-}
-@media(max-width:700px){
-  .home-banner-carousel,
-  .home-banner-slide picture,
-  .home-banner-slide img{
-    height:44vh !important;
-    min-height:310px !important;
-  }
-  .search-panel{
-    padding:16px 0 !important;
-  }
-  .search-box{
-    padding:22px 20px !important;
-  }
-  .keyword-row{
-    display:block !important;
-  }
-  .keyword-row input,
-  .keyword-row .button{
-    width:100% !important;
-    margin-top:10px !important;
-  }
-}
-</style>
-
-</head><body><div id="header"></div>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
 <main id="top">
 <section class="home-banner-section" id="homeBannerSection">
   <div class="home-banner-carousel" id="homeBannerCarousel">
@@ -140,7 +8,7 @@
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="北投旅圖">
       </picture>
       <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
-        <div class="kicker">METRO INN GUIDE</div>
+        
         <h1>北投旅圖</h1>
         <p>從北投會館出發，把溫泉、散步、咖啡、夜市與河岸風景，整理成一份好讀的在地旅遊手冊。</p>
         <a class="button" href="spots.html">開始探索</a>
@@ -152,7 +20,7 @@
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg" alt="北投散策">
       </picture>
       <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
-        <div class="kicker">BEITOU WALK</div>
+        
         <h1>北投散策</h1>
         <p>從新北投站一路散步，安排地熱谷、溫泉博物館、圖書館與在地美食。</p>
         <a class="button" href="trips.html">查看行程</a>
@@ -164,7 +32,7 @@
         <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1800&q=85" alt="北投美食">
       </picture>
       <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
-        <div class="kicker">LOCAL TASTES</div>
+        
         <h1>在地美食</h1>
         <p>泡湯後的熱湯、午後咖啡與市場小吃，讓旅程更剛剛好。</p>
         <a class="button" href="foods.html">查看美食</a>
@@ -174,58 +42,52 @@
   </div>
 </section>
 
-<section class="search-panel"><div class="container"><div class="search-box search-box-simple"><div class="field keyword-only"><label>KEYWORD SEARCH</label><h2 class="quick-search-title">想去哪裡走走？</h2><div class="keyword-row"><input id="kw" placeholder="搜尋地熱谷、泡湯、咖啡廳、親子景點..."><a class="button" href="#" onclick="const q=document.getElementById('kw').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div><div class="search-tags"><span>熱門關鍵字：</span><a href="search.html?q=地熱谷">地熱谷</a><a href="search.html?q=北投溫泉">北投溫泉</a><a href="search.html?q=親子景點">親子景點</a><a href="search.html?q=陽明山">陽明山</a><a href="search.html?q=淡水夕陽">淡水夕陽</a><a href="search.html?q=士林夜市">士林夜市</a><a href="search.html?q=泡湯">泡湯</a><a href="search.html?q=咖啡廳">咖啡廳</a><a href="search.html?q=拉麵">拉麵</a><a href="search.html?q=優惠">優惠</a></div></div></div></div></section>
+<section class="search-panel"><div class="container"><div class="search-box search-box-simple"><div class="field keyword-only"><h2 class="quick-search-title">想去哪裡走走？</h2><div class="keyword-row"><input id="kw" placeholder="搜尋地熱谷、泡湯、咖啡廳、親子景點..."><a class="button" href="#" onclick="const q=document.getElementById('kw').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div></div></div><div class="search-tags"><span>熱門關鍵字：</span><a href="search.html?q=地熱谷">地熱谷</a><a href="search.html?q=北投溫泉">北投溫泉</a><a href="search.html?q=親子景點">親子景點</a><a href="search.html?q=陽明山">陽明山</a><a href="search.html?q=淡水夕陽">淡水夕陽</a><a href="search.html?q=士林夜市">士林夜市</a><a href="search.html?q=泡湯">泡湯</a><a href="search.html?q=咖啡廳">咖啡廳</a><a href="search.html?q=拉麵">拉麵</a><a href="search.html?q=優惠">優惠</a></div></div></section>
 
-<section class="section mag-news-wrap" id="news"><div class="container"><div class="section-head compact"><div><div class="kicker">LATEST NEWS</div><h2>最新消息</h2></div><a class="section-link" href="news.html">READ MORE →</a></div><div class="news-line-list"><a class="news-line" href="news-kids.html"><time>2026.06.11</time><span class="news-type">活動</span><strong>捷伴童行親子專案即將開賣</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.06.01</time><span class="news-type">住宿</span><strong>北投溫泉慢旅住房專案上架</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.20</time><span class="news-type">季節</span><strong>陽明山季節散策推薦：從北投出發的半日路線</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.15</time><span class="news-type">合作</span><strong>合作店家優惠陸續上架，出示畫面即可使用</strong><em>→</em></a><a class="news-line" href="news-kids.html"><time>2026.05.08</time><span class="news-type">公告</span><strong>Metro Inn Guide｜北投旅圖試營運內容更新</strong><em>→</em></a></div></div></section>
-
-<section class="section"><div class="container mag-intro"><h2 class="title-line">不是遠行，<br>是把城市重新看一次。</h2><p>這裡不是一般訂房網站，而是給住宿旅客閱讀的數位旅遊手冊。從北投、新北投、陽明山、士林到淡水，把景點、美食、行程與優惠整理在一起，讓旅客不需要再翻紙本手冊，也能快速找到想去的地方。</p></div></section>
-
-<section class="section alt" id="spots"><div class="container"><div class="section-head"><div><div class="kicker">POPULAR SPOTS</div><h2>熱門景點</h2></div><p>一張圖、一段介紹，先找到想停留的地方。</p></div><div class="mag-three"><a class="mag-tile" href="spot-thermal-valley.html"><div class="mag-tile-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20in%20Beitou.jpg"></div><div class="mag-tile-label"><div class="meta">BEITOU</div><h3>地熱谷</h3></div></a><a class="mag-tile" href="spot-thermal-valley.html"><div class="mag-tile-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Hot%20Spring%20Museum.jpg"></div><div class="mag-tile-label"><div class="meta">XINBEITOU</div><h3>溫泉博物館</h3></div></a><a class="mag-tile" href="spots.html"><div class="mag-tile-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg"></div><div class="mag-tile-label"><div class="meta">YANGMINGSHAN</div><h3>陽明山</h3></div></a></div><div class="home-preview"><a class="section-link" href="spots.html">查看全部景點 →</a></div></div></section>
-
-<section class="section"><div class="container mag-feature"><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg"></div><div class="mag-feature-copy"><div class="kicker">FEATURED JOURNEY</div><h2>把午後留給北投，走進一座有溫度的山城</h2><p>地熱谷、溫泉博物館、泡湯與晚餐，把半日行程拆成清楚段落，適合不想趕景點、只想把午後過得舒服的旅客。</p><a class="button" href="trip-beitou.html">閱讀行程</a></div></div></section>
-
-<section class="section alt"><div class="container"><div class="mag-subscribe"><h2>住客優惠與活動提醒</h2><form onsubmit="return false"><input placeholder="輸入 Email 接收最新活動"><button>SUBSCRIBE</button></form></div><div class="section-head"><div><div class="kicker">LOCAL TASTES</div><h2>在地美食</h2></div><a class="section-link" href="foods.html">查看全部美食 →</a></div><div class="mag-three"><a class="mag-tile" href="food-beitou-dining.html"><div class="mag-tile-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwanese%20Beef%20Noodle%20Soup.jpg"></div><div class="mag-tile-label"><div class="meta">BEITOU</div><h3>一碗熱湯</h3></div></a><a class="mag-tile" href="foods.html"><div class="mag-tile-img"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=85"></div><div class="mag-tile-label"><div class="meta">CAFÉ</div><h3>午後咖啡</h3></div></a><a class="mag-tile" href="coupon.html"><div class="mag-tile-img"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85"></div><div class="mag-tile-label"><div class="meta">OFFER</div><h3>出示優惠</h3></div></a></div></div></section>
-
-<section class="section"><div class="container mag-feature"><div class="mag-feature-copy"><div class="kicker">STAY A LITTLE LONGER</div><h2>入住北投會館，從旅店開始慢慢認識城市。</h2><p>旅圖是你的數位旅遊手冊；訂房則回到北投會館官方系統，保留清楚的旅遊內容與訂房流程。</p><a class="button" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2007-10-23%20Room%20%40%20Far%20East%20Plaza%20Hotel%2C%20Taipei%2001.jpg"></div></div></section>
+<section class="editor-picks section" id="picks"><div class="container">
+  <div class="picks-heading"><div><h2>找到你的北投旅行方式</h2><p>從溫泉、散步到在地美食，探索適合自己的旅行體驗。</p></div><a class="picks-more" id="picksMore" href="spots.html">更多精選 ↗</a></div>
+  <div class="picks-topics" role="group" aria-label="選擇旅遊主題">
+    <button type="button" class="active" data-topic="all" aria-pressed="true">人氣精選</button><button type="button" data-topic="first">初訪北投</button><button type="button" data-topic="family">親子樂</button><button type="button" data-topic="culture">文化深度遊</button><button type="button" data-topic="food">美食愛好者</button><button type="button" data-topic="nature">自然漫遊</button>
+  </div>
+  <div class="picks-carousel"><button class="picks-arrow prev" type="button" aria-label="上一組推薦">‹</button><div class="picks-track" id="picksTrack" tabindex="0" aria-label="推薦內容，左右滑動瀏覽"></div><button class="picks-arrow next" type="button" aria-label="下一組推薦">›</button></div>
+  <div class="picks-controls"><div class="picks-progress" aria-hidden="true"><span id="picksProgress"></span></div><span id="picksCount" aria-live="polite">01 / 09</span></div>
+</div></section>
+<section class="section home-journey"><div class="container mag-feature"><div class="mag-feature-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt="北投地熱風景" loading="lazy"></div><div class="mag-feature-copy"><h2>搭捷運，去旅行。</h2><p>從北捷行旅出發，沿著捷運探索溫泉文化與在地風景，安排一趟不趕路的城市散策。</p><a class="button" href="trips.html">探索推薦行程 →</a></div></div></section>
+<section class="section home-news" id="news"><div class="container"><div class="section-head compact"><div><h2>最新消息</h2></div><a class="section-link" href="news.html">全部消息 →</a></div><div class="news-line-list"><a class="news-line" href="news.html"><span class="news-type">活動與公告</span><strong>查看北投旅圖最新活動與旅遊資訊</strong><em>→</em></a></div></div></section>
+<section class="home-subscribe"><div class="container"><div class="home-subscribe-inner"><div><h2>住客優惠與活動提醒</h2><p>最新住宿優惠及旅遊活動資訊。</p></div><form onsubmit="return false"><label for="homeSubscribeEmail">電子郵件</label><input id="homeSubscribeEmail" type="email" placeholder="輸入電子郵件" aria-label="電子郵件"><button type="submit">訂閱</button><small>訂閱功能尚未開通</small></form></div></div></section>
 </main><div id="footer"></div><script>
 
 document.getElementById('header').innerHTML=header();
 document.getElementById('footer').innerHTML=footer();
 
-let homeBannerAutoTimer = null;
-
-function renderHomeBanners(banners){
-  const section = document.getElementById('homeBannerSection');
-  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
-
-  if(!valid.length){
-    setupHomeBannerCarousel();
-    return;
-  }
-
-  const bannerItems = valid.slice(0,4);
-  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${bannerItems.map((b,i)=>{
-    const pc = b.image_url || b.image_pc;
-    const mobile = b.mobile_image_url || b.image_mobile || pc;
-    const title = b.title || '北投旅圖';
-    const subtitle = b.subtitle || b.summary || '';
-    const buttonText = b.button_text || '了解更多';
-    const buttonUrl = b.button_url || 'spots.html';
-    return `<article class="home-banner-slide ${i===0?'active':''}">
-      <picture>
-        <source media="(max-width:700px)" srcset="${mobile}">
-        <img src="${pc}" alt="${title}">
-      </picture>
-      <div class="home-banner-overlay"><div class="container"><div class="home-banner-copy">
-        <div class="kicker">${b.kicker || 'METRO INN GUIDE'}</div>
-        <h1>${title}</h1>
-        <p>${subtitle}</p>
-        ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
-      </div></div></div>
-    </article>`;
-  }).join('')}<div class="home-banner-dots">${bannerItems.map((_,i)=>`<button class="${i===0?'active':''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('')}</div></div>`;
-  setupHomeBannerCarousel();
+// 首頁主題推薦：沿用現有內頁連結；日後可改由後台提供推薦資料。
+const pickItems=[
+ {title:'地熱谷',type:'景點・溫泉',desc:'感受北投獨特的地熱風景。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20in%20Beitou.jpg',href:'spot.html?id=spot_0001',tags:['all','first','nature']},
+ {title:'北投圖書館',type:'景點・建築',desc:'在綠意中探索特色建築。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Taipei%20Public%20Library%20Beitou%20Branch.jpg',href:'spots.html',tags:['all','first','family','culture']},
+ {title:'北投溫泉博物館',type:'景點・文化',desc:'走進北投的溫泉歷史。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Hot%20Spring%20Museum.jpg',href:'spots.html',tags:['all','first','family','culture']},
+ {title:'北投在地美食',type:'美食・日常',desc:'從街頭小吃開始認識北投。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Taiwanese%20Beef%20Noodle%20Soup.jpg',href:'foods.html',tags:['all','food','family']},
+ {title:'北投午後咖啡',type:'美食・散步',desc:'留一點時間給旅途中的午後。',img:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85',href:'foods.html',tags:['all','food','first']},
+ {title:'陽明山自然風景',type:'景點・自然',desc:'走進山林，感受四季景色。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg',href:'spots.html',tags:['all','nature','family']},
+ {title:'北投半日散策',type:'行程・慢旅行',desc:'把午後留給北投的街道與溫泉。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg',href:'trips.html',tags:['all','first','culture']},
+ {title:'在地餐桌提案',type:'美食・探索',desc:'品嚐北投旅途中的好味道。',img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85',href:'foods.html',tags:['all','food']},
+ {title:'搭捷運去旅行',type:'行程・大眾運輸',desc:'從北捷行旅出發探索城市。',img:'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg',href:'trips.html',tags:['all','nature','culture','family']}
+];
+const pickMore={all:'spots.html',first:'spots.html',family:'spots.html',culture:'spots.html',food:'foods.html',nature:'spots.html'};
+function initPicks(){
+ const track=document.getElementById('picksTrack'),progress=document.getElementById('picksProgress'),count=document.getElementById('picksCount');
+ if(!track)return;
+ let active='all';
+ function update(){const max=Math.max(1,track.scrollWidth-track.clientWidth);const ratio=track.scrollLeft/max;const cards=[...track.children];let index=cards.length?cards.reduce((best,el,i)=>Math.abs(el.offsetLeft-track.offsetLeft-track.scrollLeft)<Math.abs(cards[best].offsetLeft-track.offsetLeft-track.scrollLeft)?i:best,0):0;progress.style.width=`${Math.min(100,Math.max(12,(track.clientWidth/track.scrollWidth)*100+ratio*(100-track.clientWidth/track.scrollWidth*100)))}%`;count.textContent=`${String(index+1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;}
+ function render(){const selected=pickItems.filter(item=>item.tags.includes(active)).slice(0,9);track.innerHTML=selected.map(item=>`<a class="picks-card" href="${item.href}"><div class="picks-photo"><img loading="lazy" src="${item.img}" alt="${item.title}"><div class="picks-caption"><span>${item.type}</span><h3>${item.title}</h3><p>${item.desc}</p></div></div></a>`).join('');track.scrollLeft=0;document.getElementById('picksMore').href=pickMore[active];update();}
+ document.querySelectorAll('.picks-topics button').forEach(button=>button.addEventListener('click',()=>{active=button.dataset.topic;document.querySelectorAll('.picks-topics button').forEach(b=>{const on=b===button;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});render();}));
+ document.querySelectorAll('.picks-arrow').forEach(button=>button.addEventListener('click',()=>{const card=track.querySelector('.picks-card');if(card)track.scrollBy({left:(button.classList.contains('next')?1:-1)*(card.getBoundingClientRect().width+20),behavior:'smooth'});}));
+ track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);render();
 }
+document.addEventListener('DOMContentLoaded',initPicks);
+if(document.readyState!=='loading')initPicks();
+
+
+let homeBannerAutoTimer = null;
 
 function setupHomeBannerCarousel(){
   const carousel = document.getElementById('homeBannerCarousel');
@@ -240,32 +102,81 @@ function setupHomeBannerCarousel(){
     homeBannerAutoTimer = null;
   }
 
-  let idx = slides.findIndex(s => s.classList.contains('active'));
-  if(idx < 0) idx = 0;
+  let current = slides.findIndex(s => s.classList.contains('active'));
+  if(current < 0) current = 0;
 
-  function show(n){
-    idx = (n + slides.length) % slides.length;
-    slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
-    dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+  function show(index){
+    current = (index + slides.length) % slides.length;
+    slides.forEach((slide,i)=>slide.classList.toggle('active', i === current));
+    dots.forEach((dot,i)=>dot.classList.toggle('active', i === current));
   }
 
-  show(idx);
-  dots.forEach((d,i)=>d.addEventListener('click',()=>show(i)));
+  show(current);
 
-  if(slides.length>1){
-    homeBannerAutoTimer = setInterval(()=>show(idx+1),4500);
+  dots.forEach((dot,i)=>dot.addEventListener('click', () => show(i)));
+
+  if(slides.length > 1){
+    homeBannerAutoTimer = setInterval(() => show(current + 1), 4500);
   }
+}
+
+function renderHomeBanners(banners){
+  const section = document.getElementById('homeBannerSection');
+  const valid = (banners || []).filter(b => b && (b.image_url || b.image_pc));
+
+  if(!valid.length){
+    setupHomeBannerCarousel();
+    return;
+  }
+
+  const bannerItems = valid.slice(0,4);
+  const slides = bannerItems.map((b,i)=>{
+    const pc = b.image_url || b.image_pc;
+    const mobile = b.mobile_image_url || b.image_mobile || pc;
+    const title = b.title || '北投旅圖';
+    const subtitle = b.subtitle || b.summary || '';
+    const buttonText = b.button_text || '了解更多';
+    const buttonUrl = b.button_url || 'spots.html';
+
+    return `<article class="home-banner-slide ${i===0 ? 'active' : ''}">
+      <picture>
+        <source media="(max-width:700px)" srcset="${mobile}">
+        <img src="${pc}" alt="${title}">
+      </picture>
+      <div class="home-banner-overlay">
+        <div class="container">
+          <div class="home-banner-copy">
+            
+            <h1>${title}</h1>
+            <p>${subtitle}</p>
+            ${buttonUrl ? `<a class="button" href="${buttonUrl}">${buttonText}</a>` : ''}
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+
+  const dots = bannerItems.map((_,i)=>`<button class="${i===0 ? 'active' : ''}" aria-label="第 ${i+1} 張 Banner"></button>`).join('');
+
+  section.innerHTML = `<div class="home-banner-carousel" id="homeBannerCarousel">${slides}<div class="home-banner-dots">${dots}</div></div>`;
+  setupHomeBannerCarousel();
 }
 
 async function loadHomeBanners(){
   setupHomeBannerCarousel();
 
-  if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') return;
+  if(typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined'){
+    return;
+  }
 
   try{
     const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?select=*&order=sort_order.asc&limit=4`, {
-      headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+      headers:{
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
     });
+
     if(!res.ok) return;
 
     const raw = await res.json();

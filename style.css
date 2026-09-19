@@ -430,3 +430,9 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 /* 2026-09: Public site neutral support colors; keep transport guide separately monochrome. */
 :root{--brand-support-dark:#4D4D4D;--brand-support-mid:#BDBDBD;--brand-support-light:#D7D7D7;--brand-support-pale:#E5F2F7}
 body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}
+
+/* 景點側欄：景點資訊暖灰、交通指南淡藍灰；僅作用於景點頁側欄。 */
+.sticky-panel > .sidebox.compact:first-child{background:#F7F5F2!important;border:1px solid #E6E1DB!important;box-shadow:none}
+.sticky-panel .metro-transit{background:#E5F2F7!important;border:1px solid #D7E3E9!important;box-shadow:none}
+.sticky-panel .metro-transit .metro-route-total{background:#F4F8FA;color:#4D4D4D}
+.sticky-panel .metro-transit .metro-route-disclaimer{border-top-color:#D1DCE2}

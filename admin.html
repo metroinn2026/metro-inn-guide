@@ -574,7 +574,7 @@
         hint:'行程改為分段管理。先看列表，點編輯後可自由新增 3 段、4 段或 6 段，每段可填時間、標題、說明與圖片，並可拖曳排序。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
-          ['summary','摘要','textarea'],['google_route','Google路線','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['summary','摘要','textarea'],['google_route','Google路線','text'],['transport_routes','大眾運輸路線（JSON）','json'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
           ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
         ],
         columns:['title','duration','is_published'],

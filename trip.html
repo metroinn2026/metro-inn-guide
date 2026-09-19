@@ -89,30 +89,13 @@
 
     <aside class="sidebar">
       <div class="sticky-panel">
-        <div class="sidebox compact">
-          <h2 class="detail-side-title">行程資訊</h2>
-          <span id="sideTitle" hidden></span>
-          <p id="sideDuration">◷ 建議停留</p>
-          <p>🚇　捷運＋步行</p>
-          <p>⌁　適合第一次造訪或不想自己規劃的旅客</p>
-          <div class="info-actions trip-actions">
-            <a class="button outline" href="#route-map">路線地圖</a>
-            <button class="share-mini" type="button" aria-label="分享行程">⇪</button>
-          </div>
-        </div>
-
-        <div class="sidebox compact fill">
-          <div class="kicker">TRAVEL NOTES</div>
-          <h3>出發前的小提醒</h3>
-          <p>建議穿著好走的鞋；山區或戶外景點請依天候調整。若安排泡湯或餐廳，建議事先確認營業資訊。</p>
-        </div>
-
-        <div class="sidebox compact">
-          <div class="kicker">NEARBY STATION</div>
-          <h3>交通建議</h3>
-          <p>🚇　可依行程起點選擇捷運站</p>
-          <p>🗺️　建議開啟 Google Maps 確認即時路線</p>
-        </div>
+      <section class="sidebox compact metro-transit compact-transit" aria-labelledby="transitTitle">
+        <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
+        <div class="compact-transit-head"><h2 id="transitTitle">大眾運輸交通指南</h2><span id="transitTotal" class="compact-transit-total" hidden></span></div>
+        <ol id="transitSteps" class="compact-transit-steps"><li class="transit-empty">交通路線整理中，請使用下方即時導航。</li></ol>
+        <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
+        <a id="travelMapLink" class="compact-transit-map" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">在 Google Maps 查看即時路線 ↗</a>
+      </section>
 
         <div class="sidebox compact dark">
           <div class="kicker" style="color:white">STAY NEARBY</div>
@@ -322,6 +305,74 @@
       }
     }
 
+    // 交通欄位可在 Supabase 補充；尚未查核的路線不顯示虛構站數與時間。
+    const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
+    function setupHotelRoutes(item) {
+      const destination = [item.title, item.address].filter(Boolean).join(' ');
+      const url = new URL('https://www.google.com/maps/dir/');
+      url.searchParams.set('api', '1');
+      url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
+      url.searchParams.set('destination', destination || item.title || '北投');
+      url.searchParams.set('travelmode', 'transit');
+      document.getElementById('travelMapLink').href = url.toString();
+      const root = document.getElementById('transitSteps');
+      const total = document.getElementById('transitTotal');
+      root.replaceChildren();
+      total.hidden = true;
+      let raw = item.transport_routes;
+      if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (_) { raw = null; } }
+      const routes = Array.isArray(raw) ? raw : raw && Array.isArray(raw.routes) ? raw.routes : [];
+      const route = routes.find(item => item && item.enabled !== false && Array.isArray(item.steps) && item.steps.length);
+      const steps = [];
+      if (route) {
+        for (const step of route.steps) {
+          if (!step) continue;
+          const mode = step.type || step.mode || '';
+          const name = step.name || step.station || '';
+          if (name && (mode === '站點' || mode === '抵達' || !mode)) steps.push({station:name});
+          else {
+            const bits = [step.line, step.direction, step.duration ? `約 ${String(step.duration).replace(/\s*分鐘$/, '')} 分鐘` : '', step.distance].filter(Boolean);
+            const description = [mode, bits.length ? `（${bits.join('，')}）` : '', step.detail || ''].filter(Boolean).join(' ');
+            if (description) steps.push({leg:description});
+          }
+        }
+      }
+      // 舊資料可沿用一格交通文字；不自行猜測站點、車程或距離。
+      if (!steps.length) {
+        const rawText = String(item.transport_text || item.transport_guide || item.transport_metro || '').trim();
+        const lines = rawText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        for (const line of lines) {
+          if (/^(全程|總時間|參考總時間)/.test(line)) {
+            total.textContent = line.replace(/^(參考)?總時間[：:]?/, '全程');
+            total.hidden = false;
+          } else if (/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line)) steps.push({leg:line.replace(/\s*[｜|]\s*/g, ' · ')});
+          else steps.push({station:line});
+        }
+      }
+      // 有結構化路線時，也可從原有交通文字的「全程約 N 分鐘」讀取總時間。
+      // 僅顯示後台提供的數字，不根據路段自行推算或寫死 30 分鐘。
+      if (total.hidden) {
+        const source = String(item.transport_text || item.transport_guide || item.transport_metro || '');
+        const match = source.match(/(?:^|\n)\s*(?:全程|總時間|參考總時間)\s*[：:]?\s*(?:約\s*)?(\d+(?:\.\d+)?\s*(?:小時|分鐘)(?:\s*\d+\s*分鐘)?)/);
+        if (match) { total.textContent = `全程約 ${match[1].replace(/\s+/g, ' ').trim()}`; total.hidden = false; }
+      }
+      if (route && (route.total_duration || route.total_time || route.duration)) {
+        const duration = String(route.total_duration || route.total_time || route.duration);
+        total.textContent = /全程/.test(duration) ? duration : `全程約 ${duration}${/分鐘|小時/.test(duration) ? '' : ' 分鐘'}`;
+        total.hidden = false;
+      }
+      if (!steps.length) {
+        const item = document.createElement('li'); item.className = 'transit-empty';
+        item.textContent = '交通路線尚待補充，請使用下方即時導航。'; root.append(item); return;
+      }
+      for (const step of steps) {
+        const item = document.createElement('li'); item.className = step.station ? 'transit-station' : 'transit-leg';
+        const label = document.createElement(step.station ? 'strong' : 'span');
+        label.textContent = step.station || step.leg; item.append(label); root.append(item);
+      }
+    }
+
+
     async function loadTrip() {
       const id = getParam('id');
 
@@ -388,6 +439,7 @@
         document.getElementById('mapButton').href = getGoogleMapsUrl(trip, steps);
         document.getElementById('mapEmbed').src = getMapEmbedUrl(trip, steps);
 
+        setupHotelRoutes(trip);
         renderRelatedReading(trip,document.getElementById('relatedReading'));
         renderRelatedContent(trip);
 

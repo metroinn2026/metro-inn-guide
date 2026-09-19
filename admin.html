@@ -389,6 +389,8 @@
   <script src="secure-delete.js"></script>
   <script src="cms-schema.js"></script>
   <script src="cms-editor.js"></script>
+  <script src="route-timeline.js"></script>
+  <link rel="stylesheet" href="route-timeline.css">
   <script src="cms-preview.js"></script>
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -879,6 +881,9 @@
         error.textContent='';
         document.getElementById('adminPreviewState').textContent='未發布預覽';
         MetroCmsPreview.render(document.getElementById('adminDraftPreview'),currentTable,values,true);
+        let routePreview=document.getElementById('adminRouteTimeline');
+        if(!routePreview){routePreview=document.createElement('div');routePreview.id='adminRouteTimeline';routePreview.className='metro-transit';document.getElementById('adminDraftPreview').after(routePreview);}
+        MetroRouteTimeline.render(routePreview,values.transport_routes);
       }catch(e){
         error.textContent='請先修正欄位，預覽暫停更新：'+e.message;
         document.getElementById('adminPreviewState').textContent='待修正';
@@ -907,7 +912,7 @@
         else if(type==='boolean'||type==='booleanActive')record[name]=el.value==='true';
         else if(type==='number')record[name]=el.value===''?null:Number(el.value);
         else if(name==='transport_routes'){
-          try{record[name]=JSON.parse(el.value||'{}');}catch{record[name]=el.value;}
+          try{record[name]=JSON.parse(el.value||'[]');}catch{record[name]=el.value;}
         }else record[name]=el.value;
       });
       const advanced=document.createElement('details');advanced.className='cms-editor-advanced';
@@ -1282,7 +1287,7 @@
         else if(name === 'password') el.value = '';
         else if(name === 'transport_routes') {
           // JSONB must be serialized as JSON, not the implicit '[object Object]'.
-          el.value = item[name] == null ? '{}' :
+          el.value = item[name] == null ? '[]' :
             (typeof item[name] === 'string' ? item[name] : JSON.stringify(item[name], null, 2));
         }
         else el.value = item[name] ?? '';
@@ -1313,9 +1318,9 @@
           // Supabase JSONB expects an object/array, not a string containing JSON.
           // Reject malformed input instead of overwriting the original JSONB value.
           try {
-            const parsed = JSON.parse(el.value.trim() || '{}');
-            if(parsed === null || typeof parsed !== 'object' || Array.isArray(parsed))
-              throw Error('交通路線必須是 JSON 物件');
+            const parsed = JSON.parse(el.value.trim() || '[]');
+            if(!Array.isArray(parsed))
+              throw Error('交通路線必須是路線清單');
             payload[name] = parsed;
           } catch(error) {
             document.getElementById('formMsg').textContent = '交通路線格式錯誤：' + error.message;

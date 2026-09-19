@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="route-timeline.css">
+  <script src="route-timeline.js"></script>
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -89,6 +91,7 @@
         <p id="sideAddress">地址載入中</p>
       </div>
 
+      <div id="metroRouteTimeline" class="metro-transit" hidden></div>
       <div class="sidebox compact fill">
         <div class="kicker">TRIP IDEA</div>
         <h3>附近可以這樣玩</h3>
@@ -264,6 +267,7 @@
         setText('sideHours', food.business_hours || '營業時間依公告為準');
         setText('sideCost', `平均消費 ${cost}`);
         setText('sideAddress', food.address || '地址請見 Google Map');
+        MetroRouteTimeline.render(document.getElementById('metroRouteTimeline'),food.transport_routes);
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

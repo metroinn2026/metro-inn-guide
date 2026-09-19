@@ -1,6 +1,7 @@
 /* 共用表單元件：僅產生表單及讀取值，不自行寫入資料庫。 */
 (function(global){'use strict';
-const excluded=new Set(['id','is_published','review_status','review_note','reviewed_at','reviewed_by','source_urls']);
+// 舊版交通文字欄位不再出現在共用編輯器；原始值仍保留於 record，避免覆寫既有資料。
+const excluded=new Set(['id','is_published','review_status','review_note','reviewed_at','reviewed_by','source_urls','transport_metro','transport_bus','transport_car']);
 function mount(root,type,record,options={}){
  if(!global.MetroCmsSchema?.hasType(type))throw Error('不支援的內容類型');
  root.replaceChildren();const schema=global.MetroCmsSchema,groups=schema.groups(type),definitions=new Map(schema.fields(type).map(f=>[f[0],f]));const inputs=new Map();const invalid=new Set();const bar=document.createElement('div'),panel=document.createElement('div');bar.className='row';root.append(bar,panel);

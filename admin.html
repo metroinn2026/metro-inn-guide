@@ -955,6 +955,8 @@
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
       wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        // 舊交通欄位保留隱藏值供讀取與儲存，避免清空既有 Supabase 資料。
+        if(['spots','foods'].includes(currentTable) && ['transport_metro','transport_bus','transport_car'].includes(name)) return `<input id="f_${name}" type="hidden">`;
         if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
         if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;

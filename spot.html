@@ -39,19 +39,19 @@
 
   <main class="container article-wrap single-point">
     <article>
+      <div id="storyMeta" class="meta detail-eyebrow">SPOT</div>
       <h1 id="articleTitle" class="spot-article-title">景點名稱</h1>
       <p id="leadText" class="lead">景點資料載入中...</p>
 
       <div id="tagListTop" class="tag-list"></div>
 
       <section class="story">
-        <div id="storyMeta" class="meta">SPOT STORY</div>
-        <h2 id="storyTitle">景點介紹</h2>
-        <p id="storyContent">景點資料載入中...</p>
+
         <div class="story-img">
           <img id="storyImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt="">
         </div>
         <p id="storyImageSource" class="image-source-caption"></p>
+        <div id="storyContent" class="detail-prose">景點資料載入中...</div>
       </section>
 
       <section id="info" class="info-card point-info">
@@ -81,7 +81,7 @@
 
     <aside class="sticky-panel">
       <div class="sidebox compact">
-        <div class="kicker">SPOT INFO</div>
+        <h2 class="detail-side-title">景點資訊</h2>
         <p id="sideHours">營業時間載入中</p>
         <p id="sideStayTime">建議停留載入中</p>
         <p id="sideStation">捷運資訊載入中</p>
@@ -292,10 +292,9 @@
         setText('breadcrumb', `首頁 〉 景點介紹 〉 ${title}`);
         setText('leadText', summary);
         setText('storyMeta', (spot.slug || areaText).replaceAll('-', ' ').toUpperCase());
-        setText('storyTitle', '景點介紹');
         setText('storyContent', content);
 
-        setText('infoTitle', `${title}景點資訊`);
+        setText('infoTitle', '景點資訊');
         setText('infoAddress', spot.address);
         setText('infoHours', spot.business_hours || '依官方公告為準');
         setText('infoStation', spot.station ? `${spot.station}附近` : '');

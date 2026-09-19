@@ -9,7 +9,7 @@
   <script src="supabase-config.js"></script>
 </head>
 
-<body id="top">
+<body id="top" class="trip-detail-page">
   <div id="header"></div>
 
   <section class="hero">
@@ -38,15 +38,13 @@
 
   <main class="container article-wrap">
     <article>
+      <div id="articleKicker" class="meta detail-eyebrow">TRIP</div>
+      <h1 id="articleTitle" class="spot-article-title">行程名稱</h1>
       <p id="leadText" class="lead">行程資料載入中...</p>
 
       <div class="route">
         <div class="kicker">TODAY'S ROUTE</div>
         <div id="routeGrid" class="route-grid"></div>
-      </div>
-
-      <div class="story-note">
-        這條路線適合不想自己從零開始規劃的旅客。景點、美食與優惠由編輯人工挑選，不使用自動附近推薦，內容比較好維護，也比較符合實際合作情境。
       </div>
 
       <div id="storySections"></div>
@@ -91,8 +89,8 @@
     <aside class="sidebar">
       <div class="sticky-panel">
         <div class="sidebox compact">
-          <div class="kicker">TRIP INFO</div>
-          <h3 id="sideTitle">行程介紹</h3>
+          <h2 class="detail-side-title">行程資訊</h2>
+          <span id="sideTitle" hidden></span>
           <p id="sideDuration">◷ 建議停留</p>
           <p>🚇　捷運＋步行</p>
           <p>⌁　適合第一次造訪或不想自己規劃的旅客</p>
@@ -369,6 +367,8 @@
         document.getElementById('heroImage').src = image;
         setText('heroKicker', (trip.slug || 'route').replaceAll('-', ' ').toUpperCase());
         setText('heroTitle', trip.title);
+        setText('articleTitle', trip.title);
+        setText('articleKicker', (trip.slug || 'TRIP').replaceAll('-', ' ').toUpperCase());
         setText('heroSubtitle', trip.summary);
         setText('heroDuration', trip.duration);
         setText('breadcrumb', `首頁　›　行程　›　${trip.title}`);

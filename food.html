@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="route-timeline.css">
-  <script src="route-timeline.js"></script>
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body id="top">
+<body id="top" class="food-detail-page">
   <div id="header"></div>
 
   <section class="hero">
@@ -41,18 +39,19 @@
 
   <main class="container article-wrap single-point">
     <article>
+      <div id="storyMeta" class="meta detail-eyebrow">FOOD</div>
+      <h1 id="articleTitle" class="spot-article-title">美食名稱</h1>
       <p id="leadText" class="lead">美食資料載入中...</p>
 
       <div id="tagListTop" class="tag-list"></div>
 
       <section class="story">
-        <div id="storyMeta" class="meta">FOOD STORY</div>
-        <h2 id="storyTitle">美食介紹</h2>
-        <p id="storyContent">美食資料載入中...</p>
+
         <div class="story-img">
           <img id="storyImage" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85" alt="">
         </div>
         <p id="storyImageSource" class="image-source-caption"></p>
+        <div id="storyContent" class="detail-prose">美食資料載入中...</div>
       </section>
 
       <section id="info" class="info-card point-info">
@@ -83,15 +82,13 @@
 
     <aside class="sticky-panel">
       <div class="sidebox compact">
-        <div class="kicker">FOOD INFO</div>
-        <h3 id="sideTitle">美食介紹</h3>
-        <div id="sideTags" class="tag-list small"></div>
+        <h2 class="detail-side-title">美食資訊</h2>
+        <span id="sideTitle" hidden></span><span id="sideTags" hidden></span>
         <p id="sideHours">營業時間載入中</p>
         <p id="sideCost">平均消費載入中</p>
         <p id="sideAddress">地址載入中</p>
       </div>
 
-      <div id="metroRouteTimeline" class="metro-transit" hidden></div>
       <div class="sidebox compact fill">
         <div class="kicker">TRIP IDEA</div>
         <h3>附近可以這樣玩</h3>
@@ -242,7 +239,8 @@
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${food.category || 'FOOD'} · FOOD`);
-        setText('heroTitle', `${title}｜${summary.slice(0, 22)}`);
+        setText('heroTitle', title);
+        setText('articleTitle', title);
         setText('heroSubtitle', summary);
         setText('heroCategory', food.category || '美食');
         setText('heroHours', food.business_hours || '營業時間依公告為準');
@@ -252,10 +250,9 @@
         setText('breadcrumb', `首頁 〉 美食介紹 〉 ${title}`);
         setText('leadText', summary);
         setText('storyMeta', (food.slug || 'food').replaceAll('-', ' ').toUpperCase());
-        setText('storyTitle', title);
         setText('storyContent', content);
 
-        setText('infoTitle', `${title}美食資訊`);
+        setText('infoTitle', '美食資訊');
         setText('infoCategory', food.category);
         setText('infoAddress', food.address);
         setText('infoHours', food.business_hours || '依店家公告為準');
@@ -267,7 +264,6 @@
         setText('sideHours', food.business_hours || '營業時間依公告為準');
         setText('sideCost', `平均消費 ${cost}`);
         setText('sideAddress', food.address || '地址請見 Google Map');
-        MetroRouteTimeline.render(document.getElementById('metroRouteTimeline'),food.transport_routes);
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

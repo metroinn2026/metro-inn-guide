@@ -485,3 +485,22 @@ body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}
 body.spot-detail-page > .hero{display:none!important}
 body.spot-detail-page .single-point .spot-article-title{margin-top:0}
 body.spot-detail-page .sticky-panel > .sidebox.compact:first-child .kicker{margin-bottom:18px}
+
+/* 2026-09: 景點、美食、行程與遊記資訊層級統一；不更動後台或資料來源。 */
+body.spot-detail-page > .hero,body.food-detail-page > .hero,body.trip-detail-page > .hero{display:none!important}
+body.spot-detail-page .article-wrap,body.food-detail-page .article-wrap,body.trip-detail-page .article-wrap{padding-top:42px}
+.detail-eyebrow{margin:0 0 12px!important;color:#858585;font-size:11px;letter-spacing:.12em;font-weight:700}
+.spot-article-title{font-size:clamp(28px,3vw,36px);line-height:1.35;color:#303030;font-weight:800;letter-spacing:.025em;margin:0 0 14px}
+.spot-article-title+.lead{margin:0 0 18px;font-size:17px;line-height:1.85}
+body.spot-detail-page .single-point>.article,body.food-detail-page .single-point>.article{min-width:0}
+body.spot-detail-page .single-point .story,body.food-detail-page .single-point .story{margin:16px 0 52px}
+body.spot-detail-page .single-point .story-img,body.food-detail-page .single-point .story-img{margin-top:0}
+.detail-prose{margin:24px 0 0;font-size:16px;line-height:2;color:#555;white-space:pre-line}
+.detail-side-title{font-size:18px!important;line-height:1.4;margin:0 0 18px!important;color:#4D4D4D}
+body.food-detail-page .sticky-panel>.sidebox.compact:first-child,body.trip-detail-page .sticky-panel .sidebox.compact:first-child{background:#fff!important;border:1px solid #e5e5e5!important}
+body.trip-detail-page .route{margin-top:32px}
+.travel-story-entry{border-bottom:1px solid #e5e5e5;padding:28px 0}
+.travel-story-entry h2{margin:0 0 10px;font-size:clamp(21px,2.5vw,27px);color:#303030}
+.travel-story-byline{font-size:13px;color:#777;margin:0 0 18px}
+.travel-story-content{font-size:16px;line-height:1.95;color:#555;white-space:pre-wrap}
+@media(max-width:600px){body.spot-detail-page .article-wrap,body.food-detail-page .article-wrap,body.trip-detail-page .article-wrap{padding-top:26px}.detail-prose{font-size:15px}.travel-story-entry{padding:22px 0}}

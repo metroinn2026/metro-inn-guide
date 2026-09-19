@@ -614,3 +614,12 @@ body.trip-detail-page .numbered-story .story-img img{
     aspect-ratio:3 / 2;
   }
 }
+
+/* 首頁最新消息：置中橘色文字連結，與下方探索連結一致 */
+.home-news .home-news-bottom{text-align:center;margin-top:18px}
+.home-news .home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;gap:4px;border:0;border-radius:0;background:transparent;padding:6px 0;color:#F3653B;font-weight:700;font-size:14px;text-decoration:none;border-bottom:1px solid transparent}
+.home-news .home-news-bottom a:hover,.home-news .home-news-bottom a:focus-visible{color:#F3653B;border-bottom-color:currentColor}
+
+/* 最新消息：與首頁探索連結完全一致的橘字、字級與斜箭頭，取消膠囊外框 */
+.home-news .home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;gap:0;color:#F3653B;font-size:inherit;font-weight:700;text-decoration:none;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:6px 0!important}
+.home-news .home-news-bottom a:hover,.home-news .home-news-bottom a:focus-visible{border-bottom:1px solid currentColor!important}

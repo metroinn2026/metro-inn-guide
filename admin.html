@@ -196,6 +196,16 @@
     #sharedAdminEditor .cms-editor-tabs {display:flex;gap:0;flex-wrap:wrap;border-bottom:1px solid #e1e8f2;margin-bottom:22px}
     #sharedAdminEditor .cms-editor-tabs > button {border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;background:transparent!important;color:#64748b!important;padding:12px 15px!important;box-shadow:none!important;font-weight:600}
     #sharedAdminEditor .cms-editor-tabs > button[aria-pressed="true"] {color:#2458a5!important;border-bottom-color:#2458a5!important}
+    /* Single-page form: headings separate groups; no tab buttons or repeated card borders. */
+    #sharedAdminEditor .cms-editor-all {display:block}
+    #sharedAdminEditor .cms-editor-section {padding:0 0 26px;margin:0 0 28px;border-bottom:1px solid #e3eaf4;scroll-margin-top:24px}
+    #sharedAdminEditor .cms-editor-section:last-child {border-bottom:0;margin-bottom:0;padding-bottom:0}
+    #sharedAdminEditor .cms-editor-section > h3 {margin:0 0 18px;font-size:17px;font-weight:700;color:#213c61}
+    #sharedAdminEditor .cms-editor-section > label {display:block;margin:0 0 14px;font-size:13px;font-weight:600;color:#475569}
+    #sharedAdminEditor .cms-editor-section > label > input,
+    #sharedAdminEditor .cms-editor-section > label > textarea {display:block;width:100%;box-sizing:border-box;margin-top:6px;font-size:15px;font-weight:400;color:#14253d}
+    #sharedAdminEditor .cms-editor-section > label > input[type=checkbox] {display:inline-block;width:auto;margin:8px 0 0 8px}
+    #sharedAdminEditor .cms-editor-section > .cms-sections {margin-top:12px}
     #sharedAdminEditor .cms-editor-advanced {margin:0 0 16px;font-size:13px;color:#64748b}
     #sharedAdminEditor .cms-editor-advanced summary {cursor:pointer;display:inline-block;color:#47617d;padding:6px 0;font-weight:600}
     #sharedAdminEditor .cms-editor-advanced p {margin:8px 0}
@@ -855,7 +865,7 @@
       });
       const advanced=document.createElement('details');advanced.className='cms-editor-advanced';
       const summary=document.createElement('summary');summary.textContent='進階編輯工具';
-      const hint=document.createElement('p');hint.textContent='圖片上傳與行程分段的原始編輯工具。一般內容請使用下方分頁。';
+      const hint=document.createElement('p');hint.textContent='圖片上傳與行程分段的原始編輯工具。一般內容請使用下方完整表單。';
       const toggle=document.createElement('button');toggle.type='button';toggle.textContent='開啟原始表單';
       advanced.append(summary,hint,toggle);
       const mount=document.createElement('div');root.replaceChildren(mount,advanced);
@@ -869,10 +879,10 @@
         legacyMode=!legacyMode;
         legacy.hidden=!legacyMode;
         mount.hidden=legacyMode;
-        toggle.textContent=legacyMode?'返回五分頁編輯器':'開啟原始表單';
+        toggle.textContent=legacyMode?'返回完整表單':'開啟原始表單';
         if(!legacyMode)mountAdminSharedEditor();
       };
-      adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{onChange:(name)=>{
+      adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{layout:'all',onChange:(name)=>{
         const el=document.getElementById('f_'+name);
         if(!el)return;
         const value=record[name];
@@ -883,8 +893,7 @@
         else el.value=value??'';
         updateImagePreview();
       }});
-      const tabBar=mount.firstElementChild;
-      if(tabBar)tabBar.classList.add('cms-editor-tabs');
+      // Full-page editor: all field groups remain visible without tab navigation.
     }
     function buildForm(){
       const cfg = configs[currentTable];

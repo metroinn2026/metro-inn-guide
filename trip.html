@@ -294,8 +294,15 @@
           fetchTable('coupons')
         ]);
 
-        renderRelatedList('relatedSpots', spots, 'spot', keyword, 4);
-        renderRelatedList('relatedFoods', foods, 'food', keyword, 3);
+        // 後台有指定景點／美食時，優先依手動排序呈現；未指定則維持原有自動推薦。
+        const selected = Array.isArray(trip.related_items) ? trip.related_items : [];
+        const chosen = type => selected.filter(ref => ref && ref.type === type)
+          .map(ref => (type === 'spots' ? spots : foods).find(row => String(row.id) === String(ref.id)))
+          .filter(Boolean);
+        const chosenSpots = chosen('spots');
+        const chosenFoods = chosen('foods');
+        renderRelatedList('relatedSpots', chosenSpots.length ? chosenSpots : spots, 'spot', chosenSpots.length ? '' : keyword, 4);
+        renderRelatedList('relatedFoods', chosenFoods.length ? chosenFoods : foods, 'food', chosenFoods.length ? '' : keyword, 3);
         renderRelatedList('relatedCoupons', coupons, 'coupon', keyword, 3);
       } catch (error) {
         console.error(error);

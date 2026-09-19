@@ -630,3 +630,8 @@ body.food-detail-page .single-point .point-info{
   padding-left:0;
   padding-right:0;
 }
+
+/* 行程關聯內容：標題、清單與上方分隔線共用左側基準線。 */
+.route-related-panel .route-related-box{padding:24px 0 20px}
+.route-related-panel .route-related-grid{margin-left:0;margin-right:0}
+@media(max-width:900px){.route-related-panel .route-related-box{padding:20px 0}}

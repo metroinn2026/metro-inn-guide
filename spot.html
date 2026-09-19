@@ -92,25 +92,21 @@
       <div class="sidebox compact fill travel-from-hotel">
         <div class="kicker">METRO INN GUIDE</div>
         <h3>從北捷行旅怎麼去？</h3>
-        <p class="travel-endpoints"><strong>北捷行旅</strong><span aria-hidden="true"> → </span><strong id="travelDestination">目的地載入中</strong></p>
+        <p class="travel-nearest">景點鄰近捷運站：<strong id="travelNearbyStation">資料整理中</strong></p>
         <div class="travel-route-card">
-          <div class="travel-route-heading"><strong>🚇 大眾運輸優先</strong><span class="travel-lowcarbon">低碳旅遊</span></div>
+          <div class="travel-route-heading"><strong>大眾運輸路線</strong></div>
           <div id="travelMetro" class="travel-route-text">路線資訊整理中，請使用下方即時導航。</div>
         </div>
         <div id="travelBusCard" class="travel-route-card" hidden>
-          <div class="travel-route-heading"><strong>🚌 公車及轉乘</strong></div>
+          <div class="travel-route-heading"><strong>公車及轉乘</strong></div>
           <p id="travelBus" class="travel-route-text"></p>
         </div>
-        <div class="travel-route-card">
-          <div class="travel-route-heading"><strong>📍 景點鄰近捷運站</strong></div>
-          <p id="travelNearbyStation" class="travel-route-text">資料整理中</p>
-        </div>
         <div id="travelCarCard" class="travel-route-card" hidden>
-          <div class="travel-route-heading"><strong>🚗 自行開車</strong></div>
+          <div class="travel-route-heading"><strong>自行開車</strong></div>
           <p id="travelCar" class="travel-route-text"></p>
         </div>
-        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 即時導航 ↗</a>
         <p class="travel-disclaimer"><strong>旅圖小編提醒：</strong>以上交通路線及時間僅供參考，實際班次、行駛時間及路況可能有所變動，出發前請以交通運輸業者最新公告及即時資訊為準。</p>
+        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 即時導航 ↗</a>
       </div>
 
       <div class="sidebox compact dark">
@@ -200,8 +196,7 @@
     const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
     function setupHotelRoutes(spot) {
       const destination = [spot.title, spot.address].filter(Boolean).join(' ');
-      setText('travelDestination', spot.title || '景點');
-      setText('travelNearbyStation', spot.station ? spot.station : '鄰近車站待查核');
+      setText('travelNearbyStation', spot.station ? (spot.station.endsWith('站') ? spot.station : spot.station + '站') : '待查核');
       const routeShown = window.MetroInnRoutes && window.MetroInnRoutes.render(spot.station, document.getElementById('travelMetro'));
       if (!routeShown && spot.transport_metro) setText('travelMetro', spot.transport_metro);
       const bus = (spot.transport_bus || '').trim();

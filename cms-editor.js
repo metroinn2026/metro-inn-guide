@@ -23,58 +23,35 @@ function mount(root,type,record,options={}){
   const add=document.createElement('button');add.type='button';add.textContent='＋新增行程段落';add.onclick=()=>{record[key].push({time:'',title:'',text:'',image:'',image_source:'',order:record[key].length+1});commit();render();};wrap.append(add);render();return wrap;
  }
  function makeRoutes(key,label){
-  const wrap=document.createElement('div');wrap.className='cms-route-builder';
-  const title=document.createElement('label');title.textContent='交通路線';title.style.cssText='display:block;font-weight:700;margin-bottom:6px';wrap.append(title);
-  const help=document.createElement('p');help.textContent='依照旅客實際行進順序新增步驟，例如：步行 → 捷運 → 步行。可新增多條推薦路線。';help.style.cssText='color:#64748b;font-size:13px;margin:0 0 12px';wrap.append(help);
-  const list=document.createElement('div');wrap.append(list);
-  const importBox=document.createElement('div');importBox.style.cssText='margin:0 0 12px;padding:10px;border:1px solid #d8e2f0';
-  const importLabel=document.createElement('label');importLabel.textContent='匯入已整理的交通路線 JSON（僅更新本筆交通資料）';importLabel.style.cssText='display:block;font-size:13px;font-weight:600;margin-bottom:6px';
-  const importInput=document.createElement('input');importInput.type='file';importInput.accept='.json,application/json';importInput.setAttribute('aria-label','選擇交通路線 JSON 檔案');
-  const importMessage=document.createElement('p');importMessage.style.cssText='font-size:12px;color:#64748b;margin:6px 0 0';importMessage.textContent='匯入後可逐步微調；按儲存草稿前不會寫入資料庫。';
-  importBox.append(importLabel,importInput,importMessage);wrap.append(importBox);
-  importInput.addEventListener('change',async()=>{
-    const file=importInput.files?.[0];if(!file)return;
-    try{
-      const parsed=JSON.parse(await file.text());
-      const routes=Array.isArray(parsed)?parsed:parsed.transport_routes;
-      if(!Array.isArray(routes)||!routes.every(r=>r&&typeof r==='object'&&Array.isArray(r.steps)&&r.steps.every(st=>st&&typeof st==='object'&&typeof st.type==='string'))){throw Error('檔案必須包含 transport_routes 路線陣列及每條路線的 steps 步驟');}
-      if(!Array.isArray(parsed)&&parsed.id&&record.id&&String(parsed.id)!==String(record.id))throw Error('檔案資料編號與目前編輯項目不符，已阻止匯入');
-      if(!confirm('將以匯入路線取代本筆現有交通路線（其他欄位不變）。確定繼續？'))return;
-      record[key]=structuredClone(routes);invalid.delete(key);render();changed();importMessage.textContent='已匯入 '+routes.length+' 條路線，請核對步行時間與站名，再儲存草稿。';
-    }catch(err){importMessage.textContent='匯入失敗：'+err.message;}
-    finally{importInput.value='';}
-  });
-  const original=record[key];
-  if(original==null||(typeof original==='object'&&!Array.isArray(original)&&!Object.keys(original).length))record[key]=[];
-  if(!Array.isArray(record[key])){
-    const warning=document.createElement('p');warning.textContent='原有交通資料格式不是路線清單，為避免覆蓋，請先檢查原始資料。';warning.style.color='#b91c1c';wrap.append(warning);invalid.add(key);return wrap;
+  const wrap=document.createElement('div');wrap.className='cms-route-text-editor';
+  const heading=document.createElement('label');heading.textContent='交通指南（每行一個站點或交通方式）';heading.style.cssText='display:block;font-weight:700;margin:0 0 8px';wrap.append(heading);
+  const hint=document.createElement('p');hint.textContent='站點直接寫名稱；交通方式使用「步行｜時間｜距離」或「捷運｜路線｜方向」。依照行進順序換行即可。';hint.style.cssText='font-size:13px;color:#64748b;margin:0 0 8px';wrap.append(hint);
+  const editor=document.createElement('textarea');editor.rows=12;editor.style.cssText='display:block;width:100%;box-sizing:border-box;line-height:1.9;min-height:230px';editor.setAttribute('aria-label','交通指南文字');wrap.append(editor);
+  const status=document.createElement('p');status.style.cssText='font-size:12px;color:#64748b;margin:7px 0';wrap.append(status);
+  const modes=new Set(['步行','捷運','公車','轉乘','自行車']);
+  function stringify(routes){if(!Array.isArray(routes))return '';
+   const route=routes.find(r=>r&&r.enabled!==false&&Array.isArray(r.steps));if(!route)return '';
+   return route.steps.map(st=>{if(st.type==='站點'||st.type==='抵達')return st.name||'';
+    const name=String(st.name||'');const legacy=name.includes('→')?name.split('→').map(x=>x.trim()):null;
+    const parts=[st.type||'步行'];if(st.type==='步行'||st.type==='自行車'){if(st.duration)parts.push(String(st.duration).replace(/\s*分鐘$/,'')+'分鐘');if(st.distance)parts.push(st.distance);}
+    else {if(st.line)parts.push(st.line);if(st.direction)parts.push(st.direction);if(st.duration)parts.push(String(st.duration).replace(/\s*分鐘$/,'')+'分鐘');}
+    if(st.detail&&!/起點|目的地/.test(st.detail))parts.push(st.detail);
+    return parts.join('｜');}).filter(Boolean).join('\n');
   }
-  function changed(){invalid.delete(key);options.onChange?.(key);}
-  function field(label,value,handler,multi=false){
-    const holder=document.createElement('label');holder.style.cssText='display:block;flex:1;min-width:130px;font-size:13px;font-weight:600;margin:5px 0';holder.textContent=label;
-    const input=document.createElement(multi?'textarea':'input');if(!multi)input.type='text';else input.rows=2;
-    input.value=value??'';input.style.cssText='display:block;width:100%;box-sizing:border-box;margin-top:5px';input.oninput=()=>{handler(input.value);changed();};holder.append(input);return holder;
+  function parse(value){const lines=value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!lines.length)return [];
+   const steps=lines.map((line,index)=>{const parts=line.split(/[｜|]/).map(x=>x.trim());const type=parts[0];if(!modes.has(type))return {type:'站點',name:line};
+    const step={type,name:'',line:'',direction:'',duration:'',distance:'',detail:''};
+    if(type==='步行'||type==='自行車'){for(const part of parts.slice(1)){if(/^(?:約\s*)?\d+(?:\.\d+)?\s*分鐘$/.test(part))step.duration=part.replace(/約\s*|\s*分鐘/g,'');else if(/公尺|公里|km|m$/.test(part))step.distance=part;else step.detail=[step.detail,part].filter(Boolean).join('；');}}
+    else {step.line=parts[1]||'';step.direction=parts[2]||'';if(parts[3])step.detail=parts.slice(3).join('；');}return step;});
+   if(modes.has(steps[0].type)||modes.has(steps[steps.length-1].type))throw Error('第一行與最後一行請填寫起點及目的地名稱');
+   return [{title:'大眾運輸推薦路線',enabled:true,steps}];
   }
-  function button(label,action){const el=document.createElement('button');el.type='button';el.textContent=label;el.onclick=action;return el;}
-  function render(){list.replaceChildren();record[key].forEach((route,ri)=>{
-    const card=document.createElement('fieldset');card.style.cssText='border:1px solid #d8e2f0;border-radius:8px;padding:12px;margin:0 0 14px;min-width:0';
-    const legend=document.createElement('legend');legend.textContent='推薦路線 '+(ri+1);card.append(legend);
-    card.append(field('路線名稱',route.title,v=>route.title=v));
-    const enabled=document.createElement('label');enabled.style.cssText='display:block;font-size:13px;margin:8px 0';const check=document.createElement('input');check.type='checkbox';check.checked=route.enabled!==false;check.onchange=()=>{route.enabled=check.checked;changed();};enabled.append(check,document.createTextNode(' 啟用這條路線'));card.append(enabled);
-    (route.steps||[]).forEach((step,si)=>{
-      const line=document.createElement('div');line.style.cssText='border:1px solid #e3eaf4;border-radius:6px;padding:10px;margin:8px 0';
-      const head=document.createElement('div');head.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap';const label=document.createElement('strong');label.textContent='步驟 '+(si+1);head.append(label);
-      const controls=document.createElement('span');for(const [text,delta] of [['↑',-1],['↓',1]]){const b=button(text,()=>{const other=si+delta;[route.steps[si],route.steps[other]]=[route.steps[other],route.steps[si]];changed();render();});b.disabled=si+delta<0||si+delta>=route.steps.length;b.setAttribute('aria-label',text==='↑'?'步驟上移':'步驟下移');controls.append(b);}controls.append(button('刪除',()=>{route.steps.splice(si,1);changed();render();}));head.append(controls);line.append(head);
-      const typeLabel=document.createElement('label');typeLabel.textContent='交通方式';typeLabel.style.cssText='display:block;font-size:13px;font-weight:600;margin-top:8px';const select=document.createElement('select');select.style.cssText='display:block;width:100%;margin-top:5px';for(const type of ['步行','捷運','公車','轉乘','抵達']){const option=document.createElement('option');option.value=type;option.textContent=type;select.append(option);}if(!['步行','捷運','公車','轉乘','抵達'].includes(step.type)){const option=document.createElement('option');option.value=step.type||'';option.textContent=(step.type||'未設定')+'（原資料）';select.append(option);}select.value=step.type||'步行';select.onchange=()=>{step.type=select.value;changed();render();};typeLabel.append(select);line.append(typeLabel);
-      line.append(field('地點／站名',step.name,v=>step.name=v));
-      if(step.type==='捷運'||step.type==='公車'){
-        line.append(field('路線名稱／公車號碼',step.line,v=>step.line=v),field('搭乘方向',step.direction,v=>step.direction=v));
-      }
-      line.append(field('預估時間（分鐘，選填）',step.duration,v=>step.duration=v),field('距離（選填，例如 500 公尺）',step.distance,v=>step.distance=v),field('補充說明（選填）',step.detail,v=>step.detail=v,true));card.append(line);
-    });
-    const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:10px';actions.append(button('＋ 新增步驟',()=>{route.steps=route.steps||[];route.steps.push({type:'步行',name:'',line:'',direction:'',duration:'',distance:'',detail:''});changed();render();}),button('刪除整條路線',()=>{if(!confirm('確定刪除這條推薦路線？'))return;record[key].splice(ri,1);changed();render();}));card.append(actions);list.append(card);
-  });}
-  const add=button('＋ 新增推薦路線',()=>{record[key].push({title:'從北捷行旅出發',enabled:true,steps:[{type:'步行',name:'北捷行旅',detail:'起點'}]});changed();render();});wrap.append(add);render();return wrap;
+  const existing=record[key];if(existing==null||(typeof existing==='object'&&!Array.isArray(existing)&&!Object.keys(existing).length))record[key]=[];
+  if(!Array.isArray(record[key])){invalid.add(key);status.textContent='原有交通資料不是路線清單，請先備份確認後再編輯。';status.style.color='#b91c1c';return wrap;}
+  editor.value=stringify(record[key]);
+  if(record[key].filter(r=>r?.enabled!==false).length>1){status.textContent='原資料有多條路線：文字框僅顯示第一條。為避免遺失其他路線，請先備份並確認。';status.style.color='#b91c1c';invalid.add(key);return wrap;}
+  editor.oninput=()=>{try{record[key]=parse(editor.value);invalid.delete(key);status.textContent='已更新草稿預覽；按「儲存草稿」才會寫入資料庫。';status.style.color='#64748b';options.onChange?.(key);}catch(err){invalid.add(key);status.textContent=err.message;status.style.color='#b91c1c';options.onInvalid?.(key);}};
+  return wrap;
  }
  function make(tab,append=false){if(!append){inputs.clear();panel.replaceChildren();}for(const name of groups[tab]){if(excluded.has(name))continue;const spec=definitions.get(name);if(!spec)continue;const [key,label,kind,rule]=spec;if(key==='transport_routes'){panel.append(makeRoutes(key,label));continue;}if(kind==='sections'){panel.append(makeSections(key,label));continue;}const wrap=document.createElement('label');wrap.textContent=label+' ';let el;if(kind==='textarea'||kind==='json'||kind==='sections'){el=document.createElement('textarea');el.rows=(kind==='json'||kind==='sections')?10:4;}else{el=document.createElement('input');el.type=kind==='number'?'number':kind==='boolean'?'checkbox':'text';}el.dataset.field=key;if(kind==='boolean')el.checked=!!record[key];else if(kind==='json'||kind==='sections')el.value=JSON.stringify(record[key]??(key==='trip_sections'?[]:{}),null,2);else el.value=record[key]??'';if(rule==='required')el.required=true;el.oninput=()=>{if(kind==='json'||kind==='sections'){try{const parsed=JSON.parse(el.value);if(kind==='sections'&&!Array.isArray(parsed))throw Error('行程分段必須是陣列');record[key]=parsed;invalid.delete(key);}catch{invalid.add(key);options.onInvalid?.(key);return;}}else record[key]=parse(el,kind);options.onChange?.(key);};el.onchange=el.oninput;wrap.append(el);panel.append(wrap);inputs.set(key,el);}}
  function parse(el,kind){if(kind==='boolean')return el.checked;if(kind==='number')return el.value===''?null:Number(el.value);if(kind==='json'){try{return JSON.parse(el.value);}catch{return el.value;}}return el.value;}

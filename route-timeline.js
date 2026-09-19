@@ -1,34 +1,23 @@
-/* 北投旅圖：推薦大眾運輸時間軸。只顯示管理員已填寫的資料，不推算班次或時間。 */
+/* 北投旅圖：單線式站點與交通區間，保留既有 transport_routes JSONB 結構。 */
 (function(global){'use strict';
-const types={步行:'♙',捷運:'▣',公車:'▤',轉乘:'↔',抵達:'◎'};
-function text(tag,value,className){const el=document.createElement(tag);if(className)el.className=className;el.textContent=value==null?'':String(value);return el;}
-function render(root,data,options={}){
- if(!root)return;root.replaceChildren();let routes=data;
- if(typeof routes==='string'){try{routes=JSON.parse(routes);}catch{routes=[];}}
- if(!Array.isArray(routes))routes=[];
- const usable=routes.filter(r=>r&&r.enabled!==false&&Array.isArray(r.steps)&&r.steps.length);
- root.hidden=!usable.length;if(!usable.length)return;
- const title=text('h3','從北捷行旅出發｜大眾運輸推薦路線');root.append(title);
- usable.forEach((route,index)=>{
-  const card=document.createElement('section');card.className='metro-route';
-  card.append(text('h4',route.title||`推薦路線 ${index+1}`));
-  if(route.description)card.append(text('p',route.description,'metro-route-description'));
-  const list=document.createElement('ol');list.className='metro-route-steps';
-  route.steps.forEach((step,i)=>{
-   if(!step||typeof step!=='object')return;
-   const li=document.createElement('li');li.className='metro-route-step';
-   const mode=String(step.type||'步行');li.dataset.mode=mode;
-   li.append(text('span',types[mode]||'•','metro-route-icon'));
-   const body=document.createElement('div');body.className='metro-route-body';
-   body.append(text('strong',step.name|| (i===0?'北捷行旅':mode),'metro-route-name'));
-   if(step.line)body.append(text('span',step.line+(step.direction?'・'+step.direction:''),'metro-route-line'));
-   if(step.duration!==''&&step.duration!=null)body.append(text('span',`約 ${step.duration} 分鐘`,'metro-route-time'));
-   if(step.distance)body.append(text('span',String(step.distance),'metro-route-distance'));
-   if(step.detail)body.append(text('p',step.detail,'metro-route-detail'));
-   li.append(body);list.append(li);
-  });card.append(list);root.append(card);
- });
- root.append(text('p','交通時間、班次與步行距離僅供參考，請以運輸業者及即時導航資訊為準。','metro-route-disclaimer'));
+function text(tag,value,cls){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=value==null?'':String(value);return e;}
+function format(st){const type=st.type||'步行';const bits=[];
+ if(st.line)bits.push(st.line);if(st.direction)bits.push(st.direction);
+ if(st.duration!==''&&st.duration!=null)bits.push('約 '+String(st.duration).replace(/\s*分鐘$/,'')+' 分鐘');if(st.distance)bits.push(st.distance);
+ const summary=type+(bits.length?'（'+bits.join('，')+'）':'');return summary;
+}
+function render(root,data){if(!root)return;root.replaceChildren();let routes=data;if(typeof routes==='string'){try{routes=JSON.parse(routes);}catch{routes=[];}}if(!Array.isArray(routes))routes=[];
+ const usable=routes.filter(r=>r&&r.enabled!==false&&Array.isArray(r.steps)&&r.steps.length);root.hidden=!usable.length;if(!usable.length)return;
+ root.append(text('h3','交通指南'));
+ usable.forEach((route,index)=>{const card=document.createElement('section');card.className='metro-route';if(usable.length>1)card.append(text('h4',route.title||'推薦路線 '+(index+1)));
+ const list=document.createElement('ol');list.className='metro-route-steps';
+ route.steps.forEach((st,i)=>{if(!st||typeof st!=='object')return;const mode=st.type||'步行';const isStation=mode==='站點'||mode==='抵達';const li=document.createElement('li');li.className='metro-route-step '+(isStation?'metro-route-station':'metro-route-leg');
+ const marker=text('span',isStation?'':'','metro-route-marker');marker.setAttribute('aria-hidden','true');li.append(marker);
+ const body=document.createElement('div');body.className='metro-route-body';
+ if(isStation){body.append(text('strong',st.name||'未命名站點','metro-route-name'));}
+ else{body.append(text('span',format(st),'metro-route-mode'));if(st.detail)body.append(text('span',st.detail,'metro-route-detail'));}
+ li.append(body);list.append(li);});card.append(list);root.append(card);});
+ root.append(text('p','路線、時間及距離請以現場與運輸業者資訊為準。','metro-route-disclaimer'));
 }
 global.MetroRouteTimeline=Object.freeze({render});
 })(window);

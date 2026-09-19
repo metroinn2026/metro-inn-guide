@@ -435,3 +435,17 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 .travel-nearest strong{font-weight:800;color:var(--green)}
 .travel-from-hotel .travel-disclaimer{margin:24px 0 18px;line-height:1.85}
 .travel-from-hotel .travel-map-link{display:block;text-align:center}
+
+/* 北投旅圖交通指南：標題留白、轉乘時間軸及導航按鈕 */
+.travel-route-heading{margin-bottom:22px!important;line-height:1.5}
+.travel-route-heading strong{display:block}
+.travel-route-card .metro-route-steps{margin-top:0}
+.metro-route-steps{border-left:2px solid #c52845!important;padding-left:0!important;margin-left:5px!important}
+.metro-route-steps li{padding:0 0 22px 23px!important;gap:5px!important}
+.metro-route-steps li:last-child{padding-bottom:0!important}
+.metro-route-steps li:before{left:-8px!important;top:5px!important;width:14px!important;height:14px!important}
+.metro-route-steps strong{font-size:15px!important;line-height:1.45}
+.metro-route-steps span{font-size:13px!important;line-height:1.65}
+.travel-disclaimer{border-top:1px solid rgba(33,78,76,.16);padding-top:18px;margin-top:24px}
+.travel-map-link{display:block;text-align:center;border:1px solid #205d5c;padding:12px 10px;text-decoration:none;color:#205d5c;font-weight:700;margin-top:18px}
+.travel-map-link:hover{background:#e1f3f4}

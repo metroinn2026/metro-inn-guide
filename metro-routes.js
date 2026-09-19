@@ -12,22 +12,33 @@
     const steps=route(destination);container.replaceChildren();
     if(!steps){container.textContent='此景點的捷運轉乘路線尚待確認，請使用下方 Google Maps 即時導航。';return false;}
     const list=document.createElement('ol');list.className='metro-route-steps';
-    function add(name,detail){const li=document.createElement('li'),strong=document.createElement('strong'),span=document.createElement('span');strong.textContent=name;span.textContent=detail;li.append(strong,span);list.append(li);}
-    add('北捷行旅','步行前往復興崗站｜步行時間待確認');
+    function add(name,detail,kind){
+      const li=document.createElement('li'),strong=document.createElement('strong'),span=document.createElement('span');
+      li.className='metro-step '+(kind||'');strong.textContent=name;span.textContent=detail;
+      li.append(strong,span);list.append(li);
+    }
+    add('北捷行旅','步行前往復興崗站｜步行時間待確認','walking');
     if(steps.length){
       let segmentStart='復興崗',segmentLine=steps[0].line,count=0;
       for(let i=0;i<steps.length;i++){
         const step=steps[i];
-        if(step.line!==segmentLine){add(segmentStart+'站','轉乘'+segmentLine+'，搭乘 '+count+' 站 → '+steps[i-1].to+'站');segmentStart=steps[i-1].to;segmentLine=step.line;count=0;}
+        if(step.line!==segmentLine){
+          const end=steps[i-1].to;
+          const direction=segmentLine==='淡水信義線'?(steps[i-1].to==='北投'?'往象山方向':'請依月台指標確認方向'):'';
+          add(segmentStart+'站','搭乘'+segmentLine+(direction?'（'+direction+'）':'')+'｜'+count+' 站 → '+end+'站','train');
+          segmentStart=end;segmentLine=step.line;count=0;
+        }
         count++;
-        if(i===steps.length-1){add(segmentStart+'站','搭乘'+segmentLine+' '+count+' 站 → '+step.to+'站');}
+        if(i===steps.length-1){
+          const direction=segmentLine==='新北投支線'?'（往新北投方向）':'';
+          add(segmentStart+'站',(segmentStart!=='復興崗'?'轉乘':'搭乘')+segmentLine+direction+'｜'+count+' 站 → '+step.to+'站','train');
+        }
       }
     }
     const end=normalize(destination);
-    add(end+'站','出站後步行前往景點｜步行時間待確認');
-    add('抵達景點','請依現場指標前往目的地');
-    container.append(list);
-    const note=document.createElement('p');note.className='metro-route-note';note.textContent='站數依已建置的靜態捷運路網計算；步行、候車及行車時間尚未納入。';container.append(note);return true;
+    add(end+'站','出站後步行前往景點｜步行時間待確認','walking');
+    add('抵達景點','請依現場指標前往目的地','destination');
+    container.append(list);return true;
   }
   window.MetroInnRoutes={render,route,normalize};
 })();

@@ -480,3 +480,8 @@ body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}
 .single-point .spot-article-title{font-size:clamp(28px,3vw,36px);line-height:1.35;color:#303030;font-weight:800;letter-spacing:.025em;margin:0 0 16px}
 .single-point .spot-article-title + .lead{margin:0 0 16px;font-size:17px;line-height:1.85}
 .single-point > article > .tag-list{margin-bottom:30px}
+
+/* 景點內頁：只保留文章區的單一景點主標題；側欄專注實用資訊。 */
+body.spot-detail-page > .hero{display:none!important}
+body.spot-detail-page .single-point .spot-article-title{margin-top:0}
+body.spot-detail-page .sticky-panel > .sidebox.compact:first-child .kicker{margin-bottom:18px}

@@ -449,3 +449,9 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 .travel-disclaimer{border-top:1px solid rgba(33,78,76,.16);padding-top:18px;margin-top:24px}
 .travel-map-link{display:block;text-align:center;border:1px solid #205d5c;padding:12px 10px;text-decoration:none;color:#205d5c;font-weight:700;margin-top:18px}
 .travel-map-link:hover{background:#e1f3f4}
+
+/* 交通指南：人工路線及轉乘資訊 */
+.travel-route-heading{margin-bottom:26px!important}
+.manual-route+.manual-route{margin-top:26px;padding-top:20px;border-top:1px solid rgba(33,78,76,.16)}
+.manual-route-title{margin:0 0 20px;font-size:15px;color:#205d5c;font-weight:800}
+.metro-step.bus strong:before{content:'🚌 ';font-size:14px}

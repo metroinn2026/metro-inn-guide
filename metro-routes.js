@@ -40,5 +40,16 @@
     add('抵達景點','請依現場指標前往目的地','destination');
     container.append(list);return true;
   }
-  window.MetroInnRoutes={render,route,normalize};
+  function renderManual(routes,container){
+    if(!Array.isArray(routes)||!routes.some(r=>r.enabled!==false && Array.isArray(r.steps)&&r.steps.length))return false;
+    container.replaceChildren();
+    routes.filter(r=>r.enabled!==false && Array.isArray(r.steps)&&r.steps.length).forEach((r,index)=>{
+      const section=document.createElement('section');section.className='manual-route';
+      const heading=document.createElement('h4');heading.className='manual-route-title';heading.textContent=r.title||'路線 '+(index+1);section.append(heading);
+      const list=document.createElement('ol');list.className='metro-route-steps';
+      r.steps.forEach(step=>{const li=document.createElement('li');li.className='metro-step '+({'步行':'walking','捷運':'train','公車':'bus','抵達':'destination'}[step.type]||'train');const name=document.createElement('strong');name.textContent=step.name||'';const detail=document.createElement('span');detail.textContent=step.detail||'';li.append(name,detail);list.append(li);});
+      section.append(list);container.append(section);
+    });return true;
+  }
+  window.MetroInnRoutes={render,renderManual,route,normalize};
 })();

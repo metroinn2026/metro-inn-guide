@@ -197,7 +197,7 @@
     function setupHotelRoutes(spot) {
       const destination = [spot.title, spot.address].filter(Boolean).join(' ');
       setText('travelNearbyStation', spot.station ? (spot.station.endsWith('站') ? spot.station : spot.station + '站') : '待查核');
-      const routeShown = window.MetroInnRoutes && window.MetroInnRoutes.render(spot.station, document.getElementById('travelMetro'));
+      const routeShown = window.MetroInnRoutes && (window.MetroInnRoutes.renderManual(spot.transport_routes, document.getElementById('travelMetro')) || window.MetroInnRoutes.render(spot.station, document.getElementById('travelMetro')));
       if (!routeShown && spot.transport_metro) setText('travelMetro', spot.transport_metro);
       const bus = (spot.transport_bus || '').trim();
       const car = (spot.transport_car || '').trim();

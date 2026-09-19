@@ -6,6 +6,7 @@
   <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
+  <script src="metro-routes.js" defer></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -89,6 +90,13 @@
         <p id="sideAddress">地址載入中</p>
       </div>
 
+      <div class="sidebox compact fill travel-from-hotel">
+        <div class="kicker">METRO INN GUIDE</div><h3>從北捷行旅怎麼去？</h3>
+        <p class="travel-nearest">店家鄰近捷運站：<strong id="travelNearbyStation">待查核</strong></p>
+        <div class="travel-route-card"><div class="travel-route-heading"><strong>大眾運輸路線推薦</strong></div><div id="travelMetro" class="travel-route-text">交通資訊整理中，請使用即時導航。</div></div>
+        <p class="travel-disclaimer"><strong>旅圖小編提醒：</strong>以上交通路線及時間僅供參考，實際班次、行駛時間及路況可能有所變動，出發前請以交通運輸業者最新公告及即時資訊為準。</p>
+        <a id="travelMapLink" class="travel-map-link" target="_blank" rel="noopener noreferrer">開啟 Google Maps 即時導航 ↗</a>
+      </div>
       <div class="sidebox compact fill">
         <div class="kicker">TRIP IDEA</div>
         <h3>附近可以這樣玩</h3>
@@ -264,6 +272,11 @@
         setText('sideHours', food.business_hours || '營業時間依公告為準');
         setText('sideCost', `平均消費 ${cost}`);
         setText('sideAddress', food.address || '地址請見 Google Map');
+        setText('travelNearbyStation', food.station ? (food.station.endsWith('站')?food.station:food.station+'站') : '待查核');
+        const routeBox=document.getElementById('travelMetro');
+        const shown=window.MetroInnRoutes && (window.MetroInnRoutes.renderManual(food.transport_routes,routeBox) || (food.station && window.MetroInnRoutes.render(food.station,routeBox)));
+        if(!shown)routeBox.textContent='尚無已確認的推薦路線，請使用下方 Google Maps 即時導航。';
+        const nav=new URL('https://www.google.com/maps/dir/');nav.searchParams.set('api','1');nav.searchParams.set('origin','北捷行旅 北投會館 台北市北投區大業路527巷88號');nav.searchParams.set('destination',[food.title,food.address].filter(Boolean).join(' '));nav.searchParams.set('travelmode','transit');document.getElementById('travelMapLink').href=nav.toString();
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

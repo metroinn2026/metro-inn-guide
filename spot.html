@@ -80,36 +80,12 @@
     </article>
 
     <aside class="sticky-panel">
-      <div class="sidebox compact">
-        <h2 class="detail-side-title">景點資訊</h2>
-        <p id="sideHours">營業時間載入中</p>
-        <p id="sideStayTime">建議停留載入中</p>
-        <p id="sideStation">捷運資訊載入中</p>
-      </div>
-
-      <div class="sidebox compact fill travel-from-hotel">
-        <div class="kicker">METRO INN GUIDE</div>
-        <h3>從北捷行旅怎麼去？</h3>
-        <p class="travel-endpoints"><strong>北捷行旅</strong><span aria-hidden="true"> → </span><strong id="travelDestination">目的地載入中</strong></p>
-        <div class="travel-route-card">
-          <div class="travel-route-heading"><strong>🚇 大眾運輸優先</strong><span class="travel-lowcarbon">低碳旅遊</span></div>
-          <p id="travelMetro" class="travel-route-text">路線資訊整理中，請使用下方即時導航。</p>
-        </div>
-        <div id="travelBusCard" class="travel-route-card" hidden>
-          <div class="travel-route-heading"><strong>🚌 公車及轉乘</strong></div>
-          <p id="travelBus" class="travel-route-text"></p>
-        </div>
-        <div class="travel-route-card">
-          <div class="travel-route-heading"><strong>📍 景點鄰近捷運站</strong></div>
-          <p id="travelNearbyStation" class="travel-route-text">資料整理中</p>
-        </div>
-        <div id="travelCarCard" class="travel-route-card" hidden>
-          <div class="travel-route-heading"><strong>🚗 自行開車</strong></div>
-          <p id="travelCar" class="travel-route-text"></p>
-        </div>
-        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 查看即時路線 ↗</a>
-        <p class="travel-disclaimer"><strong>旅圖小編提醒：</strong>以上交通路線及時間僅供參考，實際班次、行駛時間及路況可能有所變動，出發前請以交通運輸業者最新公告及即時資訊為準。</p>
-      </div>
+      <section class="sidebox compact metro-transit compact-transit" aria-labelledby="transitTitle">
+        <div class="compact-transit-head"><h2 id="transitTitle">大眾運輸交通指南</h2><span id="transitTotal" class="compact-transit-total" hidden></span></div>
+        <ol id="transitSteps" class="compact-transit-steps"><li class="transit-empty">交通路線整理中，請使用下方即時導航。</li></ol>
+        <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
+        <a id="travelMapLink" class="compact-transit-map" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">在 Google Maps 查看即時路線 ↗</a>
+      </section>
 
       <div class="sidebox compact dark">
         <div class="kicker" style="color:white">STAY NEARBY</div>
@@ -198,21 +174,60 @@
     const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
     function setupHotelRoutes(spot) {
       const destination = [spot.title, spot.address].filter(Boolean).join(' ');
-      setText('travelDestination', spot.title || '景點');
-      setText('travelNearbyStation', spot.station ? spot.station : '鄰近車站待查核');
-      setText('travelMetro', spot.transport_metro || '捷運路線、站數及時間待查核；可先使用下方即時導航。');
-      const bus = (spot.transport_bus || '').trim();
-      const car = (spot.transport_car || '').trim();
-      document.getElementById('travelBusCard').hidden = !bus;
-      document.getElementById('travelCarCard').hidden = !car;
-      setText('travelBus', bus);
-      setText('travelCar', car);
       const url = new URL('https://www.google.com/maps/dir/');
       url.searchParams.set('api', '1');
       url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
       url.searchParams.set('destination', destination || spot.title || '北投');
       url.searchParams.set('travelmode', 'transit');
       document.getElementById('travelMapLink').href = url.toString();
+      const root = document.getElementById('transitSteps');
+      const total = document.getElementById('transitTotal');
+      root.replaceChildren();
+      total.hidden = true;
+      let raw = spot.transport_routes;
+      if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (_) { raw = null; } }
+      const routes = Array.isArray(raw) ? raw : raw && Array.isArray(raw.routes) ? raw.routes : [];
+      const route = routes.find(item => item && item.enabled !== false && Array.isArray(item.steps) && item.steps.length);
+      const steps = [];
+      if (route) {
+        for (const step of route.steps) {
+          if (!step) continue;
+          const mode = step.type || step.mode || '';
+          const name = step.name || step.station || '';
+          if (name && (mode === '站點' || mode === '抵達' || !mode)) steps.push({station:name});
+          else {
+            const bits = [step.line, step.direction, step.duration ? `約 ${String(step.duration).replace(/\s*分鐘$/, '')} 分鐘` : '', step.distance].filter(Boolean);
+            const description = [mode, bits.length ? `（${bits.join('，')}）` : '', step.detail || ''].filter(Boolean).join(' ');
+            if (description) steps.push({leg:description});
+          }
+        }
+      }
+      // 舊資料可沿用一格交通文字；不自行猜測站點、車程或距離。
+      if (!steps.length) {
+        const rawText = String(spot.transport_text || spot.transport_guide || spot.transport_metro || '').trim();
+        const lines = rawText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        for (const line of lines) {
+          if (/^(全程|總時間|參考總時間)/.test(line)) {
+            total.textContent = line.replace(/^(參考)?總時間[：:]?/, '全程');
+            total.hidden = false;
+          } else if (/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line)) steps.push({leg:line.replace(/\s*[｜|]\s*/g, ' · ')});
+          else steps.push({station:line});
+        }
+      }
+      if (route && (route.total_duration || route.total_time || route.duration)) {
+        const duration = String(route.total_duration || route.total_time || route.duration);
+        total.textContent = /全程/.test(duration) ? duration : `全程約 ${duration}${/分鐘|小時/.test(duration) ? '' : ' 分鐘'}`;
+        total.hidden = false;
+      }
+      if (!steps.length) {
+        const item = document.createElement('li'); item.className = 'transit-empty';
+        item.textContent = '交通路線尚待補充，請使用下方即時導航。'; root.append(item); return;
+      }
+      for (const step of steps) {
+        const item = document.createElement('li'); item.className = step.station ? 'transit-station' : 'transit-leg';
+        const label = document.createElement(step.station ? 'strong' : 'span');
+        label.textContent = step.station || step.leg; item.append(label); root.append(item);
+      }
     }
 
     async function loadSpot() {
@@ -302,9 +317,6 @@
         setText('infoTags', tags.join('、'));
         setText('infoNote', '實際開放時間、票價與活動資訊，請以官方公告為準。');
 
-        setText('sideHours', spot.business_hours || '營業時間依公告為準');
-        setText('sideStayTime', spot.stay_time ? `建議停留 ${spot.stay_time}` : '建議停留依行程安排');
-        setText('sideStation', stationText);
         setupHotelRoutes(spot);
 
         const tagHtml = tags.map((tag, index) =>

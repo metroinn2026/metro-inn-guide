@@ -87,3 +87,6 @@ async function loadSiteSettings(){
   }catch(e){console.warn('site settings not loaded', e);}
 }
 document.addEventListener('DOMContentLoaded', () => setTimeout(loadSiteSettings, 0));
+
+/* Public reading font-size controls: shared across all pages loading data.js. */
+(function(){if(typeof document!=="undefined"&&!document.querySelector("script[data-reading-controls]")){var s=document.createElement("script");s.src="font-size-controls.js";s.defer=true;s.dataset.readingControls="";document.head.appendChild(s);}})();

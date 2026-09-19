@@ -224,7 +224,7 @@
           </div>
           <div class="actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
-            <button id="categoryImportBtn" type="button" hidden onclick="openCategoryWorkflow('import')">匯入資料</button>
+            <button id="categoryImportBtn" type="button" hidden onclick="openCategoryImport()">匯入資料</button>
             <button id="categoryReviewBtn" type="button" hidden onclick="openCategoryWorkflow('review')">審稿與發布</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
           </div>
@@ -311,6 +311,10 @@
     </main>
   </div>
 
+  <dialog id="categoryImportDialog" aria-labelledby="categoryImportTitle" style="width:min(720px,calc(100% - 24px));max-height:90vh;border:1px solid #d6e2f2;border-radius:12px;padding:0;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #d6e2f2"><h2 id="categoryImportTitle" style="margin:0">匯入資料</h2><button type="button" onclick="closeCategoryImport()" aria-label="關閉匯入視窗">關閉 ✕</button></div>
+    <iframe id="categoryImportFrame" title="匯入資料" style="display:block;width:100%;height:min(570px,70vh);border:0;background:#fff"></iframe>
+  </dialog>
   <dialog id="changePasswordDialog" style="width:min(440px,calc(100% - 32px));border:1px solid #d6e2f2;border-radius:12px;padding:24px">
     <form id="changePasswordForm" onsubmit="changeMyPassword(event)">
       <h2>變更自己的登入密碼</h2><p>需驗證目前密碼。此功能不會修改其他管理員帳號。</p>
@@ -635,6 +639,35 @@
     }
 
 
+    // 匯入使用分類專屬彈窗，成功後回到原清單並重新讀取。
+    let importDialogTable=null;
+    document.getElementById('categoryImportDialog').addEventListener('close',()=>{document.getElementById('categoryImportFrame').src='about:blank';importDialogTable=null;});
+    function openCategoryImport(){
+      if(!['spots','foods','trips'].includes(currentTable))return;
+      importDialogTable=currentTable;
+      const dlg=document.getElementById('categoryImportDialog');
+      document.getElementById('categoryImportTitle').textContent=({spots:'景點',foods:'美食',trips:'行程'})[currentTable]+'｜匯入資料';
+      document.getElementById('categoryImportFrame').src='content-review.html?embedded=1&modal=1&category='+encodeURIComponent(currentTable)+'&mode=import';
+      if(!dlg.open)dlg.showModal();
+    }
+    function closeCategoryImport(){
+      const dlg=document.getElementById('categoryImportDialog');
+      if(dlg.open)dlg.close();
+      document.getElementById('categoryImportFrame').src='about:blank';
+      importDialogTable=null;
+    }
+    window.addEventListener('message',event=>{
+      const frame=document.getElementById('categoryImportFrame');
+      if(event.origin!==location.origin||event.source!==frame.contentWindow)return;
+      if(event.data?.type==='metro-import-complete'&&event.data.table===importDialogTable){
+        const table=importDialogTable;
+        closeCategoryImport();
+        if(currentTable===table&&!document.getElementById('cmsPanel').hidden){
+          backToList();
+          loadCurrentTable();
+        }
+      }
+    });
     // 景點、美食、行程各自進入所屬分類的匯入與審稿，不再使用獨立的官方審核選單。
     function openCategoryWorkflow(mode){
       if(!['spots','foods','trips'].includes(currentTable))return;

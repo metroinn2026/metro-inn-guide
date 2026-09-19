@@ -172,6 +172,36 @@
     @media(max-width:600px){.topbar .top-actions{margin-left:0;max-width:100%;}.topbar #userDisplayName{max-width:160px;}}
   </style>
 
+
+  <style>
+    /* Focused content editor: the list toolbar belongs only to the list. */
+    #cmsPanel.cms-editing > .panel-head,
+    #cmsPanel.cms-editing > #featuredManagementTabs,
+    #cmsPanel.cms-editing > #sectionHint,
+    #cmsPanel.cms-editing > #myAccountCard {display:none!important}
+    #editorView .editor-top {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 18px;margin-bottom:20px;border-bottom:1px solid #e3eaf4}
+    #editorView .editor-heading {display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+    #editorView .editor-heading h2 {margin:0;font-size:23px;line-height:1.35}
+    #editorView .editor-back {border:0;background:transparent;box-shadow:none;padding:8px 4px;color:#365a92;font-weight:700;cursor:pointer}
+    #editorView .editor-context {color:#64748b;font-size:13px;margin:5px 0 0;overflow-wrap:anywhere}
+    #editorView .editor-status {display:inline-flex;padding:4px 10px;border-radius:20px;background:#eff4fa;color:#47617d;font-size:12px;font-weight:700}
+    #editorView .editor-status[hidden] {display:none!important}
+    #editorView .editor-status.published {background:#e8f7ef;color:#167044}
+    #editorView .editor-actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    #editorView .editor-actions .button,#editorView .editor-actions button {white-space:nowrap}
+    #editorView .editor-actions .publish-save {order:3}
+    #editorView .editor-actions .draft-save,#editorView .editor-actions .normal-save {order:2}
+    #editorView .editor-actions #previewLink {order:1}
+    #editorView .editor-grid > .card {padding:22px!important;border:1px solid #e3eaf4;border-radius:12px}
+    #sharedAdminEditor .cms-editor-tabs {display:flex;gap:0;flex-wrap:wrap;border-bottom:1px solid #e1e8f2;margin-bottom:22px}
+    #sharedAdminEditor .cms-editor-tabs > button {border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;background:transparent!important;color:#64748b!important;padding:12px 15px!important;box-shadow:none!important;font-weight:600}
+    #sharedAdminEditor .cms-editor-tabs > button[aria-pressed="true"] {color:#2458a5!important;border-bottom-color:#2458a5!important}
+    #sharedAdminEditor .cms-editor-advanced {margin:0 0 16px;font-size:13px;color:#64748b}
+    #sharedAdminEditor .cms-editor-advanced summary {cursor:pointer;display:inline-block;color:#47617d;padding:6px 0;font-weight:600}
+    #sharedAdminEditor .cms-editor-advanced p {margin:8px 0}
+    #editorView .editor-utilities {margin-top:22px;padding-top:16px;border-top:1px solid #e3eaf4;display:flex;gap:8px;justify-content:flex-end}
+    @media(max-width:850px){#editorView .editor-top{align-items:flex-start}#editorView .editor-actions{width:100%}#editorView .editor-heading h2{font-size:20px}#editorView .editor-grid > .card{padding:14px!important}}
+  </style>
 </head>
 <body>
   <div class="admin-shell">
@@ -277,24 +307,24 @@
         </div>
 
         <div id="editorView" class="editor-view">
-          <div class="panel-head">
+          <div class="editor-top">
             <div>
-              <h2 id="formTitle">編輯內容</h2>
+              <div class="editor-heading"><button type="button" class="editor-back" onclick="backToList()" aria-label="返回管理清單">← 返回</button><h2 id="formTitle">編輯內容</h2><span id="editorStatus" class="editor-status" hidden></span></div>
+              <p id="editorContext" class="editor-context"></p>
             </div>
-            <div class="actions">
-              <button class="ghost" onclick="backToList()">← 回列表</button>
+            <div class="editor-actions">
+              <a id="previewLink" class="button" href="#" target="_blank" rel="noopener" style="display:none">預覽</a>
               <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
-              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
             </div>
-            <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:8px 0 0;flex-basis:100%"></p>
+            <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:0;flex-basis:100%"></p>
           </div>
 
           <div class="editor-grid">
             <div class="card">
               <div id="sharedAdminEditor" hidden></div><div id="formFields"></div>
-              <div class="actions">
-                <button onclick="clearForm()">清空</button>
-                <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
+              <div class="editor-utilities">
+                <button onclick="clearForm()">清空欄位</button>
+                <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除此筆</button>
               </div>
               <p id="formMsg" class="msg"></p>
             </div>
@@ -823,10 +853,12 @@
           try{record[name]=JSON.parse(el.value||'{}');}catch{record[name]=el.value;}
         }else record[name]=el.value;
       });
-      const hint=document.createElement('p');hint.className='help';
-      hint.textContent='共用編輯器：修改內容會同步到原有表單；圖片上傳及行程分段的圖形編輯可切換至原始表單。';
-      const toggle=document.createElement('button');toggle.type='button';toggle.textContent='切換至原始表單（圖片上傳／行程分段）';
-      const mount=document.createElement('div');root.replaceChildren(hint,toggle,mount);
+      const advanced=document.createElement('details');advanced.className='cms-editor-advanced';
+      const summary=document.createElement('summary');summary.textContent='進階編輯工具';
+      const hint=document.createElement('p');hint.textContent='圖片上傳與行程分段的原始編輯工具。一般內容請使用下方分頁。';
+      const toggle=document.createElement('button');toggle.type='button';toggle.textContent='開啟原始表單';
+      advanced.append(summary,hint,toggle);
+      const mount=document.createElement('div');root.replaceChildren(mount,advanced);
       let legacyMode=false;
       toggle.onclick=()=>{
         // 共用編輯器若有未修正的 JSON，禁止切換至舊表單而遺失原始輸入。
@@ -837,7 +869,7 @@
         legacyMode=!legacyMode;
         legacy.hidden=!legacyMode;
         mount.hidden=legacyMode;
-        toggle.textContent=legacyMode?'返回五分頁共用編輯器':'切換至原始表單（圖片上傳／行程分段）';
+        toggle.textContent=legacyMode?'返回五分頁編輯器':'開啟原始表單';
         if(!legacyMode)mountAdminSharedEditor();
       };
       adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{onChange:(name)=>{
@@ -851,6 +883,8 @@
         else el.value=value??'';
         updateImagePreview();
       }});
+      const tabBar=mount.firstElementChild;
+      if(tabBar)tabBar.classList.add('cms-editor-tabs');
     }
     function buildForm(){
       const cfg = configs[currentTable];
@@ -923,9 +957,20 @@
       return String(text||'').trim().toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g,'-').replace(/^-+|-+$/g,'') || `${currentTable}-${Date.now()}`;
     }
 
+    function updateEditorHeading(item=null){
+      const label=({spots:'景點',foods:'美食',trips:'行程'})[currentTable] || configs[currentTable]?.label || '內容';
+      document.getElementById('formTitle').textContent=(item?'編輯':'新增')+label;
+      document.getElementById('editorContext').textContent=item
+        ? label+'管理 / '+String(item.title||item.name||item.id||'')+' · 資料編號 '+String(item.id||'')
+        : label+'管理 / 新增資料';
+      const status=document.getElementById('editorStatus');
+      status.hidden=!['spots','foods','trips'].includes(currentTable);
+      status.textContent=item?.is_published?'已上架':item?'未上架':'新草稿';
+      status.classList.toggle('published',!!item?.is_published);
+    }
     function clearForm(){
       editingId = '';
-      document.getElementById('formTitle').textContent = '新增內容';
+      updateEditorHeading();
       document.getElementById('formMsg').textContent = '';
       document.getElementById('previewLink').style.display = 'none';
       document.getElementById('deleteInEditor').style.display = 'none';
@@ -950,6 +995,7 @@
       clearForm();
       document.getElementById('listView').classList.add('hidden');
       document.getElementById('editorView').classList.add('active');
+      document.getElementById('cmsPanel').classList.add('cms-editing');
       mountAdminSharedEditor();
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -957,6 +1003,7 @@
     function backToList(scroll=true){
       document.getElementById('listView').classList.remove('hidden');
       document.getElementById('editorView').classList.remove('active');
+      document.getElementById('cmsPanel').classList.remove('cms-editing');
       if(scroll) window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -1167,7 +1214,7 @@
       const item = cache.find(x=>String(x.id)===String(id));
       if(!item) return;
       editingId = id;
-      document.getElementById('formTitle').textContent = '編輯內容';
+      updateEditorHeading(item);
       configs[currentTable].fields.forEach(([name,label,type])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
@@ -1187,6 +1234,7 @@
       document.getElementById('deleteInEditor').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
       document.getElementById('listView').classList.add('hidden');
       document.getElementById('editorView').classList.add('active');
+      document.getElementById('cmsPanel').classList.add('cms-editing');
       if(currentTable === 'trips') renderTripSections(item.trip_sections || []);
       refreshAllImageThumbs();
       updateImagePreview();

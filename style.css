@@ -431,8 +431,19 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 :root{--brand-support-dark:#4D4D4D;--brand-support-mid:#BDBDBD;--brand-support-light:#D7D7D7;--brand-support-pale:#E5F2F7}
 body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}
 
-/* 景點側欄：景點資訊暖灰、交通指南淡藍灰；僅作用於景點頁側欄。 */
-.sticky-panel > .sidebox.compact:first-child{background:#F7F5F2!important;border:1px solid #E6E1DB!important;box-shadow:none}
-.sticky-panel .metro-transit{background:#E5F2F7!important;border:1px solid #D7E3E9!important;box-shadow:none}
-.sticky-panel .metro-transit .metro-route-total{background:#F4F8FA;color:#4D4D4D}
-.sticky-panel .metro-transit .metro-route-disclaimer{border-top-color:#D1DCE2}
+/* 日系和紙配色：僅調整景點側欄兩張卡片，保留既有字級、路線與功能。 */
+.sticky-panel > .sidebox.compact:first-child{
+  background:#F7F5F0!important; border:1px solid #E6E1D8!important;
+  box-shadow:none!important; color:#4D4D4D;
+}
+.sticky-panel > .sidebox.compact:first-child .tag{
+  background:#F0EDE7; border-color:#DED8CF; color:#4D4D4D;
+}
+.sticky-panel .metro-transit{
+  background:#F8F8F6!important; border:1px solid #E5E4DF!important;
+  box-shadow:none!important; color:#4D4D4D;
+}
+.sticky-panel .metro-transit .metro-route-total{
+  background:#EEECE7!important; color:#4D4D4D!important;
+}
+.sticky-panel .metro-transit .metro-route-disclaimer{border-top-color:#DFDED9!important}

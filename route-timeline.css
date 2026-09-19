@@ -4,6 +4,6 @@
 /* Transit guide remains monochrome even when global brand accent is orange. */
 .metro-transit{color:#4D4D4D}.metro-route-total{display:inline-block;margin:0 0 16px;font-size:13px;font-weight:650;color:#4D4D4D;background:#E5F2F7;padding:5px 9px}.metro-route-marker,.metro-route-name,.metro-route-mode{color:#4D4D4D}
 
-/* 單色交通路線維持原樣，僅為景點側欄卡片加淡藍灰底。 */
-.sticky-panel .metro-transit{background:#E5F2F7;border-color:#D7E3E9}
-.sticky-panel .metro-route-total{background:#F4F8FA}
+/* 與景點資訊同色系的和紙底；交通時間軸仍為單色。 */
+.sticky-panel .metro-transit{background:#F8F8F6;border-color:#E5E4DF}
+.sticky-panel .metro-route-total{background:#EEECE7}

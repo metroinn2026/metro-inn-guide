@@ -81,6 +81,7 @@
 
     <aside class="sticky-panel">
       <section class="sidebox compact metro-transit compact-transit" aria-labelledby="transitTitle">
+        <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
         <div class="compact-transit-head"><h2 id="transitTitle">大眾運輸交通指南</h2><span id="transitTotal" class="compact-transit-total" hidden></span></div>
         <ol id="transitSteps" class="compact-transit-steps"><li class="transit-empty">交通路線整理中，請使用下方即時導航。</li></ol>
         <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
@@ -213,6 +214,13 @@
           } else if (/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line)) steps.push({leg:line.replace(/\s*[｜|]\s*/g, ' · ')});
           else steps.push({station:line});
         }
+      }
+      // 有結構化路線時，也可從原有交通文字的「全程約 N 分鐘」讀取總時間。
+      // 僅顯示後台提供的數字，不根據路段自行推算或寫死 30 分鐘。
+      if (total.hidden) {
+        const source = String(spot.transport_text || spot.transport_guide || spot.transport_metro || '');
+        const match = source.match(/(?:^|\n)\s*(?:全程|總時間|參考總時間)\s*[：:]?\s*(?:約\s*)?(\d+(?:\.\d+)?\s*(?:小時|分鐘)(?:\s*\d+\s*分鐘)?)/);
+        if (match) { total.textContent = `全程約 ${match[1].replace(/\s+/g, ' ').trim()}`; total.hidden = false; }
       }
       if (route && (route.total_duration || route.total_time || route.duration)) {
         const duration = String(route.total_duration || route.total_time || route.duration);

@@ -232,7 +232,8 @@
           if (!['admin','super_admin'].includes(profile?.role)) throw new Error('沒有草稿預覽權限。');
           const { data, error } = await client.from('spots').select('*').eq('id',id).maybeSingle();
           if (error || !data) throw new Error('草稿讀取失敗，請檢查管理員讀取權限。');
-          previewSpot = data;
+          previewSpot=data;
+          try { const draft=JSON.parse(sessionStorage.getItem('metro_review_preview_spots_'+id)||'null');if(draft && draft.id===id) previewSpot={...data,...draft}; } catch(e){console.warn('預覽草稿格式無效',e);}
           const banner = document.createElement('div');
           banner.textContent = '管理員草稿預覽｜此頁未公開，請勿作為正式頁面分享';
           banner.style.cssText = 'position:sticky;top:0;z-index:9999;padding:12px;text-align:center;background:#fff0bc;color:#543a00;font-weight:700';

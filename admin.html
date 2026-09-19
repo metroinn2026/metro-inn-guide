@@ -14,6 +14,24 @@
     .list-view.hidden{display:none!important;}
     .editor-view{display:none!important;}
     .editor-view.active{display:block!important;}
+
+  /* 2026-09-19 單列編輯操作：所有 CMS 項目共用（景點、美食、行程等）。 */
+  #cmsPanel > .panel-head{display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;gap:12px!important;min-width:0}
+  #cmsPanel > .panel-head > div:first-child{flex:0 0 auto;min-width:0}
+  #cmsPanel > .panel-head #currentTitle{font-size:clamp(17px,1.6vw,24px);white-space:nowrap;margin:0!important}
+  #cmsPanel > .panel-head .actions{margin-left:auto;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap!important;min-width:0}
+  #cmsPanel > .panel-head .actions > button,#cmsPanel > .panel-head .actions > a{flex:0 0 auto;white-space:nowrap;padding:8px 10px;font-size:13px;border-radius:8px}
+  #cmsPanel .editor-header-actions{display:none!important}
+  #cmsPanel:has(#editorView.active) > .panel-head .list-header-actions{display:none!important}
+  #cmsPanel:has(#editorView.active) > .panel-head .editor-header-actions{display:flex!important}
+  #cmsPanel #editorView > .panel-head{display:block!important;margin:0!important}
+  #cmsPanel #editorView > .panel-head > div:first-child{display:none!important}
+  #cmsPanel #editorView #formMsgTop:empty{display:none}
+  #cmsPanel #editorView #formMsgTop:not(:empty){margin:0 0 12px!important}
+  @media(max-width:850px){
+    #cmsPanel > .panel-head{overflow-x:auto;scrollbar-width:thin;padding-bottom:6px}
+    #cmsPanel > .panel-head .actions{margin-left:auto}
+  }
   </style>
 
 
@@ -220,9 +238,18 @@
           <div>
             <h2 id="currentTitle">Banner 管理</h2>
           </div>
-          <div class="actions">
+          <div class="actions list-header-actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
+          </div>
+          <div class="actions editor-header-actions" aria-label="編輯操作">
+            <button class="ghost" onclick="backToList()">← 回列表</button>
+            <button onclick="loadCurrentTable()">重新讀取</button>
+            <button class="primary" onclick="newItem()">新增</button>
+            <button class="primary normal-save" onclick="saveItem()">儲存</button>
+            <button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button>
+            <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
+            <button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
           </div>
         </div>
 
@@ -272,11 +299,7 @@
             <div>
               <h2 id="formTitle">編輯內容</h2>
             </div>
-            <div class="actions">
-              <button class="ghost" onclick="backToList()">← 回列表</button>
-              <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
-              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
-            </div>
+
             <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:8px 0 0;flex-basis:100%"></p>
           </div>
 

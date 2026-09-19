@@ -201,18 +201,49 @@ function fallbackPreview(record){const routes=Array.isArray(record.transport_rou
  const routeHtml=routes.map(r=>'<h3>'+safeHtml(r.title)+'</h3>'+(r.steps||[]).map(st=>'<p>● '+safeHtml(st.type)+'｜'+safeHtml(st.name)+'｜'+safeHtml(st.detail)+'</p>').join('')).join('');
  return '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>body{margin:0;font:16px/1.8 system-ui,sans-serif;color:#24344a}header{padding:20px;border-bottom:1px solid #ddd}main{padding:22px}h1{font-size:30px}p{white-space:pre-wrap}.notice{background:#fff0bc;padding:8px;text-align:center}section{margin:24px 0}a{color:#245bc4}</style></head><body><div class="notice">管理員編輯預覽｜尚未儲存，不對外公開</div><header>METRO INN　｜　北投旅圖</header>'+image+'<main><small>首頁 › '+safeHtml(category==='spots'?'景點':category==='foods'?'美食':'行程')+'</small><h1>'+safeHtml(record.title)+'</h1><p>'+safeHtml(record.summary)+'</p><section><h2>詳細介紹</h2><p>'+safeHtml(record.content||'')+'</p></section><section><h2>交通指南</h2><p>最近捷運站：'+safeHtml(record.station||'待確認')+'</p>'+routeHtml+'</section></main></body></html>';}
 let previewSequence=0;
+let previewTimer=null;
 function updatePreview(){
  if(!selected)return;
- try{
-  const payload=previewPayload();
-  sessionStorage.setItem('metro_review_preview_'+category+'_'+selected.id,JSON.stringify(payload));
-  const frame=$('frame'),sequence=++previewSequence;
-  $('previewMsg').textContent='正在載入完整前台預覽…';
-  frame.onload=()=>{if(sequence===previewSequence)$('previewMsg').textContent='已載入前台頁面（管理員草稿預覽）。如頁面內顯示錯誤，請確認 Supabase 權限與資料。';};
-  frame.onerror=()=>{if(sequence===previewSequence){frame.removeAttribute('src');frame.srcdoc=fallbackPreview(payload);$('previewMsg').textContent='完整頁面載入失敗，已改顯示簡易內容預覽。';}};
-  frame.removeAttribute('srcdoc');
-  frame.src=previewUrl()+'&review_refresh='+sequence;
- }catch(e){$('previewMsg').textContent='無法預覽：'+e.message;}
+ let payload;
+ try{payload=previewPayload();sessionStorage.setItem('metro_review_preview_'+category+'_'+selected.id,JSON.stringify(payload));}
+ catch(e){$('previewMsg').textContent='無法預覽：'+e.message;return;}
+ const frame=$('frame'),sequence=++previewSequence;
+ if(previewTimer)clearTimeout(previewTimer);
+ const showFallback=(reason)=>{
+   if(sequence!==previewSequence)return;
+   frame.onload=null;frame.onerror=null;
+   frame.removeAttribute('src');
+   frame.srcdoc=fallbackPreview(payload);
+   $('previewMsg').textContent=reason+'；已顯示目前編輯內容的備用預覽（非正式版型）。';
+ };
+ $('previewMsg').textContent='正在載入正式網頁預覽…';
+ frame.onload=()=>{
+   if(sequence!==previewSequence)return;
+   // iframe 的 load 事件不代表前台非同步資料已渲染；不可直接回報成功。
+   if(previewTimer)clearTimeout(previewTimer);
+   previewTimer=setTimeout(()=>{
+     if(sequence!==previewSequence)return;
+     try{
+       const doc=frame.contentDocument;
+       const text=doc?.body?.innerText||'';
+       const hasContent=!!doc && text.includes(String(payload.title||'')) && text.trim().length>100;
+       if(!hasContent){showFallback('正式頁面未能呈現稿件（可能為權限、載入或前台程式問題）');return;}
+       $('previewMsg').textContent='已顯示正式網頁草稿預覽。';
+     }catch(e){showFallback('無法讀取預覽畫面：'+e.message);}
+   },5000);
+ };
+ frame.onerror=()=>showFallback('正式網頁載入失敗');
+ frame.removeAttribute('srcdoc');
+ frame.src=previewUrl()+'&review_refresh='+sequence;
+ // 某些瀏覽器不會對 iframe 的非同步錯誤觸發 error，必須有逾時處理。
+ previewTimer=setTimeout(()=>{
+   if(sequence!==previewSequence)return;
+   try{
+     const doc=frame.contentDocument;
+     const text=doc?.body?.innerText||'';
+     if(!text.includes(String(payload.title||'')))showFallback('正式網頁載入逾時或內容空白');
+   }catch(e){showFallback('預覽讀取失敗：'+e.message);}
+ },12000);
 }
 function choose(id){if(selected?.id!==id&&!confirmLeave())return;selected=rows.find(r=>r.id===id);if(!selected)return;editorDirty=false;$('detail').classList.remove('hide');$('reviewSection').classList.add('hide');$('detailTitle').textContent='審稿：'+selected.title;buildEditor();$('note').value=selected.review_note||'';$('reviewPosition').textContent=(rows.findIndex(r=>r.id===selected.id)+1)+' / '+rows.length;updatePreview();$('saveMsg').textContent='';window.scrollTo({top:0,behavior:'smooth'});}
 

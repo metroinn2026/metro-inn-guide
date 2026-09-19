@@ -623,3 +623,10 @@ body.trip-detail-page .numbered-story .story-img img{
 /* 最新消息：與首頁探索連結完全一致的橘字、字級與斜箭頭，取消膠囊外框 */
 .home-news .home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;gap:0;color:#F3653B;font-size:inherit;font-weight:700;text-decoration:none;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:6px 0!important}
 .home-news .home-news-bottom a:hover,.home-news .home-news-bottom a:focus-visible{border-bottom:1px solid currentColor!important}
+
+/* 景點／美食資訊區：標題、資料列及按鈕與上方深色橫線左緣對齊。 */
+body.spot-detail-page .single-point .point-info,
+body.food-detail-page .single-point .point-info{
+  padding-left:0;
+  padding-right:0;
+}

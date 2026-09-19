@@ -210,6 +210,19 @@
     #sharedAdminEditor .cms-editor-advanced summary {cursor:pointer;display:inline-block;color:#47617d;padding:6px 0;font-weight:600}
     #sharedAdminEditor .cms-editor-advanced p {margin:8px 0}
     #editorView .editor-utilities {margin-top:22px;padding-top:16px;border-top:1px solid #e3eaf4;display:flex;gap:8px;justify-content:flex-end}
+    /* 景點／美食／行程：左側預覽，右側完整表單。其他管理模組維持原狀。 */
+    #editorView.content-split .editor-grid{display:grid!important;grid-template-columns:minmax(280px,38%) minmax(0,1fr)!important;gap:20px!important;align-items:start}
+    #editorView.content-split .editor-grid > .card{min-width:0}
+    #adminPreviewCard[hidden]{display:none!important}
+    #editorView.content-split .editor-preview-card{position:sticky;top:18px;padding:16px!important}
+    #editorView.content-split .editor-preview-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+    #editorView.content-split .editor-preview-head h3{font-size:17px;margin:0;color:#213c61}
+    #editorView.content-split .editor-preview-note{font-size:12px;color:#64748b;line-height:1.6;margin:0 0 12px}
+    #editorView.content-split #adminDraftPreview{display:block;width:100%;height:min(72vh,820px);min-height:480px;border:1px solid #dce5f3;border-radius:6px;background:#fff}
+    #editorView.content-split .editor-form-card{grid-column:2;grid-row:1}
+    #editorView.content-split .editor-preview-card{grid-column:1;grid-row:1}
+    @media(max-width:1050px){#editorView.content-split .editor-grid{grid-template-columns:minmax(240px,36%) minmax(0,1fr)!important;gap:12px!important}}
+    @media(max-width:760px){#editorView.content-split .editor-grid{grid-template-columns:minmax(0,1fr)!important}#editorView.content-split .editor-preview-card,#editorView.content-split .editor-form-card{grid-column:1;grid-row:auto}#editorView.content-split .editor-preview-card{position:static}#editorView.content-split #adminDraftPreview{height:460px;min-height:0}}
     @media(max-width:850px){#editorView .editor-top{align-items:flex-start}#editorView .editor-actions{width:100%}#editorView .editor-heading h2{font-size:20px}#editorView .editor-grid > .card{padding:14px!important}}
   </style>
 </head>
@@ -330,7 +343,7 @@
           </div>
 
           <div class="editor-grid">
-            <div class="card">
+            <div class="card editor-form-card">
               <div id="sharedAdminEditor" hidden></div><div id="formFields"></div>
               <div class="editor-utilities">
                 <button onclick="clearForm()">清空欄位</button>
@@ -339,6 +352,12 @@
               <p id="formMsg" class="msg"></p>
             </div>
 
+            <aside class="card editor-preview-card" id="adminPreviewCard" hidden aria-label="草稿預覽">
+              <div class="editor-preview-head"><h3>預覽</h3><span id="adminPreviewState" class="editor-status">僅供預覽</span></div>
+              <p class="editor-preview-note">左側呈現目前編輯內容。儲存草稿不會公開，只有按「儲存並上架」才會發布。</p>
+              <iframe id="adminDraftPreview" title="目前稿件預覽" sandbox="allow-same-origin" loading="eager"></iframe>
+              <p id="adminPreviewError" class="msg" role="status"></p>
+            </aside>
             <div class="card image-side-card">
               <h3>圖片與版面建議</h3>
               <div id="imageTips"></div>
@@ -370,6 +389,7 @@
   <script src="secure-delete.js"></script>
   <script src="cms-schema.js"></script>
   <script src="cms-editor.js"></script>
+  <script src="cms-preview.js"></script>
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -844,6 +864,33 @@
     // The original form remains the canonical save/upload interface. The shared editor
     // synchronizes its fields into that form; it never writes to Supabase independently.
     let adminSharedEditor=null;
+    let adminPreviewTimer=null;
+    function scheduleAdminDraftPreview(){
+      clearTimeout(adminPreviewTimer);
+      adminPreviewTimer=setTimeout(renderAdminDraftPreview,180);
+    }
+    function renderAdminDraftPreview(){
+      const card=document.getElementById('adminPreviewCard');
+      if(!card||card.hidden||!['spots','foods','trips'].includes(currentTable))return;
+      const error=document.getElementById('adminPreviewError');
+      try{
+        const values=adminSharedEditor?.values();
+        if(!values)throw Error('請使用完整表單編輯後預覽。');
+        error.textContent='';
+        document.getElementById('adminPreviewState').textContent='未發布預覽';
+        MetroCmsPreview.render(document.getElementById('adminDraftPreview'),currentTable,values,true);
+      }catch(e){
+        error.textContent='請先修正欄位，預覽暫停更新：'+e.message;
+        document.getElementById('adminPreviewState').textContent='待修正';
+      }
+    }
+    function syncAdminPreviewLayout(){
+      const enabled=['spots','foods','trips'].includes(currentTable);
+      document.getElementById('editorView').classList.toggle('content-split',enabled);
+      document.getElementById('adminPreviewCard').hidden=!enabled;
+      if(enabled)scheduleAdminDraftPreview();
+      else clearTimeout(adminPreviewTimer);
+    }
     function mountAdminSharedEditor(){
       const root=document.getElementById('sharedAdminEditor');
       const legacy=document.getElementById('formFields');
@@ -851,7 +898,7 @@
       adminSharedEditor=null;
       root.hidden=!supported;
       legacy.hidden=supported;
-      if(!supported){root.replaceChildren();return;}
+      if(!supported){root.replaceChildren();syncAdminPreviewLayout();return;}
       const record={};
       configs[currentTable].fields.forEach(([name,,type])=>{
         const el=document.getElementById('f_'+name);
@@ -881,6 +928,8 @@
         mount.hidden=legacyMode;
         toggle.textContent=legacyMode?'返回完整表單':'開啟原始表單';
         if(!legacyMode)mountAdminSharedEditor();
+        else document.getElementById('adminPreviewError').textContent='原始表單模式下，請返回完整表單更新預覽。';
+        if(!legacyMode)scheduleAdminDraftPreview();
       };
       adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{layout:'all',onChange:(name)=>{
         const el=document.getElementById('f_'+name);
@@ -892,7 +941,9 @@
         else if(typeof value==='boolean')el.value=String(value);
         else el.value=value??'';
         updateImagePreview();
-      }});
+        scheduleAdminDraftPreview();
+      },onInvalid:()=>scheduleAdminDraftPreview()});
+      syncAdminPreviewLayout();
       // Full-page editor: all field groups remain visible without tab navigation.
     }
     function buildForm(){

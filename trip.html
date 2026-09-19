@@ -6,6 +6,7 @@
   <title>行程介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
+  <script src="related-reading.js"></script>
   <script src="supabase-config.js"></script>
 </head>
 
@@ -123,18 +124,7 @@
     </aside>
   </main>
 
-  <section class="section related">
-    <div class="container">
-      <div class="kicker">MORE STORIES</div>
-      <h2>延伸閱讀</h2>
-      <div class="rel-grid">
-        <a class="rel" href="spots.html"><div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg"></div><div class="meta">SPOTS</div><h3>景點探索</h3></a>
-        <a class="rel" href="foods.html"><div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou_Market.jpg"></div><div class="meta">FOOD</div><h3>美食目錄</h3></a>
-        <a class="rel" href="coupons.html"><div class="rel-img"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85"></div><div class="meta">OFFERS</div><h3>優惠目錄</h3></a>
-        <a class="rel" href="index.html"><div class="rel-img"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=85"></div><div class="meta">GUIDE</div><h3>回首頁搜尋</h3></a>
-      </div>
-    </div>
-  </section>
+  <section id="relatedReading" class="section related" hidden></section>
 
   <section class="cta">
     <div class="container">
@@ -398,6 +388,7 @@
         document.getElementById('mapButton').href = getGoogleMapsUrl(trip, steps);
         document.getElementById('mapEmbed').src = getMapEmbedUrl(trip, steps);
 
+        renderRelatedReading(trip,document.getElementById('relatedReading'));
         renderRelatedContent(trip);
 
       } catch (error) {

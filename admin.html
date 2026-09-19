@@ -179,6 +179,15 @@
     #cmsPanel.cms-editing > #featuredManagementTabs,
     #cmsPanel.cms-editing > #sectionHint,
     #cmsPanel.cms-editing > #myAccountCard {display:none!important}
+    .related-picker{margin-top:26px;padding-top:20px;border-top:1px solid #dce5f3}
+    .related-picker h3{font-size:19px;margin:0 0 8px}
+    .related-picker p{color:#64748b;font-size:13px;line-height:1.6}
+    .related-picker input{width:100%;margin:10px 0 14px;padding:11px;border:1px solid #d6e2f2;border-radius:6px}
+    .related-picker-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e9eef4;font-size:14px}
+    .related-picker-row small{color:#64748b;margin-left:8px}
+    .related-picker-row button{margin-left:4px;padding:5px 9px}
+    #relatedCandidates{max-height:370px;overflow:auto;margin-top:20px}
+    #relatedSelected{margin-top:12px}
     #editorView .editor-top {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 18px;margin-bottom:20px;border-bottom:1px solid #e3eaf4}
     #editorView .editor-heading {display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
     #editorView .editor-heading h2 {margin:0;font-size:23px;line-height:1.35}
@@ -345,7 +354,7 @@
 
           <div class="editor-grid">
             <div class="card editor-form-card">
-              <div id="sharedAdminEditor" hidden></div><div id="formFields"></div>
+              <div id="sharedAdminEditor" hidden></div><div id="formFields"></div><section id="relatedPicker" class="related-picker" hidden><h3>延伸閱讀</h3><p>依標題、地區與標籤推薦已上架內容；最多選取 4 篇，選好後按儲存。注意：若目前文章已上架，既有儲存草稿功能仍會更新公開資料；如需先審稿，請先下架該篇。</p><input id="relatedSearch" type="search" placeholder="搜尋景點、美食、行程、遊記" oninput="renderRelatedPicker()"><div id="relatedSelected"></div><div id="relatedCandidates"></div><p id="relatedPickerMsg" role="status"></p></section>
               <div class="editor-utilities">
                 <button onclick="clearForm()">清空欄位</button>
                 <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除此筆</button>
@@ -597,6 +606,53 @@
     // 景點、美食、行程統一引用共用欄位定義；其餘模組保留原版。
     for(const type of MetroCmsSchema.types){configs[type].fields=MetroCmsSchema.fields(type);}
 
+    const relatedTypes=['spots','foods','trips'];
+    const relatedCatalogTables=['spots','foods','trips','stories'];
+    let relatedCatalog=[];
+    let relatedSelection=[];
+    let relatedRequest=0;
+    const relatedEsc=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const relatedKey=item=>item.type+':'+item.id;
+    function relatedTerms(text){return String(text||'').toLowerCase().split(/[\s,，、｜|/]+/).filter(t=>t.length>1);}
+    function relatedScore(item){
+      const title=document.getElementById('f_title')?.value||'';
+      const area=document.getElementById('f_area')?.value||'';
+      const tags=document.getElementById('f_tags')?.value||'';
+      const words=relatedTerms([title,area,tags].join(' '));
+      const hay=[item.title,item.summary,item.area,item.tags,item.category].filter(Boolean).join(' ').toLowerCase();
+      return words.reduce((n,w)=>n+(hay.includes(w)?(w===area.toLowerCase()?4:2):0),0);
+    }
+    function renderRelatedPicker(){
+      const panel=document.getElementById('relatedPicker');
+      if(!panel||panel.hidden)return;
+      const q=document.getElementById('relatedSearch').value.trim().toLowerCase();
+      const ownId=document.getElementById('f_id')?.value||editingId;
+      const available=relatedCatalog.filter(x=>!(x.type===currentTable&&String(x.id)===String(ownId)));
+      const selected=relatedSelection.map(key=>available.find(x=>relatedKey(x)===key)||{type:key.split(':')[0],id:key.slice(key.indexOf(':')+1),title:'原文章目前無法讀取（仍保留選取）',typeLabel:key.split(':')[0]});
+      document.getElementById('relatedSelected').innerHTML='<strong>已選 '+relatedSelection.length+'/4（依此順序顯示）</strong>'+ (selected.length?selected.map((x,i)=>`<div class="related-picker-row"><span>${i+1}. ${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><span><button type="button" onclick="moveRelated(${i},-1)" ${i===0?'disabled':''}>↑</button><button type="button" onclick="moveRelated(${i},1)" ${i===selected.length-1?'disabled':''}>↓</button><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')">移除</button></span></div>`).join(''):'<p>尚未選取；不選擇時前台不顯示延伸閱讀。</p>');
+      const options=available.filter(x=>!relatedSelection.includes(relatedKey(x))&&(!q||[x.title,x.summary,x.area,x.tags,x.category].filter(Boolean).join(' ').toLowerCase().includes(q))).sort((a,b)=>relatedScore(b)-relatedScore(a)||a.title.localeCompare(b.title,'zh-Hant')).slice(0,35);
+      document.getElementById('relatedCandidates').innerHTML='<strong>可選文章（僅已上架）</strong>'+(options.length?options.map(x=>`<div class="related-picker-row"><span>${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')" ${relatedSelection.length>=4?'disabled':''}>＋加入</button></div>`).join(''):'<p>沒有符合條件的已上架文章。</p>');
+    }
+    function toggleRelated(key){const index=relatedSelection.indexOf(key);if(index>=0)relatedSelection.splice(index,1);else if(relatedSelection.length<4)relatedSelection.push(key);renderRelatedPicker();scheduleAdminDraftPreview();}
+    function moveRelated(i,d){const j=i+d;if(j<0||j>=relatedSelection.length)return;[relatedSelection[i],relatedSelection[j]]=[relatedSelection[j],relatedSelection[i]];renderRelatedPicker();scheduleAdminDraftPreview();}
+    async function loadRelatedPicker(){
+      const token=++relatedRequest;
+      const sourceTable=currentTable;
+      const panel=document.getElementById('relatedPicker');
+      panel.hidden=!relatedTypes.includes(currentTable);
+      if(panel.hidden)return;
+      const msg=document.getElementById('relatedPickerMsg');msg.textContent='正在載入已上架文章…';
+      const results=await Promise.allSettled(relatedCatalogTables.map(async table=>{
+        const {data,error}=table==='stories' ? await db.rpc('get_published_travel_stories') : await db.from(table).select('id,title,summary,cover_image,is_published'+(table==='spots'?',area,tags':table==='foods'?',category,tags':'')).eq('is_published',true).limit(500);
+        if(error)throw Error(table+': '+error.message);
+        return (data||[]).filter(x=>table!=='stories'||(x.submission_type==='travel_story'&&x.id!=null)).map(x=>({...x,type:table,typeLabel:({spots:'景點',foods:'美食',trips:'行程',stories:'遊記'})[table]}));
+      }));
+      if(token!==relatedRequest||currentTable!==sourceTable)return;
+      relatedCatalog=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value);
+      const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason.message);
+      msg.textContent=errors.length?'部分文章無法讀取：'+errors.join('；'):'已載入 '+relatedCatalog.length+' 篇已上架內容。';
+      renderRelatedPicker();
+    }
     let currentTable = 'banners';
     let cache = [];
     let currentList = [];
@@ -1065,6 +1121,7 @@
       document.getElementById('editorView').classList.add('active');
       document.getElementById('cmsPanel').classList.add('cms-editing');
       mountAdminSharedEditor();
+      relatedSelection=[];loadRelatedPicker();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -1307,6 +1364,8 @@
       refreshAllImageThumbs();
       updateImagePreview();
       mountAdminSharedEditor();
+      relatedSelection=Array.isArray(item.related_items)?item.related_items.filter(x=>x&&typeof x.type==='string'&&x.id!=null).slice(0,4).map(relatedKey):[];
+      loadRelatedPicker();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -1432,6 +1491,7 @@
       }
       const payload = formPayload();
       if(!payload)return;
+      if(relatedTypes.includes(currentTable))payload.related_items=relatedSelection.map(key=>{const i=key.indexOf(':');return {type:key.slice(0,i),id:key.slice(i+1)};});
       if(currentTable==='featured_picks' && payload.is_active && cache.filter(x=>x.is_active && x.id!==payload.id).length>=10){msg.textContent='最多只能啟用 10 筆精選，請先停用其他項目。';return;}
       if(configs[currentTable].fields.some(f=>f[3]==='required') && !payload.title){
         msg.textContent = '請輸入標題 / 名稱。';

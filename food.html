@@ -6,6 +6,7 @@
   <title>美食介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
+  <script src="related-reading.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -109,34 +110,7 @@
     </aside>
   </main>
 
-  <section id="related" class="section related">
-    <div class="container">
-      <div class="kicker">MORE STORIES</div>
-      <h2>延伸閱讀</h2>
-      <div class="rel-grid">
-        <a class="rel" href="spots.html">
-          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg" alt=""></div>
-          <div class="meta">BEITOU</div>
-          <h3>北投景點探索</h3>
-        </a>
-        <a class="rel" href="trips.html">
-          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt=""></div>
-          <div class="meta">TRIP</div>
-          <h3>北投溫泉半日遊</h3>
-        </a>
-        <a class="rel" href="foods.html">
-          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt=""></div>
-          <div class="meta">FOOD</div>
-          <h3>更多美食</h3>
-        </a>
-        <a class="rel" href="index.html">
-          <div class="rel-img"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=85" alt=""></div>
-          <div class="meta">GUIDE</div>
-          <h3>回首頁搜尋</h3>
-        </a>
-      </div>
-    </div>
-  </section>
+  <section id="related" class="section related" hidden></section>
 
   <div id="footer"></div>
 
@@ -269,6 +243,9 @@
         setText('sideHours', food.business_hours || '營業時間依公告為準');
         setText('sideCost', `平均消費 ${cost}`);
         setText('sideAddress', food.address || '地址請見 Google Map');
+
+        renderRelatedReading(food,document.getElementById('related'));
+
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

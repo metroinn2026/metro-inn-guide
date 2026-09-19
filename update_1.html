@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>北投旅圖管理後台</title>
+  <link rel="stylesheet" href="admin.css?v=20260602-image-superadmin-fix">
+
+  <style>
+    #workspacePanel[hidden]{display:none!important} #cmsPanel[hidden]{display:none!important}
+    /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
+    .panel{display:block!important;}
+    .list-view{display:block!important;}
+    .list-view.hidden{display:none!important;}
+    .editor-view{display:none!important;}
+    .editor-view.active{display:block!important;}
+
+  /* 2026-09-19 單列編輯操作：所有 CMS 項目共用（景點、美食、行程等）。 */
+  #cmsPanel > .panel-head{display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;gap:12px!important;min-width:0}
+  #cmsPanel > .panel-head > div:first-child{flex:0 0 auto;min-width:0}
+  #cmsPanel > .panel-head #currentTitle{font-size:clamp(17px,1.6vw,24px);white-space:nowrap;margin:0!important}
+  #cmsPanel > .panel-head .actions{margin-left:auto;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap!important;min-width:0}
+  #cmsPanel > .panel-head .actions > button,#cmsPanel > .panel-head .actions > a{flex:0 0 auto;white-space:nowrap;padding:8px 10px;font-size:13px;border-radius:8px}
+  #cmsPanel .editor-header-actions{display:none!important}
+  #cmsPanel:has(#editorView.active) > .panel-head .list-header-actions{display:none!important}
+  #cmsPanel:has(#editorView.active) > .panel-head .editor-header-actions{display:flex!important}
+  #cmsPanel #editorView > .panel-head{display:block!important;margin:0!important}
+  #cmsPanel #editorView > .panel-head > div:first-child{display:none!important}
+  #cmsPanel #editorView #formMsgTop:empty{display:none}
+  #cmsPanel #editorView #formMsgTop:not(:empty){margin:0 0 12px!important}
+  @media(max-width:850px){
+    #cmsPanel > .panel-head{overflow-x:auto;scrollbar-width:thin;padding-bottom:6px}
+    #cmsPanel > .panel-head .actions{margin-left:auto}
+  }
+  </style>
+
+
+  <style>
+    /* DRAG SORT UPDATE 20260601 */
+    .drag-handle{
+      cursor:grab;
+      color:#2563EB;
+      font-weight:700;
+      user-select:none;
+      display:inline-flex;
+      width:28px;
+      height:28px;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #DBEAFE;
+      border-radius:8px;
+      background:#EFF6FF;
+    }
+    tr.dragging{
+      opacity:.45;
+      background:#EFF6FF;
+    }
+    tr.drag-over{
+      outline:2px dashed #2563EB;
+      outline-offset:-4px;
+      background:#F8FAFC;
+    }
+    .sort-save-bar{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      padding:12px 14px;
+      border:1px solid #BFDBFE;
+      background:#EFF6FF;
+      color:#1E3A8A;
+      border-radius:14px;
+      line-height:1.6;
+    }
+    .sort-save-bar.active{display:flex;}
+    .id-code{
+      font-family:Consolas,Monaco,monospace;
+      color:#1D4ED8;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .row-order{
+      color:#6B7280;
+      font-size:12px;
+      margin-left:6px;
+    }
+  </style>
+
+
+  <style>
+    /* TRIP SECTIONS UPDATE 20260601 */
+    .trip-section-editor{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+    .trip-section-card{
+      border:1px solid #E5E7EB;
+      border-radius:16px;
+      padding:14px;
+      background:#F9FAFB;
+      display:grid;
+      gap:10px;
+    }
+    .trip-section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      cursor:grab;
+    }
+    .trip-section-head strong{
+      color:#1D4ED8;
+    }
+    .trip-section-grid{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:10px;
+    }
+    .trip-section-card textarea{
+      min-height:90px;
+    }
+    .trip-section-card.dragging{
+      opacity:.5;
+    }
+    .trip-section-card.drag-over{
+      outline:2px dashed #2563EB;
+      outline-offset:2px;
+    }
+    @media(max-width:760px){
+      .trip-section-grid{grid-template-columns:1fr}
+    }
+  </style>
+
+  <style>
+    .role-pill{display:inline-block;border-radius:99px;padding:5px 10px;font-size:12px;background:#EFF6FF;color:#1D4ED8;font-weight:700}
+    .role-pill.super{background:#FEF3C7;color:#92400E}
+    .readonly-note{font-size:13px;color:#6B7280;line-height:1.7;margin-top:8px}
+  </style>
+
+  <style>
+    /* IMAGE UPLOAD + EDITOR WIDTH FIX */
+    .editor-grid{display:grid!important;grid-template-columns:1fr!important;gap:18px!important;}
+    .image-side-card{display:none!important;}
+    .image-field-box{
+      border:1px solid #E5E7EB;
+      border-radius:16px;
+      padding:14px;
+      background:#F9FAFB;
+      display:grid;
+      gap:10px;
+    }
+    .image-field-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .image-thumb{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:10px;
+      border:1px solid #E5E7EB;
+      border-radius:14px;
+      background:#fff;
+    }
+    .image-thumb img{
+      width:120px;
+      height:78px;
+      object-fit:cover;
+      border-radius:10px;
+      background:#f3f4f6;
+      flex:0 0 auto;
+    }
+    .image-thumb small{display:block;color:#6B7280;line-height:1.6;word-break:break-all}
+    .source-hint{font-size:12px;color:#6B7280;line-height:1.6}
+    .trip-section-image-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(max-width:760px){.trip-section-image-row{grid-template-columns:1fr}.image-thumb{display:block}.image-thumb img{width:100%;height:160px;margin-bottom:8px}}
+  </style>
+  <style>
+    /* Align the signed-in name and logout button on the same baseline. */
+    .topbar .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:nowrap;margin-left:auto;}
+    .topbar #userDisplayName{display:inline-flex;align-items:center;line-height:1.4;font-size:14px;color:#4D4D4D;font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .topbar .top-actions button{flex:0 0 auto;margin:0;}
+    @media(max-width:600px){.topbar .top-actions{margin-left:0;max-width:100%;}.topbar #userDisplayName{max-width:160px;}}
+  </style>
+
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="brand admin-brand">
+        <div class="admin-logo-wrap"><img src="metro-inn-logo.png" alt="METRO INN"></div>
+        <div class="brand-title">北投旅圖管理後台</div>
+      </div>
+      <nav class="side-nav" id="sideNav" aria-label="後台功能選單">
+        <div class="nav-group"><div class="nav-group-title">網站管理</div>
+          <a class="active" data-table="banners">首頁輪播管理</a>
+          <a data-table="featured_picks">首頁精選管理</a>
+          <a data-table="featured_topics">精選分類管理</a>
+          <a data-table="site_settings">頁首頁尾設定</a>
+        </div>
+        <div class="nav-group"><div class="nav-group-title">內容管理</div>
+          <a data-table="news">最新消息</a>
+          <a data-table="spots">景點管理</a>
+          
+          
+          <a data-table="foods">美食管理</a>
+          <a data-table="trips">行程管理</a>
+          <a data-table="coupons">優惠管理</a>
+        </div>
+        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核 <span id="reviewPendingBadge" style="display:none;background:#dc2626;color:white;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:6px" aria-label="待辦數量"></span></a></div>
+        <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
+          <a data-table="admin_profiles">帳號權限</a>
+        </div>
+      </nav>
+      <div class="side-bottom">
+        <a class="button" href="index.html" target="_blank">開啟前台預覽 ↗</a>
+        <button onclick="logout()">登出</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>北投旅圖管理後台</h1>
+        </div>
+        <div class="top-actions">
+          <span id="userDisplayName" aria-label="目前登入使用者">檢查登入中...</span>
+          <button onclick="logout()">登出</button>
+        </div>
+      </header>
+
+      <section class="panel" id="cmsPanel">
+        <div class="panel-head">
+          <div>
+            <h2 id="currentTitle">Banner 管理</h2>
+          </div>
+          <div class="actions list-header-actions">
+            <button class="primary" id="newBtn" onclick="newItem()">新增</button>
+            <button onclick="loadCurrentTable()">重新讀取</button>
+          </div>
+          <div class="actions editor-header-actions" aria-label="編輯操作">
+            <button class="ghost" onclick="backToList()">← 回列表</button>
+            <button onclick="loadCurrentTable()">重新讀取</button>
+            <button class="primary" onclick="newItem()">新增</button>
+            <button class="primary normal-save" onclick="saveItem()">儲存</button>
+            <button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button>
+            <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
+            <button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
+          </div>
+        </div>
+
+        <div id="sectionHint" class="notice warning"></div>
+        <section id="myAccountCard" class="account-self-card" hidden aria-label="我的帳號">
+          <div><strong>我的帳號</strong><p id="myAccountInfo">登入帳號資訊</p><small>變更自己的登入密碼，不會修改其他管理員的密碼或權限。</small></div>
+          <button type="button" onclick="showChangePassword()">變更密碼</button>
+        </section>
+
+        <div id="listView" class="list-view">
+          <div class="toolbar">
+            <input id="searchInput" placeholder="搜尋標題、摘要、內容、標籤..." oninput="renderList()">
+            <select id="statusFilter" onchange="renderList()">
+              <option value="all">全部狀態</option>
+              <option value="published">已上架 / 啟用</option>
+              <option value="draft">草稿 / 停用</option>
+            </select>
+            <select id="typeFilter" onchange="renderList()">
+              <option value="all">全部類別</option>
+            </select>
+            <button onclick="clearFilters()">清除篩選</button>
+          </div>
+
+          <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span>
+            <div id="contentCountCard" class="content-count-line" hidden aria-live="polite"><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span></div>
+          </div>
+          <div id="sortSaveBar" class="sort-save-bar">
+            <span>排序已變更。請按「儲存排序」寫入資料庫，前台排序才會同步更新。</span>
+            <div class="actions">
+              <button class="primary" onclick="saveSortOrder()">儲存排序</button>
+              <button onclick="loadCurrentTable()">取消變更</button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead id="tableHead"></thead>
+              <tbody id="listBody">
+                <tr><td>資料載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="editorView" class="editor-view">
+          <div class="panel-head">
+            <div>
+              <h2 id="formTitle">編輯內容</h2>
+            </div>
+
+            <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:8px 0 0;flex-basis:100%"></p>
+          </div>
+
+          <div class="editor-grid">
+            <div class="card">
+              <div id="formFields"></div>
+              <div class="actions">
+                <button onclick="clearForm()">清空</button>
+                <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
+              </div>
+              <p id="formMsg" class="msg"></p>
+            </div>
+
+            <div class="card image-side-card">
+              <h3>圖片與版面建議</h3>
+              <div id="imageTips"></div>
+              <div class="image-preview" id="imagePreview">圖片預覽</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="panel" id="workspacePanel" hidden style="display:none"><div class="panel-head"><h2 id="workspaceTitle">內容審核中心</h2></div><iframe id="workspaceFrame" title="後台工作區" style="width:100%;height:calc(100vh - 175px);min-height:660px;border:0;background:#fff" loading="lazy"></iframe></section>
+    </main>
+  </div>
+
+  <dialog id="changePasswordDialog" style="width:min(440px,calc(100% - 32px));border:1px solid #d6e2f2;border-radius:12px;padding:24px">
+    <form id="changePasswordForm" onsubmit="changeMyPassword(event)">
+      <h2>變更自己的登入密碼</h2><p>需驗證目前密碼。此功能不會修改其他管理員帳號。</p>
+      <div class="form-row"><label for="oldPassword">目前密碼</label><input id="oldPassword" type="password" autocomplete="current-password" required></div>
+      <div class="form-row"><label for="newPassword">新密碼（至少 8 碼）</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+      <div class="form-row"><label for="confirmPassword">確認新密碼</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+      <p id="changePasswordMsg" role="status" aria-live="polite"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" onclick="closeChangePassword()">取消</button><button type="submit" id="changePasswordSubmit" class="primary">確認變更</button></div>
+    </form>
+  </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="secure-delete.js"></script>
+  <script>
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const imageTipsDefault = `
+      <ul class="tip-list">
+        <li>Banner 桌機建議：1920 × 720 px，JPG / WEBP，單張建議 500KB 以下。</li>
+        <li>Banner 手機建議：1080 × 1350 px，重要文字放中央安全區。</li>
+        <li>最新消息封面：1200 × 630 px。</li>
+        <li>景點／行程封面：1600 × 900 px。</li>
+        <li>美食封面：1200 × 900 px。</li>
+        <li>優惠券圖片：1080 × 1080 px。</li>
+        <li>Logo 建議：SVG 或透明 PNG，高度約 80px。</li>
+      </ul>`;
+
+    const configs = {
+      featured_topics:{
+        label:'精選分類管理',kicker:'TOPICS',table:'featured_topics',preview:'index.html#picks',
+        hint:'管理首頁精選上方的分類標籤。可修改名稱、顯示順序及啟用狀態；分類代碼建立後請勿隨意修改，避免既有精選失去分類。',
+        fields:[['id','分類代碼（英文小寫，例如 family）','text','required'],['title','分類顯示名稱','text','required'],['sort_order','顯示順序','number'],['is_active','狀態','booleanActive']],
+        columns:['title','id','is_active'],subtitle:x=>'分類代碼：'+x.id,statusKey:'is_active',order:'sort_order',idPrefix:'topic',
+        tips:'<ul class="tip-list"><li>「all」為人氣精選，會顯示全部啟用精選。</li><li>請先建立分類，再到「首頁精選管理」的分類標籤填入對應代碼；多個分類以逗號分隔。</li><li>停用分類只會隱藏首頁標籤，不會刪除精選內容。</li><li>首次使用請執行 featured_topics.sql。</li></ul>'
+      },
+      featured_picks:{
+        label:'首頁精選管理',kicker:'FEATURED',table:'featured_picks',preview:'index.html#picks',
+        hint:'最多啟用 10 筆，拖曳排序後按「儲存排序」。請填寫已上架景點／美食／行程的資料編號及其封面圖片網址。',
+        fields:[['id','ID','text','auto'],['sort_order','顯示順序','number'],['title','精選標題','text','required'],['category','內容類型（spot／food／trip）','text','required'],['content_id','對應內容 ID（例如 spot_0001）','text','required'],['summary','簡短介紹','textarea'],['cover_image','封面圖片網址','image'],['topics','分類代碼（至「精選分類管理」查詢，多個以逗號分隔）','text'],['is_active','狀態','booleanActive']],
+        columns:['title','category','is_active'],subtitle:x=>x.category+' / '+x.content_id,statusKey:'is_active',typeOptions:[['all','全部類別'],['spot','景點'],['food','美食'],['trip','行程']],order:'sort_order',idPrefix:'pick',
+        tips:'<ul class="tip-list"><li>最多 10 筆啟用精選；建議封面 1600×900。</li><li>內容類型填 spot、food 或 trip；內容 ID 必須是已上架的資料。</li><li>分類標籤請填「精選分類管理」設定的分類代碼，以逗號分隔。</li><li>首次使用請先執行隨包附上的 featured_picks.sql。</li></ul>'
+      },
+      banners: {
+        label:'Banner 管理', kicker:'BANNER', table:'banners', preview:'index.html',
+        hint:'首頁上方 Banner 最多建議 4 張輪播。排序請填 1～4；若超過 4 張，前台只會優先顯示排序最前面的啟用項目。',
+        fields:[
+          ['id','ID','text','auto'],
+          ['title','Banner 標題','text','required'],
+          ['subtitle','Banner 副標','textarea'],
+          ['image_pc','桌機 Banner 圖片（1920×720）','image'],
+          ['image_pc_source','桌機 Banner 圖片來源','text'],
+          ['image_mobile','手機 Banner 圖片（1080×1350）','image'],
+          ['image_mobile_source','手機 Banner 圖片來源','text'],
+          ['button_text','按鈕文字','text'],
+          ['button_url','按鈕連結','text'],
+          ['sort_order','排序（1～4）','number'],
+          ['is_active','狀態','booleanActive']
+        ],
+        columns:['title','sort_order','is_active'],
+        subtitle:(x)=>'排序：' + (x.sort_order ?? '-'),
+        statusKey:'is_active',
+        typeOptions:[['all','全部類別']],
+        order:'sort_order',
+        idMode:'uuid',
+        tips:`<ul class="tip-list">
+          <li><b>最多 4 張輪播</b>：排序 1～4，首頁只顯示啟用的 Banner。</li>
+          <li><b>桌機尺寸</b>：1920 × 720 px。</li>
+          <li><b>手機尺寸</b>：1080 × 1350 px。</li>
+          <li><b>格式</b>：JPG / WEBP，單張建議 500KB 以下。</li>
+          <li><b>安全區</b>：左右各預留約 250px 不放重要文字，避免手機或窄螢幕裁切。</li>
+        </ul>`
+      },
+      site_settings: {
+        label:'頁首頁尾設定', kicker:'SETTING', table:'site_settings', preview:'index.html',
+        hint:'這裡管理全站共用資訊，例如 Logo、訂房按鈕、頁尾地址、電話、社群連結。此資料表固定只有 1 筆。',
+        fields:[
+          ['id','ID','number','fixed1'],
+          ['logo_url','網站 CI／Logo（支援 SVG、透明 PNG 或 WEBP）','image'],
+          ['booking_text','訂房按鈕文字','text'],
+          ['booking_url','訂房按鈕連結','text'],
+          ['footer_title','頁尾標題','text'],
+          ['footer_address','地址','textarea'],
+          ['footer_phone','電話','text'],
+          ['footer_email','Email','text'],
+          ['facebook_url','Facebook 連結','text'],
+          ['instagram_url','Instagram 連結','text'],
+          ['line_url','LINE 連結','text'],
+          ['map_iframe','Google Map iframe','textarea'],
+          ['copyright_text','版權文字','text']
+        ],
+        columns:['footer_title','booking_text','footer_phone'],
+        subtitle:(x)=>x.footer_phone || x.footer_email || '-',
+        statusKey:null,
+        typeOptions:[['all','全部類別']],
+        order:'id',
+        idMode:'fixed1',
+        tips:`<ul class="tip-list">
+          <li><b>Logo</b>：建議 SVG 或透明 PNG，高度約 80px。</li>
+          <li><b>頁首</b>：訂房按鈕文字建議 4～6 字，例如「立即訂房」。</li>
+          <li><b>頁尾</b>：地址、電話、Email 建議完整填寫，避免旅客找不到聯絡資訊。</li>
+          <li><b>Google Map</b>：可貼 iframe，但若不熟悉可先留空。</li>
+          <li><b>社群圖示</b>：若未來使用圖片，建議 64 × 64 px PNG。</li>
+        </ul>`
+      },
+
+      admin_profiles: {
+        label:'帳號權限', kicker:'ADMINS', table:'admin_profiles', preview:'admin.html',
+        hint:'只有超級管理員可建立帳號與調整權限。一般管理員可管理內容，但不能新增管理員帳號。',
+        fields:[
+          ['id','User ID','text','auto'],
+          ['email','Email','text','required'],
+          ['role','權限角色','role'],
+          ['display_name','暱稱／姓名（顯示於右上角）','text'],
+          ['password','建立新帳號密碼（新增時必填，編輯時留空即可）','password']
+        ],
+        columns:['email','role','display_name'],
+        subtitle:(x)=>x.display_name || '-',
+        statusKey:null,
+        typeOptions:[['all','全部角色'],['super_admin','超級管理員'],['admin','管理員']],
+        order:'email',
+        idMode:'auth',
+        tips:`<ul class="tip-list"><li><b>超級管理員</b>：可新增管理員帳號、調整權限、管理所有內容。</li><li><b>管理員</b>：可管理 Banner、消息、景點、美食、行程、優惠，但不可建立其他管理員。</li><li>建立帳號會透過 Vercel API 寫入 Supabase Auth，因此 Vercel 需設定 SERVICE ROLE KEY。</li></ul>`
+      },
+
+      news: {
+        label:'最新消息', kicker:'NEWS', table:'news', preview:'news-detail.html?id=',
+        hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
+        fields:[
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
+          ['summary','摘要','textarea'],['content','內文','textarea'],['cover_image','封面圖（1200×630）','image'],['cover_image_source','封面圖片來源','text'],
+          ['publish_date','發布日期','date'],['event_name','活動名稱','text'],['event_date','活動日期','text'],
+          ['event_address','活動地點（地址）','text'],['phone','電話','text'],['event_content','活動內容','textarea'],
+          ['remark','備註','textarea'],['is_published','狀態','boolean']
+        ],
+        columns:['title','publish_date','is_published'],
+        subtitle:(x)=>x.publish_date || x.event_date || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類別'],['親子','親子'],['住宿','住宿'],['北投','北投']],
+        order:'sort_order',
+        idPrefix:'news',
+        tips:`<ul class="tip-list"><li>最新消息封面建議：1200 × 630 px。</li><li>標題建議 18 字以內，摘要建議 40～70 字。</li></ul>`
+      },
+      spots: {
+        label:'景點管理', kicker:'SPOTS', table:'spots', preview:'spot.html?id=',
+        hint:'可用地區、捷運站、標籤搜尋景點。建議景點封面採橫式照片。',
+        fields:[
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
+          ['area','地區','text'],['station','最近捷運站','text'],['transport_routes','交通指南｜人工推薦路線','routes'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
+          ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
+          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['is_published','狀態','boolean']
+        ],
+        columns:['title','area','is_published'],
+        subtitle:(x)=>x.area || x.station || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部地區'],['北投','北投'],['新北投','新北投'],['陽明山','陽明山'],['士林','士林'],['淡水','淡水']],
+        order:'sort_order',
+        idPrefix:'spot',
+        tips:`<ul class="tip-list"><li>景點封面建議：1600 × 900 px。</li><li>內容照也建議橫式，避免列表裁切。</li></ul>`
+      },
+      foods: {
+        label:'美食管理', kicker:'FOODS', table:'foods', preview:'food.html?id=',
+        hint:'可用店名、類型、價格、標籤搜尋。建議美食圖片保留餐點與店面主體。',
+        fields:[
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
+          ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
+          ['price_range','價格區間','text'],['tags','標籤','text'],['station','最近捷運站','text'],['transport_routes','交通指南｜人工推薦路線','routes'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
+          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖（1200×900）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
+        ],
+        columns:['title','category','is_published'],
+        subtitle:(x)=>x.category || x.average_cost || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['小吃','小吃'],['咖啡','咖啡'],['餐廳','餐廳'],['甜點','甜點']],
+        order:'sort_order',
+        idPrefix:'food',
+        tips:`<ul class="tip-list"><li>美食封面建議：1200 × 900 px。</li><li>餐點照可用 4:3，店面照建議橫式。</li></ul>`
+      },
+      trips: {
+        label:'行程管理', kicker:'TRIPS', table:'trips', preview:'trip.html?id=',
+        hint:'行程改為分段管理。先看列表，點編輯後可自由新增 3 段、4 段或 6 段，每段可填時間、標題、說明與圖片，並可拖曳排序。',
+        fields:[
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
+          ['summary','摘要','textarea'],['google_route','Google路線','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
+        ],
+        columns:['title','duration','is_published'],
+        subtitle:(x)=>x.duration || '-',
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['半日','半日'],['一日','一日'],['親子','親子'],['雨天','雨天']],
+        order:'sort_order',
+        idPrefix:'trip',
+        tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>分段建議：每段填「時間、標題、說明、圖片網址」。</li><li>可新增任意段數，例如 3 段、4 段或 6 段，並拖曳調整順序。</li><li>若圖片留空，前台只顯示文字段落。</li></ul>`
+      },
+      coupons: {
+        label:'優惠管理', kicker:'COUPONS', table:'coupons', preview:'coupon.html?id=',
+        hint:'可用優惠名稱、日期、內容搜尋。優惠圖建議方形，方便手機瀏覽。',
+        fields:[
+          ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','優惠名稱','text','required'],
+          ['summary','摘要','textarea'],['content','優惠內容','textarea'],['start_date','開始日期','date'],['end_date','結束日期','date'],
+          ['official_website','連結網址','text'],['cover_image','封面圖（1080×1080）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
+        ],
+        columns:['title','end_date','is_published'],
+        subtitle:(x)=>(x.start_date || '-') + ' ~ ' + (x.end_date || '-'),
+        statusKey:'is_published',
+        typeOptions:[['all','全部類型'],['住宿','住宿'],['美食','美食'],['親子','親子'],['北捷行旅','北捷行旅']],
+        order:'sort_order',
+        idPrefix:'coupon',
+        tips:`<ul class="tip-list"><li>優惠券圖片建議：1080 × 1080 px。</li><li>優惠文字請避免直接寫在圖片邊緣，手機會被裁切。</li></ul>`
+      }
+    };
+
+    let currentTable = 'banners';
+    let cache = [];
+    let currentList = [];
+    let draggingId = '';
+    let editingId = '';
+    let currentUserRole = 'admin';
+
+    async function checkLogin(){
+      const { data } = await db.auth.getSession();
+      if(!data.session){ location.href = 'admin-login.html'; return; }
+      document.getElementById('userDisplayName').textContent = '管理員';
+      await loadMyProfile(data.session.user);
+      const initialWorkspace=location.hash;
+      switchTable('banners');
+      if(initialWorkspace==='#review'||initialWorkspace==='#submissions')openWorkspace('review');refreshReviewBadge();
+    }
+
+    function showChangePassword(){
+      document.getElementById('changePasswordForm').reset();
+      document.getElementById('changePasswordMsg').textContent='';
+      document.getElementById('changePasswordDialog').showModal();
+    }
+    function closeChangePassword(){document.getElementById('changePasswordDialog').close();}
+    async function changeMyPassword(event){
+      event.preventDefault();
+      const msg=document.getElementById('changePasswordMsg');
+      const btn=document.getElementById('changePasswordSubmit');
+      const oldPassword=document.getElementById('oldPassword').value;
+      const next=document.getElementById('newPassword').value;
+      if(next.length<8 || next!==document.getElementById('confirmPassword').value){msg.textContent='新密碼至少 8 碼，且兩次輸入必須一致。';return;}
+      if(oldPassword===next){msg.textContent='新密碼不可與舊密碼相同。';return;}
+      btn.disabled=true;msg.textContent='正在驗證目前密碼…';
+      try{
+        const {data:{user},error:userError}=await db.auth.getUser();
+        if(userError || !user?.email) throw Error('請重新登入');
+        const verifier=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+        let ok=false;
+        try{const {data,error}=await verifier.auth.signInWithPassword({email:user.email,password:oldPassword});ok=!error&&data?.user?.id===user.id;}
+        finally{await verifier.auth.signOut({scope:'local'}).catch(()=>{});}
+        if(!ok) throw Error('目前密碼驗證失敗');
+        msg.textContent='正在更新密碼…';
+        const {error}=await db.auth.updateUser({password:next});
+        if(error) throw error;
+        document.getElementById('changePasswordForm').reset();
+        msg.textContent='密碼已更新。請使用新密碼進行後續驗證。';
+      }catch(e){msg.textContent='變更失敗：'+e.message;}
+      finally{btn.disabled=false;}
+    }
+    async function logout(){ await db.auth.signOut(); location.href='admin-login.html'; }
+
+
+    async function loadMyProfile(user){
+      // 第一位超級管理員保底：避免 RLS 或舊表欄位造成「管理員帳號」閃一下又消失
+      if(user.email === 'metroinn2026@gmail.com'){
+        currentUserRole = 'super_admin';
+      }
+
+      try{
+        const { data, error } = await db
+          .from('admin_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if(!error && data?.role){
+          currentUserRole = data.role;
+        }
+        const preferredName = String(data?.display_name || '').trim();
+        const fallbackName = String(user.user_metadata?.full_name || user.user_metadata?.name || '').trim();
+        const emailPrefix = String(user.email || '').split('@')[0];
+        document.getElementById('userDisplayName').textContent = (preferredName && preferredName !== user.email) ? preferredName : (fallbackName || emailPrefix || '管理員');
+
+        if(!data){
+          await db.from('admin_profiles').upsert({
+            id:user.id,
+            username:user.email === 'metroinn2026@gmail.com' ? 'metroinn2026' : user.email,
+            email:user.email,
+            role:user.email === 'metroinn2026@gmail.com' ? 'super_admin' : 'admin',
+            display_name:String(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || '管理員')
+          },{onConflict:'id'});
+        }
+      }catch(err){
+        console.warn('profile read failed, fallback role used', err);
+      }
+
+      // 再保底一次，避免查詢失敗後被當成一般管理員
+      if(user.email === 'metroinn2026@gmail.com'){
+        currentUserRole = 'super_admin';
+      }
+
+      const accountLink = document.querySelector('[data-table="admin_profiles"]');
+      if(accountLink){
+        accountLink.style.display = '';
+      }
+    }
+
+    function requireSuperAdmin(){
+      if(currentUserRole !== 'super_admin'){
+        alert('此功能限超級管理員使用。');
+        return false;
+      }
+      return true;
+    }
+
+
+    async function refreshReviewBadge(){
+      const badge=document.getElementById('reviewPendingBadge');if(!badge)return;
+      const tables=['spots','foods','trips','travel_submissions'];let total=0;
+      try{for(const table of tables){for(const status of ['pending','needs_changes']){
+        const {count,error}=await db.from(table).select('*',{count:'exact',head:true}).eq('review_status',status).eq('is_published',false);
+        if(error)throw error;total+=count||0;
+      }}badge.textContent=total;badge.style.display=total?'inline-block':'none';}
+      catch(e){badge.style.display='none';console.warn('待辦數讀取失敗',e);}
+    }
+    window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='metro-review-updated')refreshReviewBadge();});
+    function openWorkspace(kind, query=''){
+      history.replaceState(null,'','#'+kind);
+      document.getElementById('cmsPanel').hidden=true;
+      const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
+      document.getElementById('workspaceTitle').textContent='內容審核';
+      const url='content-review.html';
+      const target=url+'?embedded=1'+(query?'&'+query:'');
+      const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
+      document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
+      window.scrollTo({top:0});
+    }
+    document.querySelectorAll('#sideNav a[data-workspace]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();openWorkspace(link.dataset.workspace);}));
+    window.addEventListener('message',event=>{
+      if(event.origin!==location.origin||event.source!==document.getElementById('workspaceFrame').contentWindow)return;
+      if(event.data?.type==='metro-edit'&&['spots','foods'].includes(event.data.table)){
+        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===event.data.table));
+        switchTable(event.data.table);
+        // Load the selected record after the database query finishes.
+        const target=event.data.id;
+        const timer=setInterval(()=>{if(cache.some(r=>r.id===target)){clearInterval(timer);editItem(target);}},100);
+        setTimeout(()=>clearInterval(timer),5000);
+      }
+    });
+    document.querySelectorAll('#sideNav a').forEach(a=>{
+      a.addEventListener('click',()=>{
+        if(!a.dataset.table) return;
+        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.remove('active'));
+        a.classList.add('active');
+        switchTable(a.dataset.table);
+      });
+    });
+
+    function switchTable(table){
+      if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+      
+      document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
+      currentTable = table;
+      const isAccount = table === 'admin_profiles';
+      const accountCard = document.getElementById('myAccountCard');
+      accountCard.hidden = !isAccount;
+      if(isAccount){
+        db.auth.getUser().then(({data})=>{
+          document.getElementById('myAccountInfo').textContent = data?.user?.email || '目前登入帳號';
+        });
+      }
+      const manageAccounts = !isAccount || currentUserRole === 'super_admin';
+      document.getElementById('listView').style.display = manageAccounts ? '' : 'none';
+      document.getElementById('newBtn').style.display = manageAccounts ? '' : 'none';
+      document.getElementById('contentCountCard').hidden = !['news','spots','foods','trips','coupons'].includes(table);
+      const cfg = configs[currentTable];
+      // 已移除裝飾性英文分類標題。
+      adminSelectionReset();
+      document.getElementById('currentTitle').textContent = cfg.label;
+      document.getElementById('sectionHint').textContent = cfg.hint;
+      document.getElementById('newBtn').style.display = currentTable === 'site_settings' || (currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') ? 'none' : 'inline-flex';
+      const manual=['spots','foods'].includes(currentTable);
+      document.querySelectorAll('.normal-save').forEach(b=>b.style.display=manual?'none':'');
+      document.querySelectorAll('.draft-save,.publish-save').forEach(b=>b.style.display=manual?'':'none');
+      document.getElementById('imageTips').innerHTML = cfg.tips || imageTipsDefault;
+      buildForm();
+      setupFilters();
+      backToList(false);
+      if(manageAccounts) loadCurrentTable();
+    }
+
+    function setupFilters(){
+      const type = document.getElementById('typeFilter');
+      type.innerHTML = configs[currentTable].typeOptions.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('statusFilter').style.display = configs[currentTable].statusKey ? 'block' : 'none';
+    }
+
+    function clearFilters(){
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('typeFilter').value = 'all';
+      renderList();
+    }
+
+
+    function imageFieldTemplate(name,label){
+      return `
+        <div class="form-row">
+          <label>${label}</label>
+          <div class="image-field-box">
+            <input id="f_${name}" type="text" placeholder="可貼圖片網址，或使用下方本機上傳" oninput="updateImagePreview(); updateFieldThumb('${name}')">
+            <div class="image-field-actions">
+              <input id="upload_${name}" type="file" accept="${name === 'logo_url' ? 'image/svg+xml,image/png,image/webp' : 'image/*'}" style="display:none" onchange="uploadImageForField('${name}', this.files[0])">
+              <button type="button" onclick="document.getElementById('upload_${name}').click()">上傳本機圖片</button>
+              <button type="button" onclick="document.getElementById('f_${name}').value=''; updateFieldThumb('${name}'); updateImagePreview();">清除圖片</button>
+            </div>
+            <div class="source-hint">${name === 'logo_url' ? '建議使用原始向量 SVG（或透明 PNG／WEBP），保留橫式比例。上傳後請按右上角「儲存」；若 SVG 上傳失敗，請確認 Supabase site-images 儲存桶允許 image/svg+xml。' : '也可以直接貼外部圖片網址。若使用外部圖片，請記得在「圖片來源」欄位填寫來源文字。'}</div>
+            <div id="thumb_${name}" class="image-thumb" style="display:none"></div>
+          </div>
+        </div>`;
+    }
+
+
+    function buildForm(){
+      const cfg = configs[currentTable];
+      const wrap = document.getElementById('formFields');
+      wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
+        if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
+        if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
+        if(type === 'routes') return `<div class="form-row"><label>${label}</label><div class="help">一條路線一組：第一行填路線名稱（如：捷運＋步行），其後每行用「類型｜站點｜說明」輸入步驟；不同路線用空白行分隔。類型可填步行、捷運、公車、轉乘、抵達。留白則使用景點自動捷運路線；人工路線優先顯示。請先查證路線及時間再填寫。</div><textarea id="f_${name}" rows="12" placeholder="捷運＋步行&#10;步行｜北捷行旅｜步行至復興崗站，約○分鐘&#10;捷運｜復興崗站｜搭乘淡水信義線至北投站&#10;轉乘｜北投站｜轉乘新北投支線&#10;步行｜新北投站｜步行前往景點，約○分鐘&#10;抵達｜抵達景點｜"></textarea></div>`;
+        if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
+        if(type === 'image') return imageFieldTemplate(name,label);
+        if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
+        if(type === 'boolean') return `<div class="form-row" ${['spots','foods'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
+        return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'||flag==='fixed1'?'readonly':''} oninput="updateImagePreview()"></div>`;
+      }).join('');
+      clearForm();
+    }
+
+    const bulkTables=new Set(['spots','foods','trips','coupons','news']);
+    let adminChecked=new Set(),adminBusy=false;
+    function adminSelectionReset(){adminChecked.clear();updateAdminBulk();}
+    function updateAdminBulk(){
+      const active=bulkTables.has(currentTable);
+      const bar=document.getElementById('adminBulkBar');if(!bar)return;
+      bar.style.display=active?'flex':'none';
+      document.getElementById('adminSelectedCount').textContent=`已選 ${adminChecked.size} 筆`;
+      const all=document.getElementById('adminSelectAll');
+      all.checked=!!currentList.length&&currentList.every(x=>adminChecked.has(String(x.id)));
+      all.indeterminate=!all.checked&&currentList.some(x=>adminChecked.has(String(x.id)));
+      all.disabled=adminBusy||!currentList.length;
+      document.getElementById('adminBulkDelete').disabled=adminBusy||!adminChecked.size;
+    }
+    function toggleAdminAll(checked){currentList.forEach(x=>checked?adminChecked.add(String(x.id)):adminChecked.delete(String(x.id)));renderList();}
+    function toggleAdminRow(id,checked){checked?adminChecked.add(String(id)):adminChecked.delete(String(id));updateAdminBulk();}
+    async function adminBulkDelete(){
+      if(adminBusy||!adminChecked.size)return;
+      const table=currentTable,ids=[...adminChecked];
+      adminBusy=true;updateAdminBulk();
+      const msg=document.getElementById('adminBulkMsg');msg.textContent='等待身分驗證…';
+      try{const result=await secureBulkDelete(db,table,ids,configs[table].label);if(result){msg.textContent=`成功刪除 ${result.deleted} 筆`;adminChecked.clear();await loadCurrentTable();}}
+      catch(e){msg.textContent='刪除失敗：'+e.message;alert(msg.textContent);}
+      finally{adminBusy=false;updateAdminBulk();}
+    }
+    function buildHead(){
+      const cfg = configs[currentTable];
+      let second = currentTable==='banners' ? '排序' :
+                   currentTable==='site_settings' ? '設定值' :
+                   currentTable==='spots' ? '地區 / 站點' :
+                   currentTable==='foods' ? '類型 / 價格' :
+                   currentTable==='trips' ? '建議時間' :
+                   currentTable==='coupons' ? '期限' : '日期';
+      const selectHead=bulkTables.has(currentTable)?'<th style="width:38px">勾選</th>':'';
+      const sortHead = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : '<th style="width:56px">排序</th>';
+      document.getElementById('tableHead').innerHTML = `<tr>${selectHead}${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
+    }
+
+    function nextId(){
+      const cfg = configs[currentTable];
+      if(cfg.idMode === 'auth') return '建立後自動產生';
+      if(cfg.idMode === 'uuid') return crypto.randomUUID();
+      if(cfg.idMode === 'fixed1') return 1;
+      const prefix = cfg.idPrefix || currentTable;
+      const nums = cache.map(x=>String(x.id||'').replace(prefix+'_','')).map(n=>parseInt(n,10)).filter(n=>!isNaN(n));
+      const next = nums.length ? Math.max(...nums)+1 : 1;
+      return `${prefix}_${String(next).padStart(4,'0')}`;
+    }
+
+    function slugify(text){
+      return String(text||'').trim().toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g,'-').replace(/^-+|-+$/g,'') || `${currentTable}-${Date.now()}`;
+    }
+
+    function clearForm(){
+      editingId = '';
+      document.getElementById('formTitle').textContent = '新增內容';
+      document.getElementById('formMsg').textContent = '';
+      document.getElementById('previewLink').style.display = 'none';
+      document.getElementById('deleteInEditor').style.display = 'none';
+      configs[currentTable].fields.forEach(([name,label,type,flag])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(name==='id') el.value = nextId();
+        else if(name==='role') el.value = 'admin';
+        else if(name==='password') el.value = '';
+        else if(name==='sort_order') el.value = String((cache.map(x=>Number(x.sort_order||0)).reduce((a,b)=>Math.max(a,b),0) || cache.length) + 1);
+        else if(name==='is_published') el.value = ['spots','foods'].includes(currentTable)?'false':'true';
+        else if(name==='is_active') el.value='true';
+        else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
+        else el.value = '';
+      });
+      if(currentTable === 'trips') renderTripSections([]);
+      refreshAllImageThumbs();
+      updateImagePreview();
+    }
+
+    function newItem(){
+      clearForm();
+      document.getElementById('listView').classList.add('hidden');
+      document.getElementById('editorView').classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function backToList(scroll=true){
+      document.getElementById('listView').classList.remove('hidden');
+      document.getElementById('editorView').classList.remove('active');
+      if(scroll) window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    async function loadCurrentTable(){
+      if(currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') return;
+      buildHead();
+      const tbody = document.getElementById('listBody');
+      tbody.innerHTML = '<tr><td colspan="6">資料載入中...</td></tr>';
+      const cfg = configs[currentTable];
+      const orderCol = cfg.order || 'sort_order';
+      const ascending = currentTable !== 'news';
+      const { data, error, count } = await db.from(cfg.table).select('*', {count:'exact'}).order(orderCol, { ascending });
+      if(error){
+        console.error(error);
+        tbody.innerHTML = `<tr><td colspan="6">讀取失敗：${error.message}</td></tr>`;
+        return;
+      }
+      cache = data || [];
+      if(['news','spots','foods','trips','coupons'].includes(currentTable)) {
+        document.getElementById('contentCountNumber').textContent = count == null ? '—' : count.toLocaleString('zh-TW');
+        document.getElementById('contentCountDetail').textContent = '包含已上架及未上架資料';
+      }
+      renderList();
+    }
+
+
+    function friendlyId(item, index){
+      if(currentTable === 'banners'){
+        const n = Number(item.sort_order || index + 1);
+        return `banner_${String(n).padStart(4,'0')}`;
+      }
+      if(currentTable === 'admin_profiles'){
+        return item.email || item.id;
+      }
+      return item.id;
+    }
+
+    function roleLabel(role){
+      if(role === 'super_admin') return '<span class="role-pill super">超級管理員</span>';
+      if(role === 'admin') return '<span class="role-pill">管理員</span>';
+      return '<span class="badge">未設定</span>';
+    }
+
+
+    function renderList(){
+      const keyword = document.getElementById('searchInput').value.trim();
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const cfg = configs[currentTable];
+
+      let list = cache.filter(item=>{
+        const text = JSON.stringify(item);
+        const matchKeyword = !keyword || text.includes(keyword);
+        const matchStatus = !cfg.statusKey || status==='all' ||
+          (status==='published' && item[cfg.statusKey]) ||
+          (status==='draft' && !item[cfg.statusKey]);
+        const matchType = type==='all' || text.includes(type);
+        return matchKeyword && matchStatus && matchType;
+      });
+
+      currentList = list;
+      const detail = document.getElementById('contentCountDetail');
+      if(!document.getElementById('contentCountCard').hidden) {
+        const filtering = keyword || status !== 'all' || type !== 'all';
+        detail.textContent = filtering ? `符合條件 ${list.length} 筆（已載入清單）` : (list.length ? `顯示第 1–${list.length} 筆` : '目前沒有資料');
+      }
+      updateAdminBulk();
+      const tbody = document.getElementById('listBody');
+      document.getElementById('sortSaveBar').classList.remove('active');
+
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="7">沒有符合條件的資料。</td></tr>'; return; }
+
+      tbody.innerHTML = list.map(item=>{
+        const title = item.title || item.footer_title || item.booking_text || item.id;
+        const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
+          ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
+          : `<span class="badge">固定設定</span>`);
+        const previewHref = ['spots','foods'].includes(currentTable) && !item.is_published ? cfg.preview + encodeURIComponent(item.id)+'&admin_preview=1' : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
+        const sortCell = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : `
+          <td>
+            <span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span>
+            <span class="row-order">#${item.sort_order ?? '-'}</span>
+          </td>`;
+        return `
+          <tr data-id="${item.id}" draggable="${(currentTable === 'site_settings' || currentTable === 'admin_profiles') ? 'false' : 'true'}">
+            ${bulkTables.has(currentTable)?`<td><input type="checkbox" aria-label="選取資料 ${item.id}" ${adminChecked.has(String(item.id))?'checked':''} onchange="toggleAdminRow('${item.id}',this.checked)"></td>`:''}
+            ${sortCell}
+            <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
+            <td><strong>${title || '未命名'}</strong></td>
+            <td>${cfg.subtitle(item)}</td>
+            <td>${statusHtml}</td>
+            <td>
+              <div class="actions">
+                <button onclick="editItem('${item.id}')">編輯</button>
+                ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
+                ${currentTable !== 'site_settings' ? `<button class="danger" onclick="deleteItem('${item.id}')">刪除</button>` : ''}
+                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+
+      bindDragSort();
+    }
+
+    function bindDragSort(){
+      if(currentTable === 'site_settings' || currentTable === 'admin_profiles') return;
+      document.querySelectorAll('#listBody tr[data-id]').forEach(row=>{
+        row.addEventListener('dragstart', e=>{
+          draggingId = row.dataset.id;
+          row.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', ()=>{
+          row.classList.remove('dragging');
+          document.querySelectorAll('#listBody tr').forEach(r=>r.classList.remove('drag-over'));
+        });
+        row.addEventListener('dragover', e=>{
+          e.preventDefault();
+          if(row.dataset.id !== draggingId) row.classList.add('drag-over');
+        });
+        row.addEventListener('dragleave', ()=>row.classList.remove('drag-over'));
+        row.addEventListener('drop', e=>{
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          if(!draggingId || draggingId === row.dataset.id) return;
+          reorderCurrentList(draggingId, row.dataset.id);
+        });
+      });
+    }
+
+    function reorderCurrentList(fromId, toId){
+      const fromIndex = currentList.findIndex(x=>String(x.id)===String(fromId));
+      const toIndex = currentList.findIndex(x=>String(x.id)===String(toId));
+      if(fromIndex < 0 || toIndex < 0) return;
+      const moved = currentList.splice(fromIndex,1)[0];
+      currentList.splice(toIndex,0,moved);
+
+      // Update visible order only; database is updated after pressing save.
+      currentList.forEach((item, index)=> item.sort_order = index + 1);
+      cache = currentList.concat(cache.filter(x=>!currentList.some(y=>String(y.id)===String(x.id))));
+      renderListFromCurrent();
+      document.getElementById('sortSaveBar').classList.add('active');
+    }
+
+    function renderListFromCurrent(){
+      const cfg = configs[currentTable];
+      const tbody = document.getElementById('listBody');
+      tbody.innerHTML = currentList.map(item=>{
+        const title = item.title || item.footer_title || item.booking_text || item.id;
+        const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
+          ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
+          : `<span class="badge">固定設定</span>`);
+        const previewHref = ['spots','foods'].includes(currentTable) && !item.is_published ? cfg.preview + encodeURIComponent(item.id)+'&admin_preview=1' : (cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(item.id) : cfg.preview);
+        return `
+          <tr data-id="${item.id}" draggable="true">
+            ${bulkTables.has(currentTable)?`<td><input type="checkbox" aria-label="選取資料 ${item.id}" ${adminChecked.has(String(item.id))?'checked':''} onchange="toggleAdminRow('${item.id}',this.checked)"></td>`:''}
+            <td><span class="drag-handle" draggable="true" data-id="${item.id}" title="按住拖曳排序">↕</span><span class="row-order">#${item.sort_order ?? '-'}</span></td>
+            <td><span class="id-code">${friendlyId(item, currentList.indexOf(item))}</span></td>
+            <td><strong>${title || '未命名'}</strong></td>
+            <td>${cfg.subtitle(item)}</td>
+            <td>${statusHtml}</td>
+            <td>
+              <div class="actions">
+                <button onclick="editItem('${item.id}')">編輯</button>
+                ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
+                <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
+                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+      bindDragSort();
+    }
+
+    async function saveSortOrder(){
+      if(currentTable === 'site_settings' || currentTable === 'admin_profiles') return;
+      const updates = currentList.map((item, index)=>
+        db.from(configs[currentTable].table).update({sort_order:index+1}).eq('id',item.id)
+      );
+      const results = await Promise.all(updates);
+      const failed = results.find(r=>r.error);
+      if(failed){
+        alert('排序儲存失敗：' + failed.error.message + '\n請確認已執行 sort_order SQL。');
+        return;
+      }
+      document.getElementById('sortSaveBar').classList.remove('active');
+      await loadCurrentTable();
+    }
+
+    function editItem(id){
+      const item = cache.find(x=>String(x.id)===String(id));
+      if(!item) return;
+      editingId = id;
+      document.getElementById('formTitle').textContent = '編輯內容';
+      configs[currentTable].fields.forEach(([name,label,type])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(type==='boolean' || type==='booleanActive') el.value = item[name] ? 'true' : 'false';
+        else if(name === 'password') el.value = '';
+        else if(type==='routes') el.value = routesToText(item[name]);
+        else el.value = item[name] ?? '';
+      });
+      const link = document.getElementById('previewLink');
+      const cfg = configs[currentTable];
+      link.href = cfg.preview.includes('=') ? cfg.preview + encodeURIComponent(id) : cfg.preview;
+      link.style.display = 'inline-flex';
+      document.getElementById('deleteInEditor').style.display = currentTable === 'site_settings' ? 'none' : 'inline-flex';
+      document.getElementById('listView').classList.add('hidden');
+      document.getElementById('editorView').classList.add('active');
+      if(currentTable === 'trips') renderTripSections(item.trip_sections || []);
+      refreshAllImageThumbs();
+      updateImagePreview();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function routesToText(value){
+      if(!Array.isArray(value)) return '';
+      return value.map(route=>[route.title||'推薦路線',...(route.steps||[]).map(step=>[step.type||'步行',step.name||'',step.detail||''].join('｜'))].join('\n')).join('\n\n');
+    }
+    function textToRoutes(text){
+      return String(text||'').trim().split(/\n\s*\n/).filter(Boolean).map(block=>{
+        const lines=block.split('\n').map(x=>x.trim()).filter(Boolean);
+        return {title:lines[0],enabled:true,steps:lines.slice(1).map(line=>{
+          const parts=line.split(/[｜|]/);
+          return {type:(parts.shift()||'步行').trim(),name:(parts.shift()||'').trim(),detail:parts.join('｜').trim()};
+        }).filter(x=>x.name)};
+      }).filter(x=>x.steps.length);
+    }
+    function formPayload(){
+      const payload = {};
+      configs[currentTable].fields.forEach(([name,label,type])=>{
+        const el = document.getElementById('f_'+name);
+        if(!el) return;
+        if(type==='sections') payload[name] = collectTripSections();
+        else if(type==='routes') payload[name] = textToRoutes(el.value);
+        else if(type==='boolean' || type==='booleanActive') payload[name] = el.value === 'true';
+        else if(type==='number') payload[name] = el.value === '' ? null : Number(el.value);
+        else payload[name] = String(el.value || '').trim();
+      });
+      if(!payload.id) payload.id = nextId();
+      if(currentTable==='featured_picks'){payload.category=String(payload.category||'').toLowerCase();if(!['spot','food','trip'].includes(payload.category)){document.getElementById('formMsg').textContent='內容類型請填 spot、food 或 trip。';return null;}if(!payload.content_id){document.getElementById('formMsg').textContent='請填寫對應內容 ID。';return null;}payload.topics=String(payload.topics||'').split(',').map(t=>t.trim()).filter(Boolean).join(',');}
+      if(currentTable==='featured_topics'){payload.id=String(payload.id||'').trim().toLowerCase();if(!/^[a-z][a-z0-9_-]*$/.test(payload.id)){document.getElementById('formMsg').textContent='分類代碼請使用英文小寫開頭及英數字、底線或連字號。';return null;}}
+      if('slug' in payload && !payload.slug && payload.title) payload.slug = slugify(payload.title);
+      Object.keys(payload).forEach(k=>{ if(payload[k]==='') payload[k]=null; });
+      return payload;
+    }
+
+
+    async function saveAdminProfile(){
+      if(!requireSuperAdmin()) return;
+      const msg = document.getElementById('formMsg');
+      const id = document.getElementById('f_id').value;
+      const email = document.getElementById('f_email').value.trim();
+      const role = document.getElementById('f_role').value;
+      const display_name = document.getElementById('f_display_name').value.trim();
+      const password = document.getElementById('f_password').value;
+
+      if(!email){
+        msg.textContent = '請輸入 Email。';
+        return;
+      }
+
+      msg.textContent = '儲存管理員帳號中...';
+
+      if(id && id !== '建立後自動產生'){
+        // Existing profiles have UPDATE (own row) RLS, but no INSERT policy.
+        // Do not use upsert here: it requires INSERT permission even for an existing row.
+        const { data: authResult, error: authError } = await db.auth.getUser();
+        const signedInUser = authResult?.user;
+        if(authError || !signedInUser){
+          msg.textContent = '登入狀態已失效，請重新登入後再試。';
+          return;
+        }
+        if(signedInUser.id !== id){
+          msg.textContent = '目前資料庫僅允許修改自己的帳號資料；其他管理員的權限與暱稱需透過具權限的後端管理功能修改。';
+          return;
+        }
+        const existing = cache.find(item => String(item.id) === String(id));
+        if(!existing){ msg.textContent = '找不到原有帳號資料，請重新讀取後再試。'; return; }
+        if(email !== existing.email || role !== existing.role || password){
+          msg.textContent = '此處目前僅支援修改自己的暱稱；Email、角色及密碼需使用獨立的安全帳號管理流程。請還原其他欄位並將密碼留空。';
+          return;
+        }
+        const { data: updated, error } = await db.from('admin_profiles')
+          .update({display_name})
+          .eq('id', signedInUser.id)
+          .select('id, display_name');
+        if(error){ msg.textContent = '更新失敗：' + error.message; return; }
+        if(!updated?.length){ msg.textContent = '沒有更新到資料，請確認帳號權限後重試。'; return; }
+        document.getElementById('userDisplayName').textContent = display_name || email.split('@')[0] || '管理員';
+        await loadCurrentTable();
+        editItem(id);
+        document.getElementById('formMsg').textContent = '暱稱已更新。';
+        return;
+      }
+
+      if(!password || password.length < 6){
+        msg.textContent = '新增帳號時密碼至少 6 碼。';
+        return;
+      }
+
+      const { data: sessionData } = await db.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch('/api/create-admin-user', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({email,password,role,display_name})
+      });
+
+      const result = await res.json().catch(()=>({}));
+      if(!res.ok){
+        msg.textContent = '新增失敗：' + (result.error || '請確認 Vercel 環境變數與 API 已部署');
+        return;
+      }
+
+      msg.textContent = '管理員帳號已建立。';
+      await loadCurrentTable();
+      editItem(result.user_id);
+    }
+
+
+    async function saveItem(mode){
+      if(currentTable === 'admin_profiles') return saveAdminProfile();
+      const msg = document.getElementById('formMsg');
+      const payload = formPayload();
+      if(!payload)return;
+      if(currentTable==='featured_picks' && payload.is_active && cache.filter(x=>x.is_active && x.id!==payload.id).length>=10){msg.textContent='最多只能啟用 10 筆精選，請先停用其他項目。';return;}
+      if(configs[currentTable].fields.some(f=>f[3]==='required') && !payload.title){
+        msg.textContent = '請輸入標題 / 名稱。';
+        return;
+      }
+      msg.textContent = '儲存中...';
+      document.getElementById('formMsgTop').textContent = msg.textContent;
+      if(['spots','foods'].includes(currentTable)){
+        if(!['draft','publish'].includes(mode)){msg.textContent='請選擇「儲存草稿」或「儲存並上架」。';return;}
+        payload.is_published=mode==='publish';
+        payload.review_status=mode==='publish'?'approved':'pending';
+        if(mode==='publish'&&!confirm('已確認資料內容、來源及圖片使用權，確定公開上架？'))return;
+      }
+      const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
+      if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; document.getElementById('formMsgTop').textContent=msg.textContent; return; }
+      msg.textContent = '已儲存。';
+      document.getElementById('formMsgTop').textContent=msg.textContent;
+      await loadCurrentTable();
+      editItem(payload.id);
+      document.getElementById('formMsgTop').textContent='儲存成功，資料已更新。';
+    }
+
+    async function toggleItem(id){
+      const item = cache.find(x=>String(x.id)===String(id));
+      if(!item) return;
+      if(currentTable==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;}
+      const key = configs[currentTable].statusKey;
+      if(['spots','foods'].includes(currentTable)&&!item.is_published){
+        if(!confirm('已確認此筆資料內容與圖片使用權，確定直接上架？'))return;
+        const {error}=await db.from(configs[currentTable].table).update({is_published:true,review_status:'approved'}).eq('id',id);
+        if(error){alert('上架失敗：'+error.message);return;}
+        await loadCurrentTable();return;
+      }
+      const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
+      if(error){ alert('更新失敗：' + error.message); return; }
+      await loadCurrentTable();
+    }
+
+    async function deleteItem(id){
+      if(!confirm('確定要刪除這筆資料嗎？')) return;
+      if(bulkTables.has(currentTable)){
+        try{const result=await secureBulkDelete(db,currentTable,[String(id)],configs[currentTable].label);if(!result)return;}
+        catch(e){alert('刪除失敗：'+e.message);return;}
+      }else{
+        const {error}=await db.from(configs[currentTable].table).delete().eq('id',id);
+        if(error){alert('刪除失敗：'+error.message);return;}
+      }
+      await loadCurrentTable();
+      backToList();
+    }
+
+    function deleteEditingItem(){
+      const id = document.getElementById('f_id')?.value;
+      if(id) deleteItem(id);
+    }
+
+    function updateImagePreview(){
+      const preview = document.getElementById('imagePreview');
+      const candidates = ['image_pc','cover_image','logo_url','image_mobile'];
+      let url = '';
+      for(const name of candidates){
+        const el = document.getElementById('f_'+name);
+        if(el && el.value.trim()){ url = el.value.trim(); break; }
+      }
+      if(url && /^https?:\/\//.test(url)){
+        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='圖片網址無法預覽，請確認網址是否公開可讀。'">`;
+      }else{
+        preview.textContent = '圖片預覽';
+      }
+    }
+
+
+    function normalizeTripSections(sections){
+      if(!Array.isArray(sections)) return [];
+      return sections.map((s, index)=>({
+        time: s.time || '',
+        title: s.title || '',
+        text: s.text || s.description || '',
+        image: s.image || s.image_url || '',
+        image_source: s.image_source || s.source || '',
+        order: Number(s.order || index + 1)
+      })).sort((a,b)=>a.order-b.order);
+    }
+
+    function renderTripSections(sections){
+      const editor = document.getElementById('tripSectionsEditor');
+      const hidden = document.getElementById('f_trip_sections');
+      if(!editor || !hidden) return;
+
+      const list = normalizeTripSections(sections);
+      hidden.value = JSON.stringify(list);
+
+      if(!list.length){
+        editor.innerHTML = '<div class="help">尚未新增分段。請按「＋新增一段」。</div>';
+        return;
+      }
+
+      editor.innerHTML = list.map((s,index)=>`
+        <div class="trip-section-card" draggable="true" data-index="${index}">
+          <div class="trip-section-head">
+            <strong>第 ${String(index+1).padStart(2,'0')} 段</strong>
+            <div class="actions">
+              <button type="button" onclick="removeTripSection(${index})">刪除此段</button>
+            </div>
+          </div>
+          <div class="trip-section-grid">
+            <div class="form-row">
+              <label>時間</label>
+              <input data-field="time" value="${escapeHtml(s.time)}" placeholder="13:00" oninput="syncTripSections()">
+            </div>
+            <div class="form-row">
+              <label>段落標題</label>
+              <input data-field="title" value="${escapeHtml(s.title)}" placeholder="地熱谷" oninput="syncTripSections()">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>說明</label>
+            <textarea data-field="text" placeholder="這一站的介紹與注意事項" oninput="syncTripSections()">${escapeHtml(s.text)}</textarea>
+          </div>
+          <div class="trip-section-image-row">
+            <div class="form-row">
+              <label>圖片網址（可留空）</label>
+              <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
+              <div class="image-field-actions">
+                <input id="section_upload_${index}" type="file" accept="image/*" style="display:none" onchange="uploadTripSectionImage(${index}, this.files[0])">
+                <button type="button" onclick="document.getElementById('section_upload_${index}').click()">上傳本機圖片</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>圖片來源文字</label>
+              <input data-field="image_source" value="${escapeHtml(s.image_source || '')}" placeholder="例：圖片來源：臺北市政府觀光傳播局" oninput="syncTripSections()">
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      bindTripSectionDrag();
+    }
+
+    function collectTripSections(){
+      const cards = [...document.querySelectorAll('.trip-section-card')];
+      return cards.map((card,index)=>({
+        time: card.querySelector('[data-field="time"]')?.value.trim() || '',
+        title: card.querySelector('[data-field="title"]')?.value.trim() || '',
+        text: card.querySelector('[data-field="text"]')?.value.trim() || '',
+        image: card.querySelector('[data-field="image"]')?.value.trim() || '',
+        image_source: card.querySelector('[data-field="image_source"]')?.value.trim() || '',
+        order: index + 1
+      })).filter(s=>s.time || s.title || s.text || s.image);
+    }
+
+    function syncTripSections(){
+      const hidden = document.getElementById('f_trip_sections');
+      if(hidden) hidden.value = JSON.stringify(collectTripSections());
+    }
+
+    function addTripSection(){
+      const list = collectTripSections();
+      list.push({time:'', title:'', text:'', image:'', order:list.length+1});
+      renderTripSections(list);
+    }
+
+    function removeTripSection(index){
+      const list = collectTripSections();
+      list.splice(index,1);
+      renderTripSections(list);
+    }
+
+
+    async function uploadTripSectionImage(index, file){
+      if(!file) return;
+      const msg = document.getElementById('formMsg');
+      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(!allowed.includes(file.type)){
+        alert('請上傳 JPG、PNG、WEBP 或 GIF 圖片。');
+        return;
+      }
+      if(file.size > 3 * 1024 * 1024){
+        alert('圖片建議小於 3MB，請先壓縮後再上傳。');
+        return;
+      }
+      msg.textContent = '分段圖片上傳中...';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const safeId = (document.getElementById('f_id')?.value || 'trip').replaceAll('/','-');
+      const path = `trips/${safeId}/section-${index+1}-${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('site-images').upload(path, file, {cacheControl:'3600',upsert:true,contentType:file.type});
+      if(error){
+        msg.textContent = '分段圖片上傳失敗：' + error.message;
+        return;
+      }
+      const cards = [...document.querySelectorAll('.trip-section-card')];
+      const input = cards[index]?.querySelector('[data-field="image"]');
+      if(input){
+        input.value = publicImageUrl(path);
+        syncTripSections();
+        msg.textContent = '分段圖片已上傳。';
+      }
+    }
+
+
+    function bindTripSectionDrag(){
+      let fromIndex = null;
+      document.querySelectorAll('.trip-section-card').forEach(card=>{
+        card.addEventListener('dragstart',()=>{
+          fromIndex = Number(card.dataset.index);
+          card.classList.add('dragging');
+        });
+        card.addEventListener('dragend',()=>{
+          card.classList.remove('dragging');
+          document.querySelectorAll('.trip-section-card').forEach(c=>c.classList.remove('drag-over'));
+        });
+        card.addEventListener('dragover',e=>{
+          e.preventDefault();
+          card.classList.add('drag-over');
+        });
+        card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+        card.addEventListener('drop',e=>{
+          e.preventDefault();
+          const toIndex = Number(card.dataset.index);
+          if(fromIndex === null || fromIndex === toIndex) return;
+          const list = collectTripSections();
+          const moved = list.splice(fromIndex,1)[0];
+          list.splice(toIndex,0,moved);
+          renderTripSections(list);
+        });
+      });
+    }
+
+    function escapeHtml(value){
+      return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+
+
+    function publicImageUrl(path){
+      const { data } = db.storage.from('site-images').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function uploadImageForField(fieldName, file){
+      if(!file) return;
+      const msg = document.getElementById('formMsg');
+      const isLogo = fieldName === 'logo_url';
+      const allowed = isLogo ? ['image/svg+xml','image/png','image/webp'] : ['image/jpeg','image/png','image/webp','image/gif'];
+      const isSvg = isLogo && (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name));
+      if(!allowed.includes(file.type) && !isSvg){
+        msg.textContent = isLogo ? '網站 CI 僅接受 SVG、PNG 或 WEBP。' : '請上傳 JPG、PNG、WEBP 或 GIF 圖片。';
+        return;
+      }
+      if(file.size > 3 * 1024 * 1024){
+        msg.textContent = '檔案不可超過 3MB。';
+        return;
+      }
+      // Browser-side checks improve feedback only; Storage policy/server must also restrict uploads.
+      if(isSvg){
+        const svgText = await file.text();
+        const xml = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+        const bad = /<parsererror|<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<iframe\b|<object\b|<embed\b|<image\b|\bon[a-z]+\s*=|\b(?:href|xlink:href)\s*=\s*["']\s*(?:https?:|data:|javascript:)|url\s*\(\s*["']?\s*(?:https?:|data:|javascript:)/i;
+        if(xml.querySelector('parsererror') || xml.documentElement.localName !== 'svg' || bad.test(svgText)){
+          msg.textContent = 'SVG 含有不支援的外部資源或動態內容，請改用純向量路徑的 SVG。';
+          return;
+        }
+      }
+
+      msg.textContent = '圖片上傳中...';
+      const ext = isSvg ? 'svg' : (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const safeId = (document.getElementById('f_id')?.value || currentTable || 'item').replaceAll('/','-');
+      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName}.${ext}`;
+
+      const { error } = await db.storage.from('site-images').upload(path, file, {
+        cacheControl:'3600',
+        upsert:true,
+        contentType:isSvg ? 'image/svg+xml' : file.type
+      });
+
+      if(error){
+        console.error(error);
+        msg.textContent = '圖片上傳失敗：' + error.message + (isSvg ? '。請確認 Supabase site-images 儲存桶允許 image/svg+xml，並確認上傳權限。' : '。請確認 site-images 儲存桶與上傳權限。');
+        return;
+      }
+
+      const url = publicImageUrl(path);
+      document.getElementById('f_' + fieldName).value = url;
+      updateFieldThumb(fieldName);
+      updateImagePreview();
+      msg.textContent = '圖片已上傳並帶入網址。';
+    }
+
+    function updateFieldThumb(fieldName){
+      const el = document.getElementById('f_' + fieldName);
+      const thumb = document.getElementById('thumb_' + fieldName);
+      if(!el || !thumb) return;
+      const url = el.value.trim();
+      if(!url){
+        thumb.style.display = 'none';
+        thumb.innerHTML = '';
+        return;
+      }
+      thumb.style.display = 'flex';
+      thumb.innerHTML = `<img src="${url}" onerror="this.style.display='none'"><div><strong>縮圖預覽</strong><small>${url}</small></div>`;
+    }
+
+    function refreshAllImageThumbs(){
+      document.querySelectorAll('[id^="f_"]').forEach(el=>{
+        const name = el.id.replace('f_','');
+        if(document.getElementById('thumb_' + name)) updateFieldThumb(name);
+      });
+    }
+
+
+    checkLogin();
+  </script>
+</body>
+</html>

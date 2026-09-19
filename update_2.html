@@ -1,0 +1,267 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>內容審核中心｜北投旅圖</title><link rel="stylesheet" href="admin.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="secure-delete.js"></script><style>body{max-width:none;margin:auto;padding:16px;color:#333;background:#fff}body.embedded .standalone-back{display:none}section{border:1px solid #ddd;padding:18px;margin:18px 0;background:#fff}button,select,input,textarea{padding:9px;margin:5px}textarea{width:100%;min-height:80px}button{cursor:pointer}.muted{color:#666}.row{display:flex;gap:15px;flex-wrap:wrap;align-items:center}.row>*{max-width:100%}.item{border-top:1px solid #ddd;padding:15px 0}.hide{display:none}.badge{background:#e5f2f7;padding:5px}.preview{width:100%;height:65vh;border:1px solid #ddd}.review-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,1fr);gap:16px}.review-controls{min-width:0}.sticky-actions{position:sticky;bottom:0;background:white;padding:10px 0;display:flex;gap:8px;border-top:1px solid #ddd}@media(max-width:800px){.review-layout{grid-template-columns:1fr}.preview{height:50vh}}label{display:block;margin:8px 0}.item button{margin-right:8px}
+/* Phase 3.1: consistent control alignment inside the embedded admin workspace. */
+*,*::before,*::after{box-sizing:border-box}
+body.embedded{padding:0;background:transparent}
+body.embedded>h1{display:none}
+body.embedded>p.muted{margin:8px 0 12px}
+body.embedded section{margin:14px 0;padding:18px;border-color:#d6e2f2;border-radius:10px}
+body.embedded section:first-of-type{margin-top:0}
+body.embedded #app{min-width:0}
+body.embedded .row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+body.embedded .row>label{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;gap:6px;margin:0;line-height:1.35;font-size:13px;color:#52647a;font-weight:600}
+body.embedded .row>label select,body.embedded .row>label input{margin:0;min-height:40px;height:40px;font-size:14px;font-weight:400;color:#27364a}
+body.embedded .row>button{height:40px;min-height:40px;margin:0;white-space:nowrap;align-self:flex-end}
+body.embedded #category{min-width:125px}
+body.embedded #filter{min-width:110px}
+body.embedded #search{width:min(270px,100%)}
+body.embedded #reviewSection>.row,body.embedded body>.row{margin:12px 0 16px}
+body.embedded #detail .row{align-items:center}
+body.embedded #detail .row>button{align-self:center}
+body.embedded .review-controls>label{margin:10px 0;line-height:1.5}
+body.embedded #publishLabel{display:flex;align-items:center;gap:8px}
+body.embedded #publishLabel input{margin:0}
+body.embedded .sticky-actions{align-items:center;flex-wrap:wrap}
+body.embedded .sticky-actions button{margin:0;min-height:40px}
+body.embedded #file{margin:8px 8px 8px 0;max-width:100%}
+@media(max-width:650px){body.embedded .row{align-items:stretch}body.embedded .row>label{flex:1 1 150px}body.embedded #search{width:100%}body.embedded .row>button{align-self:stretch}}
+
+/* Review dashboard: compact horizontal summary cards and numbered rows. */
+.review-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 18px}
+.review-stat{appearance:none;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;min-width:0;margin:0;padding:14px 16px;border:1px solid #e0e9f6;border-top:4px solid #6c9bf3;border-radius:12px;background:#fff;color:#10243e;cursor:pointer}
+.review-stat strong{font-size:30px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums}
+.review-stat .stat-title,.review-stat .stat-desc{font-size:13px;color:#52647a;font-weight:600}
+.review-stat[aria-pressed="true"]{border-color:#3675d1;border-top-color:#245fc3;background:#f2f7ff}
+.review-stat:focus-visible{outline:3px solid #3675d1;outline-offset:2px}
+.review-list-row{display:grid;grid-template-columns:32px 42px minmax(0,1fr) auto;align-items:center;gap:12px}
+.review-number{font-weight:700;color:#52647a;font-variant-numeric:tabular-nums}
+.review-row-main{min-width:0}.review-row-main p{margin:6px 0;overflow-wrap:anywhere}
+.review-row-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.review-row-actions button{margin:0}.review-select{width:18px;height:18px;margin:0;cursor:pointer}.review-bulk-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0;padding:10px 12px;background:#f4f8ff;border:1px solid #d6e2f2;border-radius:8px}.review-bulk-toolbar label{display:flex;align-items:center;gap:7px;margin:0}.review-bulk-toolbar button{margin:0}.review-bulk-toolbar .review-delete:disabled{opacity:.45;cursor:not-allowed}.review-bulk-toolbar #bulkMsg{font-size:13px;color:#52647a;overflow-wrap:anywhere}.review-delete{color:#ad3333;border:1px solid #e7b9b9;background:#fff}
+.review-delete:hover{background:#fff4f4}
+@media(max-width:800px){.review-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.review-list-row{grid-template-columns:24px 30px minmax(0,1fr)}.review-row-actions{grid-column:3;justify-content:flex-start}}
+@media(max-width:440px){.review-stats{gap:8px}.review-stat{padding:10px}.review-stat strong{font-size:24px}}
+
+.inline-editor{display:grid;gap:12px;margin:16px 0;padding:14px;border:1px solid #d8e4f4;background:#f7faff;border-radius:8px}.inline-editor .form-row{display:grid;gap:5px;min-width:0}.inline-editor label{font-weight:700;margin:0}.inline-editor input,.inline-editor textarea{box-sizing:border-box;width:100%;margin:0;background:#fff;border:1px solid #b9cbe3;border-radius:6px}.inline-editor textarea{min-height:105px;resize:vertical}.inline-editor .hint{font-size:12px;color:#52647a}.review-controls{min-width:0}.review-preview{min-width:0}.review-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.review-actions button{margin:0}.review-controls .sticky-actions{flex-wrap:wrap;z-index:3}.review-controls .sticky-actions button{margin:0}
+
+.review-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap;overflow-x:auto;border:1px solid #d8e4f4;border-radius:8px;padding:10px;margin:12px 0;background:#fff}.review-topbar button{margin:0;white-space:nowrap;flex-shrink:0}.review-pager,.review-top-actions,.preview-heading{display:flex;align-items:center;gap:8px}.review-top-actions{margin-left:auto}.review-top-actions #approvePublish{background:#168453;color:white;border:1px solid #168453}.review-top-actions #save{background:#245bc4;color:white;border:1px solid #245bc4}.preview-heading{justify-content:space-between;flex-wrap:wrap}.preview-heading h3{margin:8px 0}.preview-heading button{margin:0}.review-layout{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}.review-preview,.review-controls{min-width:0}.preview{height:72vh;background:white}.review-controls h2{margin-top:8px}#previewMsg{margin:5px 0;font-size:12px}body.embedded{padding:8px}@media(max-width:900px){.review-layout{grid-template-columns:1fr}.review-topbar{gap:8px}.preview{height:55vh}}
+
+/* 審稿左右等高：由右側完整表單決定列高，左側 iframe 填滿剩餘高度。 */
+@media (min-width:901px){
+  #detail .review-layout{align-items:stretch;grid-auto-rows:auto;}
+  #detail .review-preview{display:flex;flex-direction:column;min-height:0;min-width:0;}
+  #detail .review-preview .preview-heading{flex:0 0 auto;}
+  #detail .review-preview #previewMsg{flex:0 0 auto;}
+  #detail .review-preview #frame{display:block;flex:1 1 auto;height:0;min-height:650px;width:100%;}
+}
+/* 窄螢幕改為上下排列，避免預覽被長表單拉得過高。 */
+@media (max-width:900px){
+  #detail .review-preview #frame{height:65vh;min-height:420px;}
+}
+
+/* 交通指南置於最近捷運站下方，審稿時不用捲到表單最底部。 */
+.transport-review-field{border:2px solid #a9c7ef;border-radius:8px;background:#edf5ff;padding:14px}
+.transport-review-field>label{font-size:16px;color:#153c70}
+.transport-review-field textarea{min-height:250px;line-height:1.7}
+
+/* 2026-09-19 審稿完整編輯、分頁與可靠預覽 */
+#detail .review-layout{align-items:stretch;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#detail .review-preview{display:flex;flex-direction:column;min-height:0}
+#detail #frame{flex:1 1 auto;height:0;min-height:700px;border:1px solid #d6e2f2;border-radius:6px}
+#detail .review-controls{min-width:0}
+.review-editor-tabs{display:flex;gap:4px;overflow-x:auto;margin:12px 0;border-bottom:1px solid #d6e2f2;padding-bottom:7px}
+.review-editor-tabs button{white-space:nowrap;margin:0;padding:10px 12px;border:1px solid #d6e2f2;border-radius:6px;background:#fff;color:#243b5a}
+.review-editor-tabs button[aria-selected=true]{background:#245bc4;color:#fff}
+.inline-editor{display:block;background:#fff;padding:0;border:0}
+.inline-editor .form-row{margin:12px 0;padding:0;display:grid;gap:5px}
+.inline-editor .form-row[hidden]{display:none!important}
+.route-group{padding:12px;margin:12px 0;border:1px solid #d6e2f2;border-radius:8px;background:#f7faff}
+.route-step{display:grid;grid-template-columns:120px minmax(0,1fr) 44px;gap:7px;margin:7px 0}
+.route-step input,.route-step select{min-width:0;width:100%;margin:0}
+.route-step .step-name{grid-column:2}
+.route-step .step-detail{grid-column:1 / 3}
+.route-step button{grid-column:3;grid-row:1 / 3;margin:0;color:#ae3333}
+.route-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.route-toolbar button,.route-add{margin:0}
+.review-note-only{margin-top:18px}
+@media(max-width:900px){#detail .review-layout{grid-template-columns:1fr}#detail #frame{height:65vh;min-height:450px}}
+</style></head><body><a class="standalone-back" href="admin.html">← 返回管理後台</a><h1>內容審核</h1><div class="row"><button type="button" id="officialSource">官方資料</button><button type="button" id="publicSource">民眾投稿</button><button type="button" id="auditTab">操作紀錄</button><label>內容分類 <select id="category"><option value="spots">景點</option><option value="foods">美食</option><option value="trips">行程</option></select></label><button id="reviewTab" type="button">官方資料審稿</button><button id="importTab" type="button">批次匯入</button></div><p class="muted">匯入資料全部預設未公開；審核通過後才可上架。完整預覽只限已登入的管理員。</p><p id="notice" role="status">確認登入中…</p><div id="app" class="hide"><section id="publicSection" class="hide"><h2>民眾投稿待辦</h2><iframe id="publicFrame" title="民眾投稿審核" style="width:100%;height:calc(100vh - 250px);min-height:700px;border:0" loading="eager"></iframe></section><section id="auditSection" class="hide"><h2>操作紀錄</h2><p class="muted">由資料庫自動記錄新增、修改、刪除及審核狀態變更；不保存欄位內容及投稿者個資。需先執行隨附 SQL。</p><button type="button" id="reloadAudit">重新整理紀錄</button><p id="auditMsg" role="status"></p><div style="overflow:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th>時間</th><th>操作人員</th><th>資料分類</th><th>資料 ID</th><th>動作</th><th>異動欄位</th></tr></thead><tbody id="auditRows"></tbody></table></div></section><section id="importSection" class="hide"><h2>批次匯入 JSON</h2><p>接受 UTF-8 JSON 陣列；欄位使用目前所選分類的資料表欄位名稱。每筆須有名稱 title；景點／美食沿用既有匯入程序。行程必須提供唯一 id，支援 trip_sections 分段陣列。全部強制未公開，不刪除其他資料；行程匯入前請先備份。</p><input id="file" type="file" accept=".json,application/json"><button id="import">檢查並匯入草稿</button><p id="importMsg" role="status"></p></section><section id="reviewSection"><h2>官方資料審稿清單</h2><div id="reviewStats" class="review-stats" aria-label="審稿狀態統計"></div><div class="row"><label>狀態 <select id="filter"><option value="pending">待審核</option><option value="needs_changes">待補件</option><option value="all">全部待辦</option></select></label><label>搜尋 <input id="search" placeholder="名稱、ID、地區／類別"></label><button id="reload">重新整理</button></div><div class="review-bulk-toolbar"><label><input id="selectAll" class="review-select" type="checkbox" aria-label="全選目前篩選結果">全選目前清單</label><span id="selectionCount" aria-live="polite">已選取 0 筆</span><button id="bulkDelete" class="review-delete" type="button" disabled>批次刪除（超級管理員驗證）</button><span id="bulkMsg" role="status"></span></div><div id="items"></div></section><section id="detail" class="hide"><div class="review-topbar"><button id="backReview" type="button">← 返回審稿清單</button><div class="review-pager"><button id="prev" type="button">上一筆</button><span id="reviewPosition" aria-live="polite"></span><button id="next" type="button">下一筆</button></div><div class="review-top-actions"><button id="save" type="button">儲存草稿</button><button id="refreshPreview" type="button">更新預覽</button><button id="approvePublish" type="button">審核通過並上架</button></div></div><div class="review-layout"><div class="review-preview"><div class="preview-heading"><h3>完整網頁預覽</h3><button id="preview" type="button">在新視窗開啟 ↗</button></div><p id="previewMsg" class="muted" role="status"></p><iframe id="frame" class="preview" title="完整預覽" loading="eager"></iframe></div><div class="review-controls"><h2 id="detailTitle">景點審稿</h2><h3>直接編輯內容</h3><p class="muted">修改欄位後按「更新預覽」即可查看未儲存的效果；只有按「儲存草稿」或「審核通過並上架」才會寫入資料庫。</p><div id="editorTabs" class="review-editor-tabs" role="tablist" aria-label="編輯分類"></div><div id="inlineEditor" class="inline-editor"></div><label class="review-note-only">審稿備註 <textarea id="note"></textarea></label><p id="saveMsg" role="status"></p></div></div></section></div><script>
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY),$=id=>document.getElementById(id);let rows=[],selected=null,category='spots',checkedIds=new Set(),visibleRows=[],bulkBusy=false;if(new URLSearchParams(location.search).has('embedded'))document.body.classList.add('embedded');const allowed=['id','sort_order','slug','title','area','station','summary','content','address','business_hours','stay_time','tags','google_map','official_website','cover_image','cover_image_source','transport_metro','transport_bus','transport_car'];function node(tag,text){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;}async function init(){const {data:{user}}=await db.auth.getUser();if(!user){location.href='admin-login.html';return;}const {data:profile,error}=await db.from('admin_profiles').select('role').eq('id',user.id).maybeSingle();if(error||!['admin','super_admin'].includes(profile?.role)){$('notice').textContent='沒有管理員權限。';return;}$('app').classList.remove('hide');await load();const id=new URLSearchParams(location.search).get('id');if(id)choose(id);}async function load(){$('notice').textContent='讀取中…';const {data,error}=await db.from(category).select('*').order('sort_order',{ascending:true}).limit(1000);if(error){$('notice').textContent='讀取失敗：'+error.message;return;}rows=data||[];checkedIds.clear();$('bulkMsg').textContent='';$('notice').textContent='已讀取 '+rows.length+' 筆（最多 1000 筆）。';renderStats();render();}const statusLabels={pending:'待審核',needs_changes:'待補件',approved:'已通過'};
+function renderStats(){
+ const counts={all:0,pending:0,needs_changes:0};
+ for(const r of rows){const key=r.review_status||'pending';if(!r.is_published&&Object.hasOwn(counts,key)&&key!=='all'){counts[key]++;counts.all++;}}
+ const cards=[['all','全部待辦','目前尚待處理'],['pending','待審核','尚未完成內容審核'],['needs_changes','待補件','資料需補充或修正']];
+ $('reviewStats').replaceChildren();
+ for(const [key,title,desc] of cards){const b=node('button');b.type='button';b.className='review-stat';b.setAttribute('aria-pressed',String($('filter').value===key));b.append(node('span',title),node('strong',String(counts[key])),node('span',desc));b.firstChild.className='stat-title';b.lastChild.className='stat-desc';b.onclick=()=>{$('filter').value=key;clearSelection();render();};$('reviewStats').append(b);}
+}
+function render(){
+ const q=$('search').value.trim().toLowerCase(),f=$('filter').value;
+ const list=rows.filter(r=>!r.is_published&&['pending','needs_changes'].includes(r.review_status||'pending')&&(f==='all'||(r.review_status||'pending')===f)&&(!q||[r.id,r.title,r.area,r.category].join(' ').toLowerCase().includes(q)));
+ $('reviewStats').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.firstChild.textContent===({all:'全部待辦',pending:'待審核',needs_changes:'待補件'})[f])));
+ visibleRows=list;updateSelectionToolbar();$('items').replaceChildren();if(!list.length){$('items').append(node('p','沒有符合的資料。'));return;}
+ list.forEach((r,i)=>{const box=node('div');box.className='item review-list-row';
+ const checkbox=node('input');checkbox.type='checkbox';checkbox.className='review-select';checkbox.checked=checkedIds.has(r.id);checkbox.disabled=bulkBusy;checkbox.setAttribute('aria-label','選取 '+(r.title||r.id)+'（'+r.id+'）');checkbox.onchange=()=>{if(checkbox.checked)checkedIds.add(r.id);else checkedIds.delete(r.id);updateSelectionToolbar();};
+ const num=node('span',String(i+1)+'.');num.className='review-number';
+ const main=node('div');main.className='review-row-main';main.append(node('strong',r.title||'未命名'),node('p',`${r.id}｜${(category==='spots'?r.area:r.category)||'未指定分類'}｜${statusLabels[r.review_status||'pending']||r.review_status}｜${r.is_published?'已上架':'未公開'}`));
+ const actions=node('div');actions.className='review-row-actions';const review=node('button','審稿／完整預覽');review.type='button';review.onclick=()=>choose(r.id);
+ const del=node('button','刪除');del.type='button';del.className='review-delete';del.setAttribute('aria-label','刪除 '+(r.title||r.id));del.onclick=()=>deleteRecord(r);
+ actions.append(review,del);box.append(checkbox,num,main,actions);$('items').append(box);
+ });
+}
+function clearSelection(){checkedIds.clear();$('bulkMsg').textContent='';updateSelectionToolbar();}
+function updateSelectionToolbar(){
+ const count=checkedIds.size,all=visibleRows.length>0&&visibleRows.every(r=>checkedIds.has(r.id));
+ $('selectionCount').textContent=`已選取 ${count} 筆`;
+ $('selectAll').checked=all;
+ $('selectAll').indeterminate=!all&&visibleRows.some(r=>checkedIds.has(r.id));
+ $('selectAll').disabled=bulkBusy||visibleRows.length===0;
+ $('bulkDelete').disabled=bulkBusy||count===0;
+}
+$('selectAll').onchange=()=>{
+ if($('selectAll').checked)visibleRows.forEach(r=>checkedIds.add(r.id));
+ else visibleRows.forEach(r=>checkedIds.delete(r.id));
+ render();
+};
+$('bulkDelete').onclick=async()=>{
+ if(bulkBusy||!checkedIds.size)return;
+ const targets=rows.filter(r=>checkedIds.has(r.id));
+ bulkBusy=true;updateSelectionToolbar();
+ try{const result=await secureBulkDelete(db,category,targets.map(r=>r.id),category==='spots'?'景點':'美食');
+ if(result){checkedIds.clear();await load();$('bulkMsg').textContent=`成功刪除 ${result.deleted} 筆。`;}}
+ catch(e){$('bulkMsg').textContent='刪除失敗：'+e.message;alert($('bulkMsg').textContent);}
+ finally{bulkBusy=false;updateSelectionToolbar();}
+};
+async function deleteRecord(r){
+ try{const result=await secureBulkDelete(db,category,[r.id],category==='spots'?'景點':'美食');if(!result)return;
+ if(selected?.id===r.id){selected=null;$('detail').classList.add('hide');$('reviewSection').classList.remove('hide');}
+ await load();$('notice').textContent=`已刪除 ${r.id}。`;}
+ catch(e){alert('刪除失敗：'+e.message);}
+}
+const editorialFields={
+ spots:[['sort_order','排序數字','number'],['slug','網址代稱'],['title','景點名稱'],['area','地區'],['station','最近捷運站'],['transport_routes','交通指南｜步行／捷運／公車／轉乘','routes'],['summary','摘要','textarea'],['content','介紹內容','textarea'],['address','地址'],['business_hours','營業時間'],['stay_time','建議停留'],['tags','標籤'],['google_map','Google Maps 連結'],['official_website','官方網站'],['cover_image','封面圖片網址'],['cover_image_source','圖片來源']],
+ foods:[['sort_order','排序數字','number'],['slug','網址代稱'],['title','店名'],['category','類型'],['address','地址'],['business_hours','營業時間'],['phone','電話'],['average_cost','平均消費'],['price_range','價格區間'],['tags','標籤'],['station','最近捷運站'],['transport_routes','交通指南｜步行／捷運／公車／轉乘','routes'],['summary','摘要','textarea'],['content','介紹內容','textarea'],['google_map','Google Maps 連結'],['official_website','官方網站'],['cover_image','封面圖片網址'],['cover_image_source','圖片來源']],
+ trips:[['sort_order','排序數字','number'],['slug','網址代稱'],['title','行程名稱'],['duration','建議時間'],['summary','摘要','textarea'],['google_route','Google 路線'],['cover_image','封面圖片網址'],['cover_image_source','圖片來源'],['trip_sections','行程分段（JSON）','json']]
+};
+// 與 admin.html 使用相同的人工交通路線文字格式，避免審稿時編輯 JSON。
+function reviewRoutesToText(value){
+ if(!Array.isArray(value))return '';
+ return value.map(route=>[route.title||'推薦路線',...(route.steps||[]).map(step=>[step.type||'步行',step.name||'',step.detail||''].join('｜'))].join('\n')).join('\n\n');
+}
+function reviewTextToRoutes(text){
+ const raw=String(text||'').trim();if(!raw)return [];
+ return raw.split(/\n\s*\n/).filter(Boolean).map((block,i)=>{
+  const lines=block.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(lines.length<2)throw Error('第 '+(i+1)+' 條交通路線至少需要路線名稱及一個步驟。');
+  const steps=lines.slice(1).map((line,j)=>{
+   const parts=line.split(/[｜|]/);
+   if(parts.length<2||!parts[1].trim())throw Error('第 '+(i+1)+' 條路線第 '+(j+1)+' 個步驟缺少站點名稱。');
+   return {type:(parts.shift()||'步行').trim(),name:(parts.shift()||'').trim(),detail:parts.join('｜').trim()};
+  });
+  return {title:lines[0],enabled:true,steps};
+ });
+}
+let editorDirty=false;
+const reviewTabNames=['基本資訊','詳細內容','交通指南','圖片管理','其他設定'];
+let currentEditorTab='基本資訊';
+const tabFields={
+ '基本資訊':['sort_order','slug','title','area','category','station','duration','tags'],
+ '詳細內容':['summary','content','trip_sections'],
+ '交通指南':['transport_routes','transport_metro','transport_bus','transport_car','google_route'],
+ '圖片管理':['cover_image','cover_image_source'],
+ '其他設定':['address','business_hours','stay_time','phone','average_cost','price_range','google_map','official_website']
+};
+function setEditorTab(name){currentEditorTab=name;document.querySelectorAll('#inlineEditor .form-row').forEach(w=>w.hidden=w.dataset.tab!==name);$('editorTabs').querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.textContent===name)));}
+function markReviewDirty(){editorDirty=true;$('saveMsg').textContent='有尚未儲存的修改。';}
+function buildRoutesEditor(wrap,value){
+ const root=node('div');root.className='routes-editor';root.dataset.field='transport_routes';
+ let routes=Array.isArray(value)?JSON.parse(JSON.stringify(value)):[];
+ function render(){root.replaceChildren();routes.forEach((route,ri)=>{
+  const group=node('div');group.className='route-group';const head=node('div');head.className='route-toolbar';
+  const name=node('input');name.placeholder='路線名稱，例如：捷運＋步行';name.value=route.title||'';name.setAttribute('aria-label','第'+(ri+1)+'條路線名稱');name.oninput=()=>{route.title=name.value;markReviewDirty();};
+  const remove=node('button','刪除路線');remove.type='button';remove.onclick=()=>{routes.splice(ri,1);markReviewDirty();render();};head.append(name,remove);group.append(head);
+  (route.steps||[]).forEach((step,si)=>{const line=node('div');line.className='route-step';const type=node('select');for(const t of ['步行','捷運','公車','轉乘','抵達']){const opt=node('option',t);opt.value=t;type.append(opt);}type.value=step.type||'步行';type.onchange=()=>{step.type=type.value;markReviewDirty();};
+  const location=node('input');location.className='step-name';location.placeholder='站點／地點';location.value=step.name||'';location.oninput=()=>{step.name=location.value;markReviewDirty();};
+  const detail=node('input');detail.className='step-detail';detail.placeholder='步行時間、搭乘方向、站數等說明';detail.value=step.detail||'';detail.oninput=()=>{step.detail=detail.value;markReviewDirty();};
+  const del=node('button','×');del.type='button';del.setAttribute('aria-label','刪除此步驟');del.onclick=()=>{route.steps.splice(si,1);markReviewDirty();render();};line.append(type,location,detail,del);group.append(line);});
+  const add=node('button','＋ 新增步驟');add.type='button';add.onclick=()=>{route.steps=route.steps||[];route.steps.push({type:'步行',name:'',detail:''});markReviewDirty();render();};group.append(add);root.append(group);
+ });const addRoute=node('button','＋ 新增推薦路線');addRoute.type='button';addRoute.className='route-add';addRoute.onclick=()=>{routes.push({title:'推薦路線 '+(routes.length+1),enabled:true,steps:[]});markReviewDirty();render();};root.append(addRoute);}
+ root.getValue=()=>routes;render();wrap.append(root);
+ wrap.append(node('span','北捷行旅至復興崗站：步行約 6 分鐘｜550 公尺。人工路線未設定時，前台沿用自動捷運路線。')).lastChild.className='hint';
+}
+function buildEditor(){const container=$('inlineEditor');container.replaceChildren();$('editorTabs').replaceChildren();for(const name of reviewTabNames){const b=node('button',name);b.type='button';b.setAttribute('role','tab');b.onclick=()=>setEditorTab(name);$('editorTabs').append(b);}
+ for(const [key,label,type] of editorialFields[category]||[]){if(!(key in selected)&&key!=='transport_routes')continue;const wrap=node('div');wrap.className='form-row';wrap.dataset.tab=reviewTabNames.find(t=>tabFields[t].includes(key))||'其他設定';const caption=node('label',label);caption.htmlFor='review_field_'+key;wrap.append(caption);
+ if(type==='routes'){buildRoutesEditor(wrap,selected[key]);container.append(wrap);continue;}
+ const el=node(type==='textarea'||type==='json'?'textarea':'input');el.id='review_field_'+key;el.dataset.field=key;if(el.tagName==='INPUT')el.type=type==='number'?'number':'text';let value=selected[key];el.value=type==='json'?(value==null?'':JSON.stringify(value,null,2)):(value??'');el.addEventListener('input',markReviewDirty);wrap.append(el);if(type==='json')wrap.append(node('span','請維持有效 JSON 格式。')).lastChild.className='hint';container.append(wrap);
+ }setEditorTab(currentEditorTab);}
+function confirmLeave(){return !editorDirty||confirm('目前有尚未儲存的內容，確定離開並捨棄修改？');}
+function previewUrl(){return (category==='spots'?'spot.html?id=':category==='foods'?'food.html?id=':'trip.html?id=')+encodeURIComponent(selected.id)+'&admin_preview=1';}
+function previewPayload(){const record={...selected};for(const el of $('inlineEditor').querySelectorAll('[data-field]')){let value=el.value;if(el.dataset.field==='sort_order')value=value.trim()===''?null:Number(value);if(el.dataset.field==='trip_sections'){try{value=value.trim()?JSON.parse(value):null;}catch(e){throw Error('行程分段 JSON 格式錯誤：'+e.message);}}record[el.dataset.field]=value;}const routes=$('inlineEditor').querySelector('.routes-editor');if(routes&&'transport_routes' in selected)record.transport_routes=routes.getValue();return record;}
+function safeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fallbackPreview(record){const routes=Array.isArray(record.transport_routes)?record.transport_routes:[];const cover=String(record.cover_image||'');const image=/^https:\/\//i.test(cover)?'<img alt="封面圖片" style="width:100%;max-height:370px;object-fit:cover" src="'+safeHtml(cover)+'">':'';
+ const routeHtml=routes.map(r=>'<h3>'+safeHtml(r.title)+'</h3>'+(r.steps||[]).map(st=>'<p>● '+safeHtml(st.type)+'｜'+safeHtml(st.name)+'｜'+safeHtml(st.detail)+'</p>').join('')).join('');
+ return '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>body{margin:0;font:16px/1.8 system-ui,sans-serif;color:#24344a}header{padding:20px;border-bottom:1px solid #ddd}main{padding:22px}h1{font-size:30px}p{white-space:pre-wrap}.notice{background:#fff0bc;padding:8px;text-align:center}section{margin:24px 0}a{color:#245bc4}</style></head><body><div class="notice">管理員編輯預覽｜尚未儲存，不對外公開</div><header>METRO INN　｜　北投旅圖</header>'+image+'<main><small>首頁 › '+safeHtml(category==='spots'?'景點':category==='foods'?'美食':'行程')+'</small><h1>'+safeHtml(record.title)+'</h1><p>'+safeHtml(record.summary)+'</p><section><h2>詳細介紹</h2><p>'+safeHtml(record.content||'')+'</p></section><section><h2>交通指南</h2><p>最近捷運站：'+safeHtml(record.station||'待確認')+'</p>'+routeHtml+'</section></main></body></html>';}
+function updatePreview(){if(!selected)return;try{const payload=previewPayload();sessionStorage.setItem('metro_review_preview_'+category+'_'+selected.id,JSON.stringify(payload));const frame=$('frame');$('previewMsg').textContent='編輯預覽已更新（未儲存）；正式頁面可按右上角「在新視窗開啟」。';frame.removeAttribute('src');frame.srcdoc=fallbackPreview(payload);}catch(e){$('previewMsg').textContent='無法預覽：'+e.message;}}
+function choose(id){if(selected?.id!==id&&!confirmLeave())return;selected=rows.find(r=>r.id===id);if(!selected)return;editorDirty=false;$('detail').classList.remove('hide');$('reviewSection').classList.add('hide');$('detailTitle').textContent='審稿：'+selected.title;buildEditor();$('note').value=selected.review_note||'';$('reviewPosition').textContent=(rows.findIndex(r=>r.id===selected.id)+1)+' / '+rows.length;updatePreview();$('saveMsg').textContent='';window.scrollTo({top:0,behavior:'smooth'});}
+
+$('refreshPreview').onclick=updatePreview;
+$('preview').onclick=()=>{if(selected){updatePreview();window.open(previewUrl(),'_blank','noopener');}};
+let approveRequested=false;$('approvePublish').onclick=()=>{if(!selected)return;approveRequested=true;$('save').click();};
+$('save').onclick=async()=>{if(!selected)return;const status=approveRequested?'approved':(selected.review_status||'pending'),published=approveRequested?true:!!selected.is_published;approveRequested=false;if(published&&!confirm('已核對內容、來源、圖片授權，確定公開？'))return;const payload={};for(const el of $('inlineEditor').querySelectorAll('[data-field]')){const key=el.dataset.field;let value=el.value;if(key==='sort_order'){value=value.trim()===''?null:Number(value);if(value!==null&&!Number.isFinite(value)){$('saveMsg').textContent='排序數字無效';return;}}else if(key==='transport_routes'){try{value=reviewTextToRoutes(value);}catch(e){$('saveMsg').textContent=e.message;el.focus();return;}}else if(key==='trip_sections'){try{value=value.trim()?JSON.parse(value):null;}catch(e){$('saveMsg').textContent='「'+key+'」JSON 格式錯誤：'+e.message;el.focus();return;}}if(key==='transport_routes'&&!(key in selected)){if(String(el.value).trim()){$('saveMsg').textContent='資料庫尚無 transport_routes 欄位，請先確認已執行交通指南資料庫更新 SQL。';el.focus();return;}continue;}payload[key]=value;}const routeEditor=$('inlineEditor').querySelector('.routes-editor');if(routeEditor){const routeValue=routeEditor.getValue();if('transport_routes' in selected)payload.transport_routes=routeValue;else if(routeValue.length){$('saveMsg').textContent='資料庫缺少 transport_routes 欄位，請先執行既有交通指南資料庫更新 SQL。';return;}}if(!String(payload.title??selected.title).trim()){$('saveMsg').textContent='名稱不可留空';return;}const previousId=selected.id;$('save').disabled=true;$('saveMsg').textContent='儲存中…';try{const {data:{user}}=await db.auth.getUser();Object.assign(payload,{review_status:status,review_note:$('note').value.trim(),is_published:published,reviewed_at:new Date().toISOString(),reviewed_by:user.id});const {data,error}=await db.from(category).update(payload).eq('id',previousId).select('id');if(error||!data?.length)throw Error(error?.message||'沒有更新到資料');editorDirty=false;await load();window.parent.postMessage({type:'metro-review-updated'},location.origin);if(published){selected=null;$('detail').classList.add('hide');$('reviewSection').classList.remove('hide');$('notice').textContent='已上架，稿件已移出待辦清單。';}else{choose(previousId);$('saveMsg').textContent='內容及審核結果已儲存，預覽已更新。';}}catch(e){$('saveMsg').textContent='儲存失敗：'+e.message;}finally{$('save').disabled=false;}};
+async function importTripDrafts(records){
+ const fields=['id','sort_order','slug','title','duration','summary','google_route','cover_image','cover_image_source','trip_sections'];
+ const ids=new Set(), slugs=new Set();
+ const clean=records.map((r,i)=>{
+  if(!r.id||typeof r.id!=='string'||!/^[-a-zA-Z0-9_]{1,100}$/.test(r.id))throw Error(`第 ${i+1} 筆行程必須提供合法 id。`);
+  if(ids.has(r.id))throw Error(`重複行程 ID：${r.id}`);ids.add(r.id);
+  if(r.slug&&slugs.has(r.slug))throw Error(`重複網址代稱：${r.slug}`);if(r.slug)slugs.add(r.slug);
+  if(!Array.isArray(r.trip_sections)||!r.trip_sections.length)throw Error(`第 ${i+1} 筆缺少行程分段。`);
+  if(r.trip_sections.some(s=>!s||typeof s!=='object'||Array.isArray(s)||!String(s.title||'').trim()))throw Error(`第 ${i+1} 筆有無效分段標題。`);
+  const item=Object.fromEntries(fields.filter(k=>Object.prototype.hasOwnProperty.call(r,k)).map(k=>[k,r[k]]));
+  item.trip_sections=r.trip_sections.map((s,j)=>({time:String(s.time||''),title:String(s.title).trim(),text:String(s.text||s.description||''),image:String(s.image||s.image_url||''),image_source:String(s.image_source||s.source||''),order:Number(s.order||j+1)}));
+  item.is_published=false;return item;
+ });
+ const {data:existing,error:checkError}=await db.from('trips').select('id').in('id',clean.map(r=>r.id));
+ if(checkError)throw Error('無法檢查既有行程：'+checkError.message);
+ const existingIds=new Set((existing||[]).map(r=>r.id));
+ if(!confirm(`確認匯入 ${clean.length} 條行程？新增 ${clean.length-existingIds.size} 條、更新 ${existingIds.size} 條。所有匯入行程都會下架，其他資料不變。請確認已備份。`))return null;
+ let done=0;
+ for(const item of clean){
+  const exists=existingIds.has(item.id);
+  const q=exists?db.from('trips').update(item).eq('id',item.id).select('id'):db.from('trips').insert(item).select('id');
+  const {data,error}=await q;
+  if(error||!data?.length)throw Error(`已成功 ${done} 筆；${item.id} 匯入失敗：${error?.message||'未取得寫入確認'}。請勿直接重試整批，先核對資料。`);
+  done++;$('importMsg').textContent=`行程匯入中：${done}/${clean.length}`;
+ }
+ return done;
+}
+$('import').onclick=async()=>{const file=$('file').files[0];if(!file){$('importMsg').textContent='請選擇 JSON 檔。';return;}let records;try{records=JSON.parse(await file.text());if(!Array.isArray(records)||!records.length||records.length>100)throw Error('單次須為 1～100 筆 JSON 陣列。');if(records.some(r=>!r||typeof r!=='object'||Array.isArray(r)||!String(r.title||'').trim()))throw Error('每筆都必須有 title。');}catch(e){$('importMsg').textContent='檔案格式錯誤：'+e.message;return;}if(category==='trips'){
+ $('import').disabled=true;$('importMsg').textContent='驗證行程資料中…';
+ try{const count=await importTripDrafts(records);$('importMsg').textContent=count===null?'已取消匯入。':`行程匯入完成：${count} 筆，全部未公開。`;}
+ catch(e){$('importMsg').textContent='行程匯入中止：'+e.message;}
+ finally{$('import').disabled=false;}return;
+}
+if(!confirm('匯入 '+records.length+' 筆'+(category==='spots'?'景點':'美食')+'草稿？同 ID 會更新且下架，不會刪除其他資料。'))return;$('import').disabled=true;$('importMsg').textContent='匯入中…';const {data,error}=await db.rpc(category==='spots'?'import_spot_drafts':'import_food_drafts',{p_records:records});$('import').disabled=false;if(error){$('importMsg').textContent='匯入失敗：'+error.message;return;}$('importMsg').textContent='匯入完成：'+data+' 筆。';await load();};$('category').onchange=async()=>{if(!confirmLeave()){$('category').value=category;return;}editorDirty=false;category=$('category').value;if(category==='trips'){$('reviewTab').disabled=false;}$('reviewTab').disabled=false;clearSelection();selected=null;$('detail').classList.add('hide');$('filter').value='all';await load();};
+$('backReview').onclick=()=>{if(!confirmLeave())return;editorDirty=false;$('detail').classList.add('hide');$('reviewSection').classList.remove('hide');};$('reviewTab').onclick=()=>{if(!confirmLeave())return;editorDirty=false;$('reviewSection').classList.remove('hide');$('importSection').classList.add('hide');$('detail').classList.add('hide');};
+$('importTab').onclick=()=>{if(!confirmLeave())return;editorDirty=false;$('reviewSection').classList.add('hide');$('detail').classList.add('hide');$('importSection').classList.remove('hide');};
+
+$('prev').onclick=()=>{const i=rows.findIndex(r=>r.id===selected?.id);if(i>0)choose(rows[i-1].id);};
+$('next').onclick=()=>{const i=rows.findIndex(r=>r.id===selected?.id);if(i>=0&&i<rows.length-1)choose(rows[i+1].id);};
+$('filter').onchange=()=>{clearSelection();render();};$('search').oninput=()=>{clearSelection();render();};$('reload').onclick=()=>{if(confirmLeave()){editorDirty=false;load();}};
+function switchReviewPane(pane){
+ if(selected&&editorDirty&&!confirmLeave())return;
+ for(const id of ['reviewSection','importSection','detail','publicSection','auditSection'])$(id).classList.add('hide');
+ if(pane==='public'){$('publicSection').classList.remove('hide');if(!$('publicFrame').getAttribute('src'))$('publicFrame').src='submissions-review.html?embedded=1';}
+ else if(pane==='audit'){$('auditSection').classList.remove('hide');loadAudit();}
+ else if(pane==='import'){$('importSection').classList.remove('hide');}
+ else{$('reviewSection').classList.remove('hide');load();}
+ $('category').parentElement.style.display=pane==='official'||pane==='import'?'':'none';
+ $('reviewTab').style.display=pane==='official'||pane==='import'?'':'none';
+ $('importTab').style.display=pane==='official'||pane==='import'?'':'none';
+}
+$('officialSource').onclick=()=>switchReviewPane('official');
+$('publicSource').onclick=()=>switchReviewPane('public');
+$('auditTab').onclick=()=>switchReviewPane('audit');
+$('reloadAudit').onclick=loadAudit;
+async function loadAudit(){const msg=$('auditMsg'),body=$('auditRows');msg.textContent='載入中…';body.replaceChildren();const {data,error}=await db.from('cms_audit_logs').select('created_at,actor_name,table_name,record_id,action,changed_fields').order('created_at',{ascending:false}).limit(200);if(error){msg.textContent='無法讀取紀錄：'+error.message+'。請確認已執行 SQL 且帳號具管理員權限。';return;}for(const r of data||[]){const tr=node('tr');for(const value of [new Date(r.created_at).toLocaleString('zh-TW'),r.actor_name||'系統／未知',r.table_name,r.record_id,r.action,(r.changed_fields||[]).join('、')]){const td=node('td',value);td.style.cssText='border-bottom:1px solid #d6e2f2;padding:10px;white-space:nowrap';tr.append(td);}body.append(tr);}msg.textContent=`顯示最近 ${(data||[]).length} 筆操作紀錄。`}
+window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data?.type==='metro-review-updated')window.parent.postMessage({type:'metro-review-updated'},location.origin);});
+init();
+</script></body></html>

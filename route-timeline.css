@@ -7,3 +7,7 @@
 /* 與景點資訊同色系的和紙底；交通時間軸仍為單色。 */
 .sticky-panel .metro-transit{background:#F8F8F6;border-color:#E5E4DF}
 .sticky-panel .metro-route-total{background:#EEECE7}
+
+/* 白色交通卡與淺灰景點卡搭配；路線圓點、文字、線條維持灰階。 */
+.sticky-panel .metro-transit{background:#FFFFFF;border-color:#E5E5E5}
+.sticky-panel .metro-route-total{background:#F2F2F2}

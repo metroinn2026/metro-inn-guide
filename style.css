@@ -3,11 +3,11 @@
   --paper:#FFFFFF;
   --ink:#2D2D2D;
   --muted:#6F7472;
-  --green:#75866F;
-  --blue:#4C89B5;
+  --green:#4D4D4D;
+  --blue:#4D4D4D;
   --orange:#F3653B;
-  --line:#E5E2DC;
-  --soft:#F1EFE9;
+  --line:#D7D7D7;
+  --soft:#E5F2F7;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -225,10 +225,10 @@ body:has(.editor-picks) .search-panel{background:#fff}
 .picks-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:28px}
 .picks-heading h2{font-size:clamp(28px,3vw,42px);line-height:1.25;color:#4D4D4D;margin:0 0 12px;letter-spacing:.025em}
 .picks-heading p{color:#73777a;margin:0;line-height:1.8}
-.picks-more{white-space:nowrap;color:#287f88;text-decoration:none;font-weight:700;border-bottom:1px solid #287f88;padding-bottom:8px}
+.picks-more{white-space:nowrap;color:#F3653B;text-decoration:none;font-weight:700;border-bottom:1px solid #F3653B;padding-bottom:8px}
 .picks-topics{display:flex;gap:9px;overflow-x:auto;padding:0 0 24px;scrollbar-width:thin}
 .picks-topics button{flex:none;white-space:nowrap;border:1px solid #dddfe2;background:#f7f7f8;color:#4D4D4D;border-radius:12px;padding:12px 19px;font-size:15px;cursor:pointer}
-.picks-topics button.active{border-color:#287f88;background:#fff;color:#216d75;font-weight:700}
+.picks-topics button.active{border-color:#F3653B;background:#fff;color:#4D4D4D;font-weight:700}
 .picks-carousel{position:relative}
 .picks-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;padding-bottom:3px}
 .picks-track::-webkit-scrollbar{display:none}
@@ -296,17 +296,17 @@ body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
 .home-news .news-line time{font-size:13px;white-space:nowrap;color:#777;font-variant-numeric:tabular-nums}
 .home-news .news-line strong{font-size:15px;line-height:1.45;font-weight:500;min-width:0}
 .home-news .news-chevron{font-size:21px;line-height:1;color:#888;text-align:right}
-.home-news .news-line:hover strong,.home-news .news-line:focus-visible strong{color:#287f88}
+.home-news .news-line:hover strong,.home-news .news-line:focus-visible strong{color:#F3653B}
 .home-news-bottom{text-align:center;margin-top:18px}
 .home-news-bottom a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #ddd;border-radius:999px;padding:9px 23px;font-size:13px;color:#4D4D4D}
-.home-news-bottom a:hover{border-color:#287f88;color:#287f88}
+.home-news-bottom a:hover{border-color:#F3653B;color:#F3653B}
 @media(max-width:600px){.home-news{padding:38px 0 42px!important}.home-news .section-head.compact{display:flex}.home-news .section-head h2{font-size:25px}.home-news .news-line{grid-template-columns:82px minmax(0,1fr) 12px;gap:9px;min-height:52px;padding:9px 0}.home-news .news-line time{font-size:11px}.home-news .news-line strong{font-size:14px}.home-news .news-chevron{font-size:17px}}
 
 
 /* 內頁視覺統一：白底、深灰、少量湖水藍；首頁維持既有設定 */
 body:not(:has(.editor-picks)){
  --bg:#fff;--paper:#fff;--ink:#4D4D4D;--muted:#666d70;
- --green:#4D4D4D;--blue:#287f88;--orange:#287f88;
+ --green:#4D4D4D;--blue:#4D4D4D;--orange:#F3653B;
  --line:#e7e7e7;--soft:#f5f5f5;
  background:#fff;color:#4D4D4D;
 }
@@ -323,7 +323,7 @@ body:not(:has(.editor-picks)) .topbar .brand-divider{width:1px;height:25px;backg
 body:not(:has(.editor-picks)) .topbar .brand-guide-name{font-size:16px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
 body:not(:has(.editor-picks)) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.4vw,22px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0;color:#4D4D4D}
 body:not(:has(.editor-picks)) .topbar .menu a{white-space:nowrap;word-break:keep-all;flex:none}
-body:not(:has(.editor-picks)) .topbar .menu a:hover{color:#287f88}
+body:not(:has(.editor-picks)) .topbar .menu a:hover{color:#F3653B}
 body:not(:has(.editor-picks)) .topbar .nav-book{flex:none;background:#4D4D4D;border-color:#4D4D4D;color:#fff;padding:11px 15px;font-size:14px}
 body:not(:has(.editor-picks)) .topbar .nav-book:hover{background:#fff;color:#4D4D4D}
 /* 頁首及內容：減少舊版暖色大底塊、讓照片和字級成為視覺主角 */
@@ -342,7 +342,7 @@ body:not(:has(.editor-picks)) .directory-body{padding-top:15px}
 body:not(:has(.editor-picks)) .directory-body h3{font-size:clamp(19px,1.6vw,24px);margin:7px 0}
 body:not(:has(.editor-picks)) .directory-body p{line-height:1.65}
 body:not(:has(.editor-picks)) .directory-card:hover h3,
-body:not(:has(.editor-picks)) .card:hover h3{color:#287f88}
+body:not(:has(.editor-picks)) .card:hover h3{color:#F3653B}
 body:not(:has(.editor-picks)) .filter-pills{gap:20px}
 body:not(:has(.editor-picks)) .pill.active,
 body:not(:has(.editor-picks)) .pill:hover{color:#4D4D4D;border-color:#4D4D4D}
@@ -358,10 +358,10 @@ body:not(:has(.editor-picks)) .button{background:#4D4D4D;border-color:#4D4D4D;co
 body:not(:has(.editor-picks)) .button:hover{background:#fff;color:#4D4D4D}
 body:not(:has(.editor-picks)) .button.outline{background:transparent;color:#4D4D4D;border-color:#4D4D4D}
 body:not(:has(.editor-picks)) .section-link,
-body:not(:has(.editor-picks)) .mini-link{color:#287f88}
+body:not(:has(.editor-picks)) .mini-link{color:#F3653B}
 /* 內頁頁尾統一深灰，原有功能與連結不改動 */
 body:not(:has(.editor-picks)) .footer{background:#4D4D4D;color:#fff}
-body:not(:has(.editor-picks)) .footer a:hover{color:#a5d4d7}
+body:not(:has(.editor-picks)) .footer a:hover{color:#E5F2F7}
 @media(max-width:1150px){
  body:not(:has(.editor-picks)) .topbar .menu{gap:11px;font-size:14px}
  body:not(:has(.editor-picks)) .topbar .brand img,
@@ -417,12 +417,16 @@ body:not(:has(.editor-picks)) .sidebox.fill,body:not(:has(.editor-picks)) .wide-
 
 /* 精選輪播下方雙入口 */
 .picks-destinations{display:flex;justify-content:center;align-items:center;gap:36px;flex-wrap:wrap;margin-top:24px}
-.picks-destinations a{color:#287f88;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
+.picks-destinations a{color:#F3653B;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
 .picks-destinations a:hover,.picks-destinations a:focus-visible{border-bottom-color:currentColor}
 @media(max-width:600px){.picks-destinations{gap:20px}.picks-destinations a{font-size:14px}}
 
 /* 精選輪播下方雙入口 */
 .picks-destinations{display:flex;justify-content:center;align-items:center;gap:36px;flex-wrap:wrap;margin-top:24px}
-.picks-destinations a{color:#287f88;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
+.picks-destinations a{color:#F3653B;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;padding:6px 0}
 .picks-destinations a:hover,.picks-destinations a:focus-visible{border-bottom-color:currentColor}
 @media(max-width:600px){.picks-destinations{gap:20px}.picks-destinations a{font-size:14px}}
+
+/* 2026-09: Public site neutral support colors; keep transport guide separately monochrome. */
+:root{--brand-support-dark:#4D4D4D;--brand-support-mid:#BDBDBD;--brand-support-light:#D7D7D7;--brand-support-pale:#E5F2F7}
+body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}

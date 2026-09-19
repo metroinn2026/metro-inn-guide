@@ -6,6 +6,7 @@
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
+  <script src="metro-routes.js" defer></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -94,7 +95,7 @@
         <p class="travel-endpoints"><strong>北捷行旅</strong><span aria-hidden="true"> → </span><strong id="travelDestination">目的地載入中</strong></p>
         <div class="travel-route-card">
           <div class="travel-route-heading"><strong>🚇 大眾運輸優先</strong><span class="travel-lowcarbon">低碳旅遊</span></div>
-          <p id="travelMetro" class="travel-route-text">路線資訊整理中，請使用下方即時導航。</p>
+          <div id="travelMetro" class="travel-route-text">路線資訊整理中，請使用下方即時導航。</div>
         </div>
         <div id="travelBusCard" class="travel-route-card" hidden>
           <div class="travel-route-heading"><strong>🚌 公車及轉乘</strong></div>
@@ -108,7 +109,7 @@
           <div class="travel-route-heading"><strong>🚗 自行開車</strong></div>
           <p id="travelCar" class="travel-route-text"></p>
         </div>
-        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 查看即時路線 ↗</a>
+        <a id="travelMapLink" class="travel-map-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">開啟 Google Maps 即時導航 ↗</a>
         <p class="travel-disclaimer"><strong>旅圖小編提醒：</strong>以上交通路線及時間僅供參考，實際班次、行駛時間及路況可能有所變動，出發前請以交通運輸業者最新公告及即時資訊為準。</p>
       </div>
 
@@ -201,7 +202,8 @@
       const destination = [spot.title, spot.address].filter(Boolean).join(' ');
       setText('travelDestination', spot.title || '景點');
       setText('travelNearbyStation', spot.station ? spot.station : '鄰近車站待查核');
-      setText('travelMetro', spot.transport_metro || '捷運路線、站數及時間待查核；可先使用下方即時導航。');
+      const routeShown = window.MetroInnRoutes && window.MetroInnRoutes.render(spot.station, document.getElementById('travelMetro'));
+      if (!routeShown && spot.transport_metro) setText('travelMetro', spot.transport_metro);
       const bus = (spot.transport_bus || '').trim();
       const car = (spot.transport_car || '').trim();
       document.getElementById('travelBusCard').hidden = !bus;

@@ -212,6 +212,7 @@
         </div>
         <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核 <span id="reviewPendingBadge" style="display:none;background:#dc2626;color:white;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:6px" aria-label="待辦數量"></span></a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
+          <a href="#audit" data-workspace="audit">操作紀錄</a>
           <a data-table="admin_profiles">帳號權限</a>
         </div>
       </nav>
@@ -549,7 +550,7 @@
       await loadMyProfile(data.session.user);
       const initialWorkspace=location.hash;
       switchTable('banners');
-      if(initialWorkspace==='#review'||initialWorkspace==='#submissions')openWorkspace('review');refreshReviewBadge();
+      if(initialWorkspace==='#review'||initialWorkspace==='#submissions'||initialWorkspace==='#audit')openWorkspace(initialWorkspace==='#audit'?'audit':'review');refreshReviewBadge();
     }
 
     function showChangePassword(){
@@ -654,9 +655,9 @@
       history.replaceState(null,'','#'+kind);
       document.getElementById('cmsPanel').hidden=true;
       const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
-      document.getElementById('workspaceTitle').textContent='內容審核';
+      document.getElementById('workspaceTitle').textContent=kind==='audit'?'操作紀錄':'內容審核';
       const url='content-review.html';
-      const target=url+'?embedded=1'+(query?'&'+query:'');
+      const target=url+'?embedded=1'+(kind==='audit'?'&pane=audit':'')+(query?'&'+query:'');
       const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
       document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
       window.scrollTo({top:0});

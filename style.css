@@ -586,3 +586,31 @@ body.spot-detail-page .compact-transit-steps{margin-bottom:12px}
  body.spot-detail-page .detail-map-frame,
  body.food-detail-page .detail-map-frame{margin:24px 0 36px}
 }
+
+/* 2026-09: Detail main photos use the requested 3:2 ratio on all screen sizes.
+   Preserve map heights (340/280px for spots/foods, 380/320px for trips). */
+body.spot-detail-page .story-img,
+body.food-detail-page .story-img,
+body.trip-detail-page .numbered-story .story-img{
+  width:100%;
+  height:auto;
+  aspect-ratio:3 / 2;
+  overflow:hidden;
+}
+body.spot-detail-page .story-img img,
+body.food-detail-page .story-img img,
+body.trip-detail-page .numbered-story .story-img img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+@media(max-width:600px){
+  body.spot-detail-page .story-img,
+  body.food-detail-page .story-img,
+  body.trip-detail-page .numbered-story .story-img{
+    height:auto;
+    aspect-ratio:3 / 2;
+  }
+}

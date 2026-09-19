@@ -210,8 +210,7 @@
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
         </div>
-        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核中心</a></div>
-        <div class="nav-group"><div class="nav-group-title">投稿管理</div><a href="#submissions" data-workspace="submissions">民眾投稿審核</a></div>
+        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核 <span id="reviewPendingBadge" style="display:none;background:#dc2626;color:white;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:6px" aria-label="待辦數量"></span></a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
           <a data-table="admin_profiles">帳號權限</a>
         </div>
@@ -550,7 +549,7 @@
       await loadMyProfile(data.session.user);
       const initialWorkspace=location.hash;
       switchTable('banners');
-      if(initialWorkspace==='#review')openWorkspace('review');else if(initialWorkspace==='#submissions')openWorkspace('submissions');
+      if(initialWorkspace==='#review'||initialWorkspace==='#submissions')openWorkspace('review');refreshReviewBadge();
     }
 
     function showChangePassword(){
@@ -641,13 +640,23 @@
     }
 
 
+    async function refreshReviewBadge(){
+      const badge=document.getElementById('reviewPendingBadge');if(!badge)return;
+      const tables=['spots','foods','trips','travel_submissions'];let total=0;
+      try{for(const table of tables){for(const status of ['pending','needs_changes']){
+        const {count,error}=await db.from(table).select('*',{count:'exact',head:true}).eq('review_status',status).eq('is_published',false);
+        if(error)throw error;total+=count||0;
+      }}badge.textContent=total;badge.style.display=total?'inline-block':'none';}
+      catch(e){badge.style.display='none';console.warn('待辦數讀取失敗',e);}
+    }
+    window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='metro-review-updated')refreshReviewBadge();});
     function openWorkspace(kind, query=''){
       history.replaceState(null,'','#'+kind);
       document.getElementById('cmsPanel').hidden=true;
       const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
-      document.getElementById('workspaceTitle').textContent=kind==='review'?'內容審核中心':'民眾投稿審核';
-      const url=kind==='review'?'content-review.html':'submissions-review.html';
-      const target=url+(kind==='review'?'?embedded=1'+(query?'&'+query:''):'?embedded=1');
+      document.getElementById('workspaceTitle').textContent='內容審核';
+      const url='content-review.html';
+      const target=url+'?embedded=1'+(query?'&'+query:'');
       const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
       document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
       window.scrollTo({top:0});

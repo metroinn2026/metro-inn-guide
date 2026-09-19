@@ -541,7 +541,9 @@ body.spot-detail-page .compact-transit-head h2{font-size:18px;line-height:1.4;fo
 body.spot-detail-page .compact-transit-total{font-size:12px;line-height:1.5;padding:3px 7px;white-space:nowrap;margin-left:auto}
 
 
-/* 2026-09-20 detail pages: consistent 4:3 media, compact grayscale transit, narrow sidebar. */
+/* Detail-page media sizing: desktop photo 360px, local map 340px,
+   itinerary map 380px; mobile photo 240px, local map 280px,
+   itinerary map 320px. Keep responsive widths and crop photos only. */
 @media (min-width:981px){
  body.spot-detail-page .article-wrap,
  body.food-detail-page .article-wrap,
@@ -549,15 +551,13 @@ body.spot-detail-page .compact-transit-total{font-size:12px;line-height:1.5;padd
 }
 body.spot-detail-page .story-img,
 body.food-detail-page .story-img,
-body.trip-detail-page .numbered-story .story-img,
-body.trip-detail-page .numbered-story img{
- aspect-ratio:4 / 3;
- height:auto;
- max-width:100%;
+body.trip-detail-page .numbered-story .story-img{
+ width:100%;height:360px;aspect-ratio:auto;max-width:100%;overflow:hidden;
 }
 body.spot-detail-page .story-img img,
 body.food-detail-page .story-img img,
-body.trip-detail-page .numbered-story .story-img img{
+body.trip-detail-page .numbered-story .story-img img,
+body.trip-detail-page .numbered-story .story-img > img{
  width:100%;height:100%;object-fit:cover;display:block;
 }
 body.spot-detail-page .detail-map-frame,
@@ -565,16 +565,24 @@ body.food-detail-page .detail-map-frame{margin:28px 0 52px;min-width:0}
 body.spot-detail-page .detail-map-frame h2,
 body.food-detail-page .detail-map-frame h2{font-size:20px;line-height:1.4;margin:0 0 14px;color:#303030}
 body.spot-detail-page .detail-map-frame .map-embed,
-body.food-detail-page .detail-map-frame .map-embed,
+body.food-detail-page .detail-map-frame .map-embed{
+ display:block;width:100%;height:340px;aspect-ratio:auto;border:1px solid #e5e5e5;
+}
 body.trip-detail-page .route-map-section .map-embed{
- display:block;width:100%;height:auto;aspect-ratio:4 / 3;border:1px solid #e5e5e5;
+ display:block;width:100%;height:380px;aspect-ratio:auto;border:1px solid #e5e5e5;
 }
 body.trip-detail-page .route-map-section{margin:48px 0;padding:24px 0;border-top:1px solid #e5e5e5}
-/* The timeline itself remains; only the two extra horizontal rules disappear. */
+/* Retain the monochrome vertical timeline; remove only two horizontal separators. */
 body.spot-detail-page .compact-transit-note{border-top:0!important;padding-top:0!important}
 body.spot-detail-page .compact-transit-map{border-top:0!important}
 body.spot-detail-page .compact-transit-steps{margin-bottom:12px}
 @media(max-width:600px){
- body.spot-detail-page .story-img,body.food-detail-page .story-img{height:auto;aspect-ratio:4 / 3}
- body.spot-detail-page .detail-map-frame,body.food-detail-page .detail-map-frame{margin:24px 0 36px}
+ body.spot-detail-page .story-img,
+ body.food-detail-page .story-img,
+ body.trip-detail-page .numbered-story .story-img{height:240px;aspect-ratio:auto}
+ body.spot-detail-page .detail-map-frame .map-embed,
+ body.food-detail-page .detail-map-frame .map-embed{height:280px;aspect-ratio:auto}
+ body.trip-detail-page .route-map-section .map-embed{height:320px;aspect-ratio:auto}
+ body.spot-detail-page .detail-map-frame,
+ body.food-detail-page .detail-map-frame{margin:24px 0 36px}
 }

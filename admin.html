@@ -192,7 +192,6 @@
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
         </div>
-        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核中心</a></div>
         <div class="nav-group"><div class="nav-group-title">投稿管理</div><a href="#submissions" data-workspace="submissions">民眾投稿審核</a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
           <a data-table="admin_profiles">帳號權限</a>
@@ -222,6 +221,8 @@
           </div>
           <div class="actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
+            <button id="categoryImportBtn" type="button" hidden onclick="openCategoryWorkflow('import')">匯入資料</button>
+            <button id="categoryReviewBtn" type="button" hidden onclick="openCategoryWorkflow('review')">審稿與發布</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
           </div>
         </div>
@@ -626,6 +627,14 @@
     }
 
 
+    // 景點、美食、行程各自進入所屬分類的匯入與審稿，不再使用獨立的官方審核選單。
+    function openCategoryWorkflow(mode){
+      if(!['spots','foods','trips'].includes(currentTable))return;
+      const table=currentTable;
+      openWorkspace('review','category='+encodeURIComponent(table)+'&mode='+encodeURIComponent(mode));
+      document.getElementById('workspaceTitle').textContent=({spots:'景點',foods:'美食',trips:'行程'})[table]+'管理｜'+(mode==='import'?'匯入資料':'審稿與發布');
+      document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===table));
+    }
     function openWorkspace(kind, query=''){
       reviewEditNavigation++;
       history.replaceState(null,'','#'+kind);
@@ -644,6 +653,9 @@
     let reviewEditNavigation=0;
     window.addEventListener('message',async event=>{
       if(event.origin!==location.origin||event.source!==document.getElementById('workspaceFrame').contentWindow)return;
+      if(event.data?.type==='metro-review-close'&&['spots','foods','trips'].includes(event.data.table)){
+        await switchTable(event.data.table);return;
+      }
       if(event.data?.type==='metro-edit'&&['spots','foods','trips'].includes(event.data.table)){
         const table=event.data.table;
         const target=String(event.data.id ?? '');
@@ -672,6 +684,9 @@
       
       document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
       currentTable = table;
+      const categoryWorkflow=['spots','foods','trips'].includes(table);
+      document.getElementById('categoryImportBtn').hidden=!categoryWorkflow;
+      document.getElementById('categoryReviewBtn').hidden=!categoryWorkflow;
       const isAccount = table === 'admin_profiles';
       const accountCard = document.getElementById('myAccountCard');
       accountCard.hidden = !isAccount;

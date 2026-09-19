@@ -655,8 +655,8 @@
       history.replaceState(null,'','#'+kind);
       document.getElementById('cmsPanel').hidden=true;
       const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
-      document.getElementById('workspaceTitle').textContent=kind==='audit'?'操作紀錄':'內容審核';
-      const url='content-review.html';
+      document.getElementById('workspaceTitle').textContent=(kind==='audit'?'操作紀錄':'內容審核')+'｜版本 20260919-admin-review-joint-01';
+      const url='content-review.html?v=20260919-admin-review-joint-01';
       const target=url+'?embedded=1'+(kind==='audit'?'&pane=audit':'')+(query?'&'+query:'');
       const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
       document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));

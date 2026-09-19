@@ -14,24 +14,6 @@
     .list-view.hidden{display:none!important;}
     .editor-view{display:none!important;}
     .editor-view.active{display:block!important;}
-
-  /* 2026-09-19 單列編輯操作：所有 CMS 項目共用（景點、美食、行程等）。 */
-  #cmsPanel > .panel-head{display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;gap:12px!important;min-width:0}
-  #cmsPanel > .panel-head > div:first-child{flex:0 0 auto;min-width:0}
-  #cmsPanel > .panel-head #currentTitle{font-size:clamp(17px,1.6vw,24px);white-space:nowrap;margin:0!important}
-  #cmsPanel > .panel-head .actions{margin-left:auto;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap!important;min-width:0}
-  #cmsPanel > .panel-head .actions > button,#cmsPanel > .panel-head .actions > a{flex:0 0 auto;white-space:nowrap;padding:8px 10px;font-size:13px;border-radius:8px}
-  #cmsPanel .editor-header-actions{display:none!important}
-  #cmsPanel:has(#editorView.active) > .panel-head .list-header-actions{display:none!important}
-  #cmsPanel:has(#editorView.active) > .panel-head .editor-header-actions{display:flex!important}
-  #cmsPanel #editorView > .panel-head{display:block!important;margin:0!important}
-  #cmsPanel #editorView > .panel-head > div:first-child{display:none!important}
-  #cmsPanel #editorView #formMsgTop:empty{display:none}
-  #cmsPanel #editorView #formMsgTop:not(:empty){margin:0 0 12px!important}
-  @media(max-width:850px){
-    #cmsPanel > .panel-head{overflow-x:auto;scrollbar-width:thin;padding-bottom:6px}
-    #cmsPanel > .panel-head .actions{margin-left:auto}
-  }
   </style>
 
 
@@ -210,9 +192,9 @@
           <a data-table="trips">行程管理</a>
           <a data-table="coupons">優惠管理</a>
         </div>
-        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核 <span id="reviewPendingBadge" style="display:none;background:#dc2626;color:white;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:6px" aria-label="待辦數量"></span></a></div>
+        <div class="nav-group"><div class="nav-group-title">審稿與匯入</div><a href="#review" data-workspace="review">內容審核中心</a></div>
+        <div class="nav-group"><div class="nav-group-title">投稿管理</div><a href="#submissions" data-workspace="submissions">民眾投稿審核</a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
-          <a href="#audit" data-workspace="audit">操作紀錄</a>
           <a data-table="admin_profiles">帳號權限</a>
         </div>
       </nav>
@@ -238,18 +220,9 @@
           <div>
             <h2 id="currentTitle">Banner 管理</h2>
           </div>
-          <div class="actions list-header-actions">
+          <div class="actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
-          </div>
-          <div class="actions editor-header-actions" aria-label="編輯操作">
-            <button class="ghost" onclick="backToList()">← 回列表</button>
-            <button onclick="loadCurrentTable()">重新讀取</button>
-            <button class="primary" onclick="newItem()">新增</button>
-            <button class="primary normal-save" onclick="saveItem()">儲存</button>
-            <button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button>
-            <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
-            <button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
           </div>
         </div>
 
@@ -299,13 +272,17 @@
             <div>
               <h2 id="formTitle">編輯內容</h2>
             </div>
-
+            <div class="actions">
+              <button class="ghost" onclick="backToList()">← 回列表</button>
+              <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
+              <a id="previewLink" class="button" href="#" target="_blank" style="display:none">前台預覽</a>
+            </div>
             <p id="formMsgTop" class="msg" role="status" aria-live="polite" style="margin:8px 0 0;flex-basis:100%"></p>
           </div>
 
           <div class="editor-grid">
             <div class="card">
-              <div id="formFields"></div>
+              <div id="sharedAdminEditor" hidden></div><div id="formFields"></div>
               <div class="actions">
                 <button onclick="clearForm()">清空</button>
                 <button class="danger" id="deleteInEditor" onclick="deleteEditingItem()">刪除</button>
@@ -338,6 +315,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="secure-delete.js"></script>
+  <script src="cms-schema.js"></script>
+  <script src="cms-editor.js"></script>
   <script>
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -472,9 +451,11 @@
         hint:'可用地區、捷運站、標籤搜尋景點。建議景點封面採橫式照片。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','景點名稱','text','required'],
-          ['area','地區','text'],['station','最近捷運站','text'],['transport_routes','交通指南｜人工推薦路線','routes'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
+          ['area','地區','text'],['station','最近捷運站','text'],['summary','摘要','textarea'],['content','介紹內容','textarea'],
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
-          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['google_map','Google Map連結','text'],['official_website','官方網站','text'],
+          ['transport_routes','交通路線（JSON）','json'],['transport_metro','捷運交通資訊','textarea'],['transport_bus','公車交通資訊','textarea'],['transport_car','自行開車資訊','textarea'],
+          ['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
           ['is_published','狀態','boolean']
         ],
         columns:['title','area','is_published'],
@@ -491,7 +472,8 @@
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','店名','text','required'],['category','類型','text'],
           ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
-          ['price_range','價格區間','text'],['tags','標籤','text'],['station','最近捷運站','text'],['transport_routes','交通指南｜人工推薦路線','routes'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
+          ['price_range','價格區間','text'],['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
+          ['station','鄰近捷運站','textarea'],['transport_routes','交通路線（JSON）','json'],
           ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖（1200×900）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
         ],
         columns:['title','category','is_published'],
@@ -536,6 +518,9 @@
       }
     };
 
+    // 景點、美食、行程統一引用共用欄位定義；其餘模組保留原版。
+    for(const type of MetroCmsSchema.types){configs[type].fields=MetroCmsSchema.fields(type);}
+
     let currentTable = 'banners';
     let cache = [];
     let currentList = [];
@@ -550,7 +535,7 @@
       await loadMyProfile(data.session.user);
       const initialWorkspace=location.hash;
       switchTable('banners');
-      if(initialWorkspace==='#review'||initialWorkspace==='#submissions'||initialWorkspace==='#audit')openWorkspace(initialWorkspace==='#audit'?'audit':'review');refreshReviewBadge();
+      if(initialWorkspace==='#review')openWorkspace('review');else if(initialWorkspace==='#submissions')openWorkspace('submissions');
     }
 
     function showChangePassword(){
@@ -641,37 +626,35 @@
     }
 
 
-    async function refreshReviewBadge(){
-      const badge=document.getElementById('reviewPendingBadge');if(!badge)return;
-      const tables=['spots','foods','trips','travel_submissions'];let total=0;
-      try{for(const table of tables){for(const status of ['pending','needs_changes']){
-        const {count,error}=await db.from(table).select('*',{count:'exact',head:true}).eq('review_status',status).eq('is_published',false);
-        if(error)throw error;total+=count||0;
-      }}badge.textContent=total;badge.style.display=total?'inline-block':'none';}
-      catch(e){badge.style.display='none';console.warn('待辦數讀取失敗',e);}
-    }
-    window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='metro-review-updated')refreshReviewBadge();});
     function openWorkspace(kind, query=''){
+      reviewEditNavigation++;
       history.replaceState(null,'','#'+kind);
       document.getElementById('cmsPanel').hidden=true;
       const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
-      document.getElementById('workspaceTitle').textContent=(kind==='audit'?'操作紀錄':'內容審核')+'｜版本 20260919-admin-review-joint-01';
-      const url='content-review.html?v=20260919-admin-review-joint-01';
-      const target=url+'?embedded=1'+(kind==='audit'?'&pane=audit':'')+(query?'&'+query:'');
+      document.getElementById('workspaceTitle').textContent=kind==='review'?'內容審核中心':'民眾投稿審核';
+      const url=kind==='review'?'content-review.html':'submissions-review.html';
+      const target=url+(kind==='review'?'?embedded=1'+(query?'&'+query:''):'?embedded=1');
       const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
       document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
       window.scrollTo({top:0});
     }
     document.querySelectorAll('#sideNav a[data-workspace]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();openWorkspace(link.dataset.workspace);}));
-    window.addEventListener('message',event=>{
+    // Review-to-admin navigation waits for the actual query, not an arbitrary 5-second poll.
+    // A newer navigation invalidates the older request before it can open an editor.
+    let reviewEditNavigation=0;
+    window.addEventListener('message',async event=>{
       if(event.origin!==location.origin||event.source!==document.getElementById('workspaceFrame').contentWindow)return;
-      if(event.data?.type==='metro-edit'&&['spots','foods'].includes(event.data.table)){
-        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===event.data.table));
-        switchTable(event.data.table);
-        // Load the selected record after the database query finishes.
-        const target=event.data.id;
-        const timer=setInterval(()=>{if(cache.some(r=>r.id===target)){clearInterval(timer);editItem(target);}},100);
-        setTimeout(()=>clearInterval(timer),5000);
+      if(event.data?.type==='metro-edit'&&['spots','foods','trips'].includes(event.data.table)){
+        const table=event.data.table;
+        const target=String(event.data.id ?? '');
+        if(!target)return;
+        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===table));
+        const loading=switchTable(table);
+        const navigation=reviewEditNavigation;
+        const loaded=await loading;
+        if(navigation!==reviewEditNavigation || !loaded || currentTable!==table || document.getElementById('cmsPanel').hidden)return;
+        if(cache.some(item=>String(item.id)===target))editItem(target);
+        else document.getElementById('listBody').textContent='找不到指定資料，可能已刪除或目前帳號無權讀取。';
       }
     });
     document.querySelectorAll('#sideNav a').forEach(a=>{
@@ -684,6 +667,7 @@
     });
 
     function switchTable(table){
+      reviewEditNavigation++;
       if(location.hash)history.replaceState(null,'',location.pathname+location.search);
       
       document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
@@ -706,14 +690,14 @@
       document.getElementById('currentTitle').textContent = cfg.label;
       document.getElementById('sectionHint').textContent = cfg.hint;
       document.getElementById('newBtn').style.display = currentTable === 'site_settings' || (currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') ? 'none' : 'inline-flex';
-      const manual=['spots','foods'].includes(currentTable);
+      const manual=['spots','foods','trips'].includes(currentTable);
       document.querySelectorAll('.normal-save').forEach(b=>b.style.display=manual?'none':'');
       document.querySelectorAll('.draft-save,.publish-save').forEach(b=>b.style.display=manual?'':'none');
       document.getElementById('imageTips').innerHTML = cfg.tips || imageTipsDefault;
       buildForm();
       setupFilters();
       backToList(false);
-      if(manageAccounts) loadCurrentTable();
+      return manageAccounts ? loadCurrentTable() : Promise.resolve(false);
     }
 
     function setupFilters(){
@@ -750,21 +734,73 @@
     }
 
 
+    // The original form remains the canonical save/upload interface. The shared editor
+    // synchronizes its fields into that form; it never writes to Supabase independently.
+    let adminSharedEditor=null;
+    function mountAdminSharedEditor(){
+      const root=document.getElementById('sharedAdminEditor');
+      const legacy=document.getElementById('formFields');
+      const supported=['spots','foods','trips'].includes(currentTable);
+      adminSharedEditor=null;
+      root.hidden=!supported;
+      legacy.hidden=supported;
+      if(!supported){root.replaceChildren();return;}
+      const record={};
+      configs[currentTable].fields.forEach(([name,,type])=>{
+        const el=document.getElementById('f_'+name);
+        if(!el)return;
+        if(type==='sections')record[name]=collectTripSections();
+        else if(type==='boolean'||type==='booleanActive')record[name]=el.value==='true';
+        else if(type==='number')record[name]=el.value===''?null:Number(el.value);
+        else if(name==='transport_routes'){
+          try{record[name]=JSON.parse(el.value||'{}');}catch{record[name]=el.value;}
+        }else record[name]=el.value;
+      });
+      const hint=document.createElement('p');hint.className='help';
+      hint.textContent='共用編輯器：修改內容會同步到原有表單；圖片上傳及行程分段的圖形編輯可切換至原始表單。';
+      const toggle=document.createElement('button');toggle.type='button';toggle.textContent='切換至原始表單（圖片上傳／行程分段）';
+      const mount=document.createElement('div');root.replaceChildren(hint,toggle,mount);
+      let legacyMode=false;
+      toggle.onclick=()=>{
+        // 共用編輯器若有未修正的 JSON，禁止切換至舊表單而遺失原始輸入。
+        if(!legacyMode && adminSharedEditor){
+          try{adminSharedEditor.values();}
+          catch(error){alert('請先修正共用編輯器欄位：'+error.message);return;}
+        }
+        legacyMode=!legacyMode;
+        legacy.hidden=!legacyMode;
+        mount.hidden=legacyMode;
+        toggle.textContent=legacyMode?'返回五分頁共用編輯器':'切換至原始表單（圖片上傳／行程分段）';
+        if(!legacyMode)mountAdminSharedEditor();
+      };
+      adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{onChange:(name)=>{
+        const el=document.getElementById('f_'+name);
+        if(!el)return;
+        const value=record[name];
+        if(name==='trip_sections'){
+          if(Array.isArray(value))renderTripSections(value);
+        }else if(name==='transport_routes')el.value=typeof value==='string'?value:JSON.stringify(value);
+        else if(typeof value==='boolean')el.value=String(value);
+        else el.value=value??'';
+        updateImagePreview();
+      }});
+    }
     function buildForm(){
       const cfg = configs[currentTable];
       const wrap = document.getElementById('formFields');
       wrap.innerHTML = cfg.fields.map(([name,label,type,flag])=>{
         if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
         if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
-        if(type === 'routes') return `<div class="form-row"><label>${label}</label><div class="help">一條路線一組：第一行填路線名稱（如：捷運＋步行），其後每行用「類型｜站點｜說明」輸入步驟；不同路線用空白行分隔。類型可填步行、捷運、公車、轉乘、抵達。留白則使用景點自動捷運路線；人工路線優先顯示。請先查證路線及時間再填寫。</div><textarea id="f_${name}" rows="12" placeholder="捷運＋步行&#10;步行｜北捷行旅｜步行至復興崗站，約○分鐘&#10;捷運｜復興崗站｜搭乘淡水信義線至北投站&#10;轉乘｜北投站｜轉乘新北投支線&#10;步行｜新北投站｜步行前往景點，約○分鐘&#10;抵達｜抵達景點｜"></textarea></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
         if(type === 'image') return imageFieldTemplate(name,label);
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
-        if(type === 'boolean') return `<div class="form-row" ${['spots','foods'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        if(type === 'json') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="8" spellcheck="false" oninput="updateImagePreview()"></textarea><div class="help">請輸入合法 JSON 物件；格式錯誤時無法儲存。</div></div>`;
+        if(type === 'boolean') return `<div class="form-row" ${['spots','foods','trips'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
         if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
         return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'||flag==='fixed1'?'readonly':''} oninput="updateImagePreview()"></div>`;
       }).join('');
       clearForm();
+      mountAdminSharedEditor();
     }
 
     const bulkTables=new Set(['spots','foods','trips','coupons','news']);
@@ -833,7 +869,7 @@
         else if(name==='role') el.value = 'admin';
         else if(name==='password') el.value = '';
         else if(name==='sort_order') el.value = String((cache.map(x=>Number(x.sort_order||0)).reduce((a,b)=>Math.max(a,b),0) || cache.length) + 1);
-        else if(name==='is_published') el.value = ['spots','foods'].includes(currentTable)?'false':'true';
+        else if(name==='is_published') el.value = ['spots','foods','trips'].includes(currentTable)?'false':'true';
         else if(name==='is_active') el.value='true';
         else if(type==='date' && (name==='publish_date' || name==='start_date')) el.value = new Date().toISOString().slice(0,10);
         else el.value = '';
@@ -847,6 +883,7 @@
       clearForm();
       document.getElementById('listView').classList.add('hidden');
       document.getElementById('editorView').classList.add('active');
+      mountAdminSharedEditor();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -856,28 +893,44 @@
       if(scroll) window.scrollTo({top:0,behavior:'smooth'});
     }
 
+    // Every load gets a token: a late response must not overwrite another module
+    // or a newer reload of the same module.
+    let currentTableLoadToken=0;
     async function loadCurrentTable(){
-      if(currentTable === 'admin_profiles' && currentUserRole !== 'super_admin') return;
+      const table=currentTable;
+      const token=++currentTableLoadToken;
+      if(table === 'admin_profiles' && currentUserRole !== 'super_admin') return false;
       buildHead();
       const tbody = document.getElementById('listBody');
-      tbody.innerHTML = '<tr><td colspan="6">資料載入中...</td></tr>';
-      const cfg = configs[currentTable];
+      tbody.textContent = '資料載入中...';
+      const cfg = configs[table];
       const orderCol = cfg.order || 'sort_order';
-      const ascending = currentTable !== 'news';
-      const { data, error, count } = await db.from(cfg.table).select('*', {count:'exact'}).order(orderCol, { ascending });
+      const ascending = table !== 'news';
+      let result;
+      try{
+        result=await db.from(cfg.table).select('*', {count:'exact'}).order(orderCol, { ascending });
+      }catch(error){
+        if(token===currentTableLoadToken && currentTable===table){
+          console.error(error);
+          tbody.textContent='讀取失敗：'+(error?.message||String(error));
+        }
+        return false;
+      }
+      if(token!==currentTableLoadToken || currentTable!==table)return false;
+      const {data,error,count}=result;
       if(error){
         console.error(error);
-        tbody.innerHTML = `<tr><td colspan="6">讀取失敗：${error.message}</td></tr>`;
-        return;
+        tbody.textContent='讀取失敗：'+error.message;
+        return false;
       }
       cache = data || [];
-      if(['news','spots','foods','trips','coupons'].includes(currentTable)) {
+      if(['news','spots','foods','trips','coupons'].includes(table)) {
         document.getElementById('contentCountNumber').textContent = count == null ? '—' : count.toLocaleString('zh-TW');
         document.getElementById('contentCountDetail').textContent = '包含已上架及未上架資料';
       }
       renderList();
+      return true;
     }
-
 
     function friendlyId(item, index){
       if(currentTable === 'banners'){
@@ -949,7 +1002,7 @@
                 <button onclick="editItem('${item.id}')">編輯</button>
                 ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
                 ${currentTable !== 'site_settings' ? `<button class="danger" onclick="deleteItem('${item.id}')">刪除</button>` : ''}
-                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+                ${currentTable==='trips'&&!item.is_published ? '<span class="readonly-note">未上架行程請於編輯器查看草稿</span>' : `<a class="button" target="_blank" href="${previewHref}">預覽</a>`}
               </div>
             </td>
           </tr>`;
@@ -1020,7 +1073,7 @@
                 <button onclick="editItem('${item.id}')">編輯</button>
                 ${cfg.statusKey ? `<button onclick="toggleItem('${item.id}')">${item[cfg.statusKey]?'停用/下架':'啟用/上架'}</button>` : ''}
                 <button class="danger" onclick="deleteItem('${item.id}')">刪除</button>
-                <a class="button" target="_blank" href="${previewHref}">預覽</a>
+                ${currentTable==='trips'&&!item.is_published ? '<span class="readonly-note">未上架行程請於編輯器查看草稿</span>' : `<a class="button" target="_blank" href="${previewHref}">預覽</a>`}
               </div>
             </td>
           </tr>`;
@@ -1053,7 +1106,11 @@
         if(!el) return;
         if(type==='boolean' || type==='booleanActive') el.value = item[name] ? 'true' : 'false';
         else if(name === 'password') el.value = '';
-        else if(type==='routes') el.value = routesToText(item[name]);
+        else if(name === 'transport_routes') {
+          // JSONB must be serialized as JSON, not the implicit '[object Object]'.
+          el.value = item[name] == null ? '{}' :
+            (typeof item[name] === 'string' ? item[name] : JSON.stringify(item[name], null, 2));
+        }
         else el.value = item[name] ?? '';
       });
       const link = document.getElementById('previewLink');
@@ -1066,33 +1123,37 @@
       if(currentTable === 'trips') renderTripSections(item.trip_sections || []);
       refreshAllImageThumbs();
       updateImagePreview();
+      mountAdminSharedEditor();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function routesToText(value){
-      if(!Array.isArray(value)) return '';
-      return value.map(route=>[route.title||'推薦路線',...(route.steps||[]).map(step=>[step.type||'步行',step.name||'',step.detail||''].join('｜'))].join('\n')).join('\n\n');
-    }
-    function textToRoutes(text){
-      return String(text||'').trim().split(/\n\s*\n/).filter(Boolean).map(block=>{
-        const lines=block.split('\n').map(x=>x.trim()).filter(Boolean);
-        return {title:lines[0],enabled:true,steps:lines.slice(1).map(line=>{
-          const parts=line.split(/[｜|]/);
-          return {type:(parts.shift()||'步行').trim(),name:(parts.shift()||'').trim(),detail:parts.join('｜').trim()};
-        }).filter(x=>x.name)};
-      }).filter(x=>x.steps.length);
-    }
     function formPayload(){
       const payload = {};
+      let invalidTransportRoutes = false;
       configs[currentTable].fields.forEach(([name,label,type])=>{
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(type==='sections') payload[name] = collectTripSections();
-        else if(type==='routes') payload[name] = textToRoutes(el.value);
+        else if(name === 'transport_routes') {
+          // Supabase JSONB expects an object/array, not a string containing JSON.
+          // Reject malformed input instead of overwriting the original JSONB value.
+          try {
+            const parsed = JSON.parse(el.value.trim() || '{}');
+            if(parsed === null || typeof parsed !== 'object' || Array.isArray(parsed))
+              throw Error('交通路線必須是 JSON 物件');
+            payload[name] = parsed;
+          } catch(error) {
+            document.getElementById('formMsg').textContent = '交通路線格式錯誤：' + error.message;
+            invalidTransportRoutes = true;
+            return;
+          }
+        }
         else if(type==='boolean' || type==='booleanActive') payload[name] = el.value === 'true';
         else if(type==='number') payload[name] = el.value === '' ? null : Number(el.value);
         else payload[name] = String(el.value || '').trim();
       });
+      // Returning from forEach does not return from formPayload. Stop the save entirely.
+      if(invalidTransportRoutes) return null;
       if(!payload.id) payload.id = nextId();
       if(currentTable==='featured_picks'){payload.category=String(payload.category||'').toLowerCase();if(!['spot','food','trip'].includes(payload.category)){document.getElementById('formMsg').textContent='內容類型請填 spot、food 或 trip。';return null;}if(!payload.content_id){document.getElementById('formMsg').textContent='請填寫對應內容 ID。';return null;}payload.topics=String(payload.topics||'').split(',').map(t=>t.trim()).filter(Boolean).join(',');}
       if(currentTable==='featured_topics'){payload.id=String(payload.id||'').trim().toLowerCase();if(!/^[a-z][a-z0-9_-]*$/.test(payload.id)){document.getElementById('formMsg').textContent='分類代碼請使用英文小寫開頭及英數字、底線或連字號。';return null;}}
@@ -1176,9 +1237,16 @@
     }
 
 
+    let contentSaveInFlight=false;
     async function saveItem(mode){
+      if(contentSaveInFlight)return;
       if(currentTable === 'admin_profiles') return saveAdminProfile();
       const msg = document.getElementById('formMsg');
+      // 舊表單負責提交，但不能繞過共用編輯器的 JSON 格式驗證。
+      if(adminSharedEditor){
+        try{adminSharedEditor.values();}
+        catch(error){msg.textContent='無法儲存，請先修正欄位：'+error.message;return;}
+      }
       const payload = formPayload();
       if(!payload)return;
       if(currentTable==='featured_picks' && payload.is_active && cache.filter(x=>x.is_active && x.id!==payload.id).length>=10){msg.textContent='最多只能啟用 10 筆精選，請先停用其他項目。';return;}
@@ -1186,37 +1254,100 @@
         msg.textContent = '請輸入標題 / 名稱。';
         return;
       }
-      msg.textContent = '儲存中...';
-      document.getElementById('formMsgTop').textContent = msg.textContent;
-      if(['spots','foods'].includes(currentTable)){
-        if(!['draft','publish'].includes(mode)){msg.textContent='請選擇「儲存草稿」或「儲存並上架」。';return;}
-        payload.is_published=mode==='publish';
-        payload.review_status=mode==='publish'?'approved':'pending';
-        if(mode==='publish'&&!confirm('已確認資料內容、來源及圖片使用權，確定公開上架？'))return;
+      // Existing records use UPDATE rather than UPSERT: UPDATE-only RLS does not imply INSERT permission.
+      // Draft updates must not rewrite review/publish fields, even with stale cache values.
+      const contentTable=['spots','foods','trips'].includes(currentTable);
+      const original=contentTable ? cache.find(x=>String(x.id)===String(payload.id)) : null;
+      if(contentTable){
+        if(!['draft','publish'].includes(mode)){
+          msg.textContent='請選擇「儲存草稿」或「儲存並上架」。';return;
+        }
+        if(mode==='publish'&&!confirm('已確認資料內容、來源及圖片使用權，確定審核通過並公開上架？'))return;
+        if(mode==='draft'){
+          if(original){delete payload.is_published;delete payload.review_status;}
+          else{payload.is_published=false;payload.review_status='pending';}
+        }else{payload.is_published=true;payload.review_status='approved';}
       }
-      const { error } = await db.from(configs[currentTable].table).upsert(payload, { onConflict:'id' });
-      if(error){ console.error(error); msg.textContent = '儲存失敗：' + error.message; document.getElementById('formMsgTop').textContent=msg.textContent; return; }
-      msg.textContent = '已儲存。';
+      // Capture the destination before awaiting: switching modules must not redirect
+      // the completion callback into another table or overwrite its editor.
+      const savingTable=currentTable;
+      const savingId=payload.id;
+      const savingEditor=editingId;
+      contentSaveInFlight=true;
+      msg.textContent='儲存中...';
       document.getElementById('formMsgTop').textContent=msg.textContent;
-      await loadCurrentTable();
-      editItem(payload.id);
-      document.getElementById('formMsgTop').textContent='儲存成功，資料已更新。';
+      try{
+        const query=original
+          ? db.from(configs[savingTable].table).update(Object.fromEntries(Object.entries(payload).filter(([key])=>key!=='id'))).eq('id',savingId)
+          : db.from(configs[savingTable].table).upsert(payload,{onConflict:'id'});
+        const {data:saved,error}=await query.select('id');
+        if(error||!saved?.length){
+          if(error)console.error(error);
+          if(currentTable===savingTable){
+            msg.textContent='儲存失敗：'+(error?.message||'沒有更新到資料，請確認登入權限及資料是否仍存在。');
+            document.getElementById('formMsgTop').textContent=msg.textContent;
+          }
+          return;
+        }
+        if(currentTable!==savingTable||editingId!==savingEditor)return;
+        msg.textContent='已儲存。';
+        document.getElementById('formMsgTop').textContent=msg.textContent;
+        const reloaded=await loadCurrentTable();
+        // The write succeeded, but a failed/stale read must not reopen an old cache record.
+        if(currentTable===savingTable&&editingId===savingEditor){
+          if(!reloaded){
+            document.getElementById('formMsgTop').textContent='資料已寫入，但重新讀取失敗；請確認網路後按重新整理，勿重複新增。';
+            return;
+          }
+          if(!cache.some(item=>String(item.id)===String(savingId))){
+            document.getElementById('formMsgTop').textContent='資料已寫入，但清單找不到這筆資料；請確認讀取權限，勿重複新增。';
+            return;
+          }
+          editItem(savingId);
+          document.getElementById('formMsgTop').textContent='儲存成功，資料已更新。';
+        }
+      }catch(error){
+        console.error(error);
+        if(currentTable===savingTable){
+          msg.textContent='儲存失敗：'+(error?.message||String(error));
+          document.getElementById('formMsgTop').textContent=msg.textContent;
+        }
+      }finally{contentSaveInFlight=false;}
     }
 
+    // Prevent duplicate status requests and detect RLS-blocked zero-row updates.
+    const statusUpdatesInFlight = new Set();
     async function toggleItem(id){
+      const table = currentTable;
+      const lockKey = table + ':' + String(id);
+      if(statusUpdatesInFlight.has(lockKey)) return;
       const item = cache.find(x=>String(x.id)===String(id));
       if(!item) return;
-      if(currentTable==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;}
-      const key = configs[currentTable].statusKey;
-      if(['spots','foods'].includes(currentTable)&&!item.is_published){
-        if(!confirm('已確認此筆資料內容與圖片使用權，確定直接上架？'))return;
-        const {error}=await db.from(configs[currentTable].table).update({is_published:true,review_status:'approved'}).eq('id',id);
-        if(error){alert('上架失敗：'+error.message);return;}
-        await loadCurrentTable();return;
+      if(table==='featured_picks' && !item.is_active && cache.filter(x=>x.is_active).length>=10){
+        alert('最多只能啟用 10 筆精選，請先停用其他項目。');return;
       }
-      const { error } = await db.from(configs[currentTable].table).update({[key]:!item[key]}).eq('id',id);
-      if(error){ alert('更新失敗：' + error.message); return; }
-      await loadCurrentTable();
+      const key = configs[table].statusKey;
+      const isContent = ['spots','foods','trips'].includes(table);
+      const publishing = isContent && !item.is_published;
+      if(publishing && !confirm('已確認此筆資料內容與圖片使用權，確定直接上架？')) return;
+      const patch = publishing
+        ? {is_published:true,review_status:'approved'}
+        : {[key]:!item[key]};
+      statusUpdatesInFlight.add(lockKey);
+      try{
+        const {data,error}=await db.from(configs[table].table)
+          .update(patch).eq('id',id).select('id');
+        if(error || !data?.length){
+          alert('狀態更新失敗：'+(error?.message||'沒有更新到資料，請確認登入權限及資料是否仍存在。'));
+          return;
+        }
+        // Do not replace the currently displayed module if the user navigated away.
+        if(currentTable===table) await loadCurrentTable();
+      }catch(error){
+        alert('狀態更新失敗：'+(error?.message||String(error)));
+      }finally{
+        statusUpdatesInFlight.delete(lockKey);
+      }
     }
 
     async function deleteItem(id){

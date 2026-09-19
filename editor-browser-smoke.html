@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>CMS browser smoke</title><div id="root"></div><pre id="result">RUNNING</pre><script src="cms-schema.js"></script><script src="cms-editor.js"></script><script>
+const results=[];function check(name,condition){results.push((condition?'PASS ':'FAIL ')+name);if(!condition)throw Error(name)}
+try{
+ for(const type of ['spots','foods','trips']){
+  const record={id:'test',title:'測試',transport_routes:{metro:'MRT'},trip_sections:[]};let changes=0,invalid=0;
+  const editor=MetroCmsEditor.mount(document.getElementById('root'),type,record,{onChange:()=>changes++,onInvalid:()=>invalid++});
+  check(type+' initial title',editor.values().title==='測試');
+  const tabs=[...document.querySelectorAll('#root button')];check(type+' has five tabs',tabs.length>=5);
+  for(const tab of tabs.slice(0,5)){tab.click();check(type+' tab opens',tab.getAttribute('aria-pressed')==='true')}
+  if(type!=='trips'){
+   editor.showTab('transport');const json=document.querySelector('[data-field="transport_routes"]');check(type+' JSON field visible',!!json);
+   json.value='{broken';json.dispatchEvent(new Event('input',{bubbles:true}));let rejected=false;try{editor.values()}catch{rejected=true}check(type+' rejects invalid JSON',rejected&&invalid>0);
+   json.value='{"metro":"捷運"}';json.dispatchEvent(new Event('input',{bubbles:true}));check(type+' accepts valid JSON',editor.values().transport_routes.metro==='捷運');
+  }else{
+   editor.showTab('detail');const add=[...document.querySelectorAll('#root button')].find(b=>b.textContent.includes('新增行程段落'));check('trip add button',!!add);add.click();check('trip section persisted',editor.values().trip_sections.length===1);
+  }
+ }
+ document.getElementById('result').textContent=results.join('\n')+'\nALL PASS';
+}catch(error){document.getElementById('result').textContent=results.join('\n')+'\nERROR '+error.stack}
+</script></html>

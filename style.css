@@ -473,3 +473,10 @@ body:not(:has(.editor-picks)){--line:#D7D7D7;--soft:#E5F2F7}
 .sticky-panel .metro-transit .metro-route-disclaimer{
   border-top-color:#E5E5E5!important;
 }
+
+/* 2026-09 景點資訊與交通指南：白、淺灰底色互換；內頁先標題、再摘要與標籤。 */
+.sticky-panel > .sidebox.compact:first-child{background:#FFFFFF!important;border-color:#E5E5E5!important}
+.sticky-panel .metro-transit{background:#F5F5F5!important;border-color:#E5E5E5!important}
+.single-point .spot-article-title{font-size:clamp(28px,3vw,36px);line-height:1.35;color:#303030;font-weight:800;letter-spacing:.025em;margin:0 0 16px}
+.single-point .spot-article-title + .lead{margin:0 0 16px;font-size:17px;line-height:1.85}
+.single-point > article > .tag-list{margin-bottom:30px}

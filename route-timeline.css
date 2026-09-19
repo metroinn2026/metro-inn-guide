@@ -11,3 +11,6 @@
 /* 白色交通卡與淺灰景點卡搭配；路線圓點、文字、線條維持灰階。 */
 .sticky-panel .metro-transit{background:#FFFFFF;border-color:#E5E5E5}
 .sticky-panel .metro-route-total{background:#F2F2F2}
+
+/* 交通卡使用淺灰底；總時間標籤保持單色。 */
+.sticky-panel .metro-transit{background:#F5F5F5!important;border-color:#E5E5E5!important}

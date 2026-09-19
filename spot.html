@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="route-timeline.css">
-  <script src="route-timeline.js"></script>
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,6 +39,7 @@
 
   <main class="container article-wrap single-point">
     <article>
+      <h2 id="articleTitle" class="spot-article-title">景點名稱</h2>
       <p id="leadText" class="lead">景點資料載入中...</p>
 
       <div id="tagListTop" class="tag-list"></div>
@@ -90,7 +89,6 @@
         <p id="sideStation">捷運資訊載入中</p>
       </div>
 
-      <div id="metroRouteTimeline" class="metro-transit" hidden></div>
       <div class="sidebox compact fill travel-from-hotel">
         <div class="kicker">METRO INN GUIDE</div>
         <h3>從北捷行旅怎麼去？</h3>
@@ -285,7 +283,8 @@
         document.getElementById('storyImage').alt = title;
 
         setText('heroKicker', `${areaText} · SPOT`);
-        setText('heroTitle', `${title}｜${summary.slice(0, 22)}`);
+        setText('heroTitle', title);
+        setText('articleTitle', title);
         setText('heroSubtitle', summary);
         setText('heroStation', stationText);
         setText('heroHours', spot.business_hours || '營業時間依公告為準');
@@ -311,8 +310,6 @@
         setText('sideStayTime', spot.stay_time ? `建議停留 ${spot.stay_time}` : '建議停留依行程安排');
         setText('sideStation', stationText);
         setupHotelRoutes(spot);
-        MetroRouteTimeline.render(document.getElementById('metroRouteTimeline'),spot.transport_routes);
-        document.querySelector('.travel-from-hotel').hidden = !document.getElementById('metroRouteTimeline').hidden;
 
         const tagHtml = tags.map((tag, index) =>
           `<span class="tag ${index === 0 ? 'dark' : ''}">${tag}</span>`

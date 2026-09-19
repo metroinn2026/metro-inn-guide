@@ -539,3 +539,42 @@ body.spot-detail-page .compact-transit-kicker{font-size:10px;letter-spacing:1.4p
 body.spot-detail-page .compact-transit-head{align-items:flex-start;flex-wrap:wrap;gap:7px;margin-bottom:17px}
 body.spot-detail-page .compact-transit-head h2{font-size:18px;line-height:1.4;font-weight:700;white-space:normal}
 body.spot-detail-page .compact-transit-total{font-size:12px;line-height:1.5;padding:3px 7px;white-space:nowrap;margin-left:auto}
+
+
+/* 2026-09-20 detail pages: consistent 4:3 media, compact grayscale transit, narrow sidebar. */
+@media (min-width:981px){
+ body.spot-detail-page .article-wrap,
+ body.food-detail-page .article-wrap,
+ body.trip-detail-page .article-wrap{grid-template-columns:minmax(0,1fr) 270px;gap:48px}
+}
+body.spot-detail-page .story-img,
+body.food-detail-page .story-img,
+body.trip-detail-page .numbered-story .story-img,
+body.trip-detail-page .numbered-story img{
+ aspect-ratio:4 / 3;
+ height:auto;
+ max-width:100%;
+}
+body.spot-detail-page .story-img img,
+body.food-detail-page .story-img img,
+body.trip-detail-page .numbered-story .story-img img{
+ width:100%;height:100%;object-fit:cover;display:block;
+}
+body.spot-detail-page .detail-map-frame,
+body.food-detail-page .detail-map-frame{margin:28px 0 52px;min-width:0}
+body.spot-detail-page .detail-map-frame h2,
+body.food-detail-page .detail-map-frame h2{font-size:20px;line-height:1.4;margin:0 0 14px;color:#303030}
+body.spot-detail-page .detail-map-frame .map-embed,
+body.food-detail-page .detail-map-frame .map-embed,
+body.trip-detail-page .route-map-section .map-embed{
+ display:block;width:100%;height:auto;aspect-ratio:4 / 3;border:1px solid #e5e5e5;
+}
+body.trip-detail-page .route-map-section{margin:48px 0;padding:24px 0;border-top:1px solid #e5e5e5}
+/* The timeline itself remains; only the two extra horizontal rules disappear. */
+body.spot-detail-page .compact-transit-note{border-top:0!important;padding-top:0!important}
+body.spot-detail-page .compact-transit-map{border-top:0!important}
+body.spot-detail-page .compact-transit-steps{margin-bottom:12px}
+@media(max-width:600px){
+ body.spot-detail-page .story-img,body.food-detail-page .story-img{height:auto;aspect-ratio:4 / 3}
+ body.spot-detail-page .detail-map-frame,body.food-detail-page .detail-map-frame{margin:24px 0 36px}
+}

@@ -27,6 +27,23 @@ function mount(root,type,record,options={}){
   const title=document.createElement('label');title.textContent='交通路線';title.style.cssText='display:block;font-weight:700;margin-bottom:6px';wrap.append(title);
   const help=document.createElement('p');help.textContent='依照旅客實際行進順序新增步驟，例如：步行 → 捷運 → 步行。可新增多條推薦路線。';help.style.cssText='color:#64748b;font-size:13px;margin:0 0 12px';wrap.append(help);
   const list=document.createElement('div');wrap.append(list);
+  const importBox=document.createElement('div');importBox.style.cssText='margin:0 0 12px;padding:10px;border:1px solid #d8e2f0';
+  const importLabel=document.createElement('label');importLabel.textContent='匯入已整理的交通路線 JSON（僅更新本筆交通資料）';importLabel.style.cssText='display:block;font-size:13px;font-weight:600;margin-bottom:6px';
+  const importInput=document.createElement('input');importInput.type='file';importInput.accept='.json,application/json';importInput.setAttribute('aria-label','選擇交通路線 JSON 檔案');
+  const importMessage=document.createElement('p');importMessage.style.cssText='font-size:12px;color:#64748b;margin:6px 0 0';importMessage.textContent='匯入後可逐步微調；按儲存草稿前不會寫入資料庫。';
+  importBox.append(importLabel,importInput,importMessage);wrap.append(importBox);
+  importInput.addEventListener('change',async()=>{
+    const file=importInput.files?.[0];if(!file)return;
+    try{
+      const parsed=JSON.parse(await file.text());
+      const routes=Array.isArray(parsed)?parsed:parsed.transport_routes;
+      if(!Array.isArray(routes)||!routes.every(r=>r&&typeof r==='object'&&Array.isArray(r.steps)&&r.steps.every(st=>st&&typeof st==='object'&&typeof st.type==='string'))){throw Error('檔案必須包含 transport_routes 路線陣列及每條路線的 steps 步驟');}
+      if(!Array.isArray(parsed)&&parsed.id&&record.id&&String(parsed.id)!==String(record.id))throw Error('檔案資料編號與目前編輯項目不符，已阻止匯入');
+      if(!confirm('將以匯入路線取代本筆現有交通路線（其他欄位不變）。確定繼續？'))return;
+      record[key]=structuredClone(routes);invalid.delete(key);render();changed();importMessage.textContent='已匯入 '+routes.length+' 條路線，請核對步行時間與站名，再儲存草稿。';
+    }catch(err){importMessage.textContent='匯入失敗：'+err.message;}
+    finally{importInput.value='';}
+  });
   const original=record[key];
   if(original==null||(typeof original==='object'&&!Array.isArray(original)&&!Object.keys(original).length))record[key]=[];
   if(!Array.isArray(record[key])){

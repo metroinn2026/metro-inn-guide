@@ -1,6 +1,6 @@
 /* 北投旅圖：推薦大眾運輸時間軸。只顯示管理員已填寫的資料，不推算班次或時間。 */
 (function(global){'use strict';
-const types={步行:'🚶',捷運:'🚇',公車:'🚌',轉乘:'↔',抵達:'📍'};
+const types={步行:'♙',捷運:'▣',公車:'▤',轉乘:'↔',抵達:'◎'};
 function text(tag,value,className){const el=document.createElement(tag);if(className)el.className=className;el.textContent=value==null?'':String(value);return el;}
 function render(root,data,options={}){
  if(!root)return;root.replaceChildren();let routes=data;
@@ -21,7 +21,7 @@ function render(root,data,options={}){
    li.append(text('span',types[mode]||'•','metro-route-icon'));
    const body=document.createElement('div');body.className='metro-route-body';
    body.append(text('strong',step.name|| (i===0?'北捷行旅':mode),'metro-route-name'));
-   if(step.line)body.append(text('span',step.line+(step.direction?'｜'+step.direction:''),'metro-route-line'));
+   if(step.line)body.append(text('span',step.line+(step.direction?'・'+step.direction:''),'metro-route-line'));
    if(step.duration!==''&&step.duration!=null)body.append(text('span',`約 ${step.duration} 分鐘`,'metro-route-time'));
    if(step.distance)body.append(text('span',String(step.distance),'metro-route-distance'));
    if(step.detail)body.append(text('p',step.detail,'metro-route-detail'));

@@ -7,6 +7,16 @@
   <link rel="stylesheet" href="admin.css?v=20260602-image-superadmin-fix">
 
   <style>
+    /* Column sorting: paired solid triangles, matching the supplied icon. */
+    .admin-sort-button{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;white-space:nowrap}
+    .admin-sort-icon{display:inline-flex;flex-direction:column;justify-content:center;gap:2px;width:9px;height:14px;vertical-align:middle;flex-shrink:0}
+    .admin-sort-icon::before,.admin-sort-icon::after{content:"";display:block;width:0;height:0;border-left:4.5px solid transparent;border-right:4.5px solid transparent;transition:opacity .15s ease}
+    .admin-sort-icon::before{border-bottom:6px solid currentColor}
+    .admin-sort-icon::after{border-top:6px solid currentColor}
+    .admin-sort-icon[data-direction="asc"]::after,.admin-sort-icon[data-direction="desc"]::before{opacity:.25}
+    .admin-sort-button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+  </style>
+  <style>
     #workspacePanel[hidden]{display:none!important} #cmsPanel[hidden]{display:none!important}
     /* SAFETY FIX 20260601: avoid old cached admin.css hiding the management panel */
     .panel{display:block!important;}
@@ -681,7 +691,8 @@
     }
     function adminSortHeader(label,key){
       const active=adminViewSort.key===key;
-      return `<th><button type="button" onclick="toggleAdminViewSort('${key}')" aria-label="依${label}排序" aria-sort="${active?(adminViewSort.direction==='asc'?'ascending':'descending'):'none'}" style="background:none;border:0;padding:0;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;white-space:nowrap">${label} <span aria-hidden="true">${active?(adminViewSort.direction==='asc'?'▲':'▼'):'↕'}</span></button></th>`;
+      const direction=active?adminViewSort.direction:'none';
+      return `<th aria-sort="${active?(direction==='asc'?'ascending':'descending'):'none'}"><button class="admin-sort-button" type="button" onclick="toggleAdminViewSort('${key}')" aria-label="依${label}排序">${label}<span class="admin-sort-icon" data-direction="${direction}" aria-hidden="true"></span></button></th>`;
     }
     function renderAdminPagination(total){
       const el=document.getElementById('listPagination');if(!el)return;

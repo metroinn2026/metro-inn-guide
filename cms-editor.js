@@ -11,21 +11,24 @@ function mount(root,type,record,options={}){
   const list=document.createElement('div');wrap.append(list);
   function commit(){record[key].forEach((item,i)=>{item.order=i+1;});options.onChange?.(key);}
   function render(){list.replaceChildren();record[key].forEach((section,index)=>{
+    if(section.show_image===undefined)section.show_image=true;
     const card=document.createElement('fieldset');card.style.cssText='border:1px solid #ccc;padding:12px;margin:10px 0;min-width:0';
     const legend=document.createElement('legend');legend.textContent='第 '+(index+1)+' 段';card.append(legend);
     for(const [field,title,multiline] of [['time','時間',false],['title','段落標題',false],['text','段落說明',true],['image','圖片網址',false],['image_source','圖片來源',false]]){
       const labelEl=document.createElement('label');labelEl.textContent=title+' ';const el=document.createElement(multiline?'textarea':'input');if(multiline)el.rows=4;else el.type='text';el.value=section[field]??(field==='text'?section.description??'':'');el.oninput=()=>{section[field]=el.value;commit();};labelEl.append(el);card.append(labelEl);
     }
+    const imageToggle=document.createElement('label');imageToggle.textContent='顯示此段圖片 ';
+    const imageToggleInput=document.createElement('input');imageToggleInput.type='checkbox';imageToggleInput.checked=section.show_image!==false;imageToggleInput.onchange=()=>{section.show_image=imageToggleInput.checked;commit();};imageToggle.prepend(imageToggleInput);card.append(imageToggle);
     const actions=document.createElement('div');actions.className='row';
     const sectionFile=document.createElement('input');sectionFile.type='file';sectionFile.accept='image/jpeg,image/png,image/webp,image/gif';sectionFile.hidden=true;
     const sectionUpload=document.createElement('button');sectionUpload.type='button';sectionUpload.textContent='上傳段落圖片';sectionUpload.onclick=()=>sectionFile.click();
-    sectionFile.onchange=async()=>{const selected=sectionFile.files?.[0];if(!selected)return;sectionUpload.disabled=true;sectionUpload.textContent='上傳中…';try{if(typeof options.uploadImage!=='function')throw Error('圖片上傳服務未連接，請更新後台程式並重新整理。');const url=await options.uploadImage('trip_section_'+index,selected);if(!url)throw Error('圖片上傳未取得網址');section.image=url;commit();render();}catch(error){alert(error?.message||'段落圖片上傳失敗');}finally{sectionUpload.disabled=false;sectionUpload.textContent='上傳段落圖片';sectionFile.value='';}};
+    sectionFile.onchange=async()=>{const selected=sectionFile.files?.[0];if(!selected)return;sectionUpload.disabled=true;sectionUpload.textContent='上傳中…';try{if(typeof options.uploadImage!=='function')throw Error('圖片上傳服務未連接，請更新後台程式並重新整理。');const url=await options.uploadImage('trip_section_'+index,selected);if(!url)throw Error('圖片上傳未取得網址');section.image=url;section.show_image=true;commit();render();}catch(error){alert(error?.message||'段落圖片上傳失敗');}finally{sectionUpload.disabled=false;sectionUpload.textContent='上傳段落圖片';sectionFile.value='';}};
     actions.append(sectionUpload,sectionFile);
     for(const [text,delta] of [['↑ 上移',-1],['↓ 下移',1]]){const button=document.createElement('button');button.type='button';button.textContent=text;button.disabled=index+delta<0||index+delta>=record[key].length;button.onclick=()=>{const other=index+delta;[record[key][index],record[key][other]]=[record[key][other],record[key][index]];commit();render();};actions.append(button);}
     const remove=document.createElement('button');remove.type='button';remove.textContent='刪除此段';remove.onclick=()=>{if(!confirm('確定刪除此行程段落？'))return;record[key].splice(index,1);commit();render();};actions.append(remove);card.append(actions);list.append(card);
   });}
   if(!Array.isArray(record[key])){record[key]=[];}
-  const add=document.createElement('button');add.type='button';add.textContent='＋新增行程段落';add.onclick=()=>{record[key].push({time:'',title:'',text:'',image:'',image_source:'',order:record[key].length+1});commit();render();};wrap.append(add);render();return wrap;
+  const add=document.createElement('button');add.type='button';add.textContent='＋新增行程段落';add.onclick=()=>{record[key].push({time:'',title:'',text:'',image:'',image_source:'',show_image:false,order:record[key].length+1});commit();render();};wrap.append(add);render();return wrap;
  }
  function makeRoutes(key,label){
   const wrap=document.createElement('div');wrap.className='cms-route-text-editor';

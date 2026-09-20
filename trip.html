@@ -197,7 +197,8 @@
         title: item.title || `第 ${index + 1} 段`,
         text,
         image,
-        image_source
+        image_source,
+        show_image: item.show_image !== false
       };
     }
 
@@ -462,10 +463,10 @@
           <section class="story numbered-story" id="s${index + 1}">
             <h2><span class="step-no">${String(index + 1).padStart(2, '0')}</span><span>${step.title}</span></h2>
             <p>${step.time ? step.time + '｜' : ''}${step.text}</p>
-            <div class="story-img">
+            ${step.show_image !== false ? `<div class="story-img">
               <img src="${step.image}" alt="${step.title}">
             </div>
-            <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>
+            <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>` : ''}
           </section>
         `).join('');
 

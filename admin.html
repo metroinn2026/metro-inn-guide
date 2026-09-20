@@ -1809,6 +1809,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         text: s.text || s.description || '',
         image: s.image || s.image_url || '',
         image_source: s.image_source || s.source || '',
+        show_image: s.show_image !== false,
         order: Number(s.order || index + 1)
       })).sort((a,b)=>a.order-b.order);
     }
@@ -1850,6 +1851,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
           </div>
           <div class="trip-section-image-row">
             <div class="form-row">
+              <label><input data-field="show_image" type="checkbox" ${s.show_image !== false ? 'checked' : ''} onchange="syncTripSections()"> 顯示此段圖片</label>
               <label>圖片網址（可留空）</label>
               <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
               <div class="image-field-actions">
@@ -1876,6 +1878,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         text: card.querySelector('[data-field="text"]')?.value.trim() || '',
         image: card.querySelector('[data-field="image"]')?.value.trim() || '',
         image_source: card.querySelector('[data-field="image_source"]')?.value.trim() || '',
+        show_image: card.querySelector('[data-field="show_image"]')?.checked !== false,
         order: index + 1
       })).filter(s=>s.time || s.title || s.text || s.image);
     }
@@ -1887,7 +1890,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
 
     function addTripSection(){
       const list = collectTripSections();
-      list.push({time:'', title:'', text:'', image:'', order:list.length+1});
+      list.push({time:'', title:'', text:'', image:'', image_source:'', show_image:false, order:list.length+1});
       renderTripSections(list);
     }
 
@@ -1923,6 +1926,8 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       const input = cards[index]?.querySelector('[data-field="image"]');
       if(input){
         input.value = publicImageUrl(path);
+        const showImage = cards[index]?.querySelector('[data-field="show_image"]');
+        if(showImage) showImage.checked = true;
         syncTripSections();
         msg.textContent = '分段圖片已上傳。';
       }

@@ -59,6 +59,7 @@
       <section class="detail-map-frame" aria-labelledby="detailMapHeading">
         <h2 id="detailMapHeading">店家位置</h2>
         <iframe id="mapEmbed" class="map-embed small" loading="lazy" title="店家位置 Google 地圖" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <p style="margin:10px 0 0;font-size:14px"><a id="mapEmbedFallback" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">地圖無法顯示？在 Google Maps 開啟 ↗</a></p>
       </section>
 
       <section id="info" class="info-card point-info">
@@ -130,34 +131,31 @@
       if (el) el.textContent = value || fallback;
     }
 
-    // A single-pin OpenStreetMap embed is used when a precise coordinate exists.
-    // Google Maps place embeds are the fallback: Google controls surrounding POI labels.
+    // Use a Google Maps search embed rather than treating a shared Maps URL as an iframe URL.
+    // A normal /maps/place or shortened sharing URL cannot be embedded directly.
     function mapCoordinates(item) {
-      const lat = Number(item.latitude ?? item.lat);
-      const lon = Number(item.longitude ?? item.lng ?? item.lon);
-      if (Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && (lat !== 0 || lon !== 0)) return [lat, lon];
+      const latRaw = item.latitude ?? item.lat;
+      const lonRaw = item.longitude ?? item.lng ?? item.lon;
+      if (latRaw !== null && latRaw !== undefined && String(latRaw).trim() !== '' &&
+          lonRaw !== null && lonRaw !== undefined && String(lonRaw).trim() !== '') {
+        const lat = Number(latRaw), lon = Number(lonRaw);
+        if (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat !== 0 || lon !== 0)) return [lat, lon];
+      }
       const link = String(item.google_map || '');
-      const patterns = [/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/, /[?&]q=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/, /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/];
+      const patterns = [/[?&](?:q|query)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/, /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/];
       for (const pattern of patterns) {
         const match = link.match(pattern);
-        if (match) {
-          const a = Number(match[1]), b = Number(match[2]);
-          if (Math.abs(a) <= 90 && Math.abs(b) <= 180) return [a, b];
-        }
+        if (match && Math.abs(Number(match[1])) <= 90 && Math.abs(Number(match[2])) <= 180) return [Number(match[1]), Number(match[2])];
       }
       return null;
     }
-
     function mapEmbedUrl(item) {
+      // Prioritize the business address/name over the map viewport coordinates (@lat,lon),
+      // which can point to the map center rather than the actual business.
+      const query = [item.title || item.name, item.address].filter(Boolean).join(' ').trim();
       const coords = mapCoordinates(item);
-      if (coords) {
-        const [lat, lon] = coords;
-        const delta = 0.003;
-        const bbox = [lon - delta, lat - delta, lon + delta, lat + delta].join(',');
-        return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${lat},${lon}`)}`;
-      }
-      const query = [item.title, item.address].filter(Boolean).join(' ');
-      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+      const location = query || (coords ? coords.join(',') : '');
+      return location ? `https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed` : '';
     }
 
     function renderImageCaption(text){
@@ -381,8 +379,22 @@
         }
 
         const mapFrame = document.getElementById('mapEmbed');
-        mapFrame.src = mapEmbedUrl(food);
-        mapFrame.title = mapCoordinates(food) ? `${title}單一定位地圖（OpenStreetMap）` : `${title}位置地圖（Google Maps）`;
+        const embedUrl = mapEmbedUrl(food);
+        const mapSection = mapFrame.closest('.detail-map-frame');
+        mapFrame.title = `${title}位置地圖（Google Maps）`;
+        if (embedUrl) {
+          mapFrame.src = embedUrl;
+          mapFrame.hidden = false;
+        } else {
+          mapFrame.removeAttribute('src');
+          mapFrame.hidden = true;
+        }
+        // An iframe's cross-origin errors cannot be reliably detected in JavaScript.
+        // Always provide an accessible direct link so the visitor never gets stuck.
+        const fallbackLink = document.getElementById('mapEmbedFallback');
+        fallbackLink.href = mapUrl;
+        fallbackLink.textContent = embedUrl ? '地圖無法顯示？在 Google Maps 開啟 ↗' : '在 Google Maps 查看店家位置 ↗';
+        if (mapSection) mapSection.hidden = false;
 
       } catch (error) {
         console.error(error);

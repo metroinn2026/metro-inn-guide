@@ -57,7 +57,7 @@
             <div class="kicker">ROUTE MAP</div>
             <h2>本次路線地圖</h2>
           </div>
-          <p>這裡會依照後台填入的「行程地圖網址」顯示 Google Maps；若要更精準，也可以改放 Google My Maps 分享連結。</p>
+          <p>依照後台設定的行程地圖顯示路線；可使用 Google 我的地圖（My Maps）分享網址。</p>
         </div>
         <iframe id="mapEmbed" class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         <div style="margin-top:18px">
@@ -225,12 +225,34 @@
       return stepNames || trip.title || '';
     }
 
+    // Google My Maps 編輯／檢視／嵌入網址共用同一個 mid；不能用一般 Maps 搜尋嵌入取代。
+    function getMyMapsId(value) {
+      if (typeof value !== 'string' || !value.trim()) return '';
+      try {
+        const url = new URL(value.trim());
+        if (!['google.com', 'www.google.com'].includes(url.hostname.toLowerCase())) return '';
+        if (!/^\/maps\/d\/(?:edit|viewer|embed)(?:\/|$)/.test(url.pathname)) return '';
+        const mid = url.searchParams.get('mid') || '';
+        return /^[a-zA-Z0-9_-]+$/.test(mid) ? mid : '';
+      } catch (e) { return ''; }
+    }
+
     function getGoogleMapsUrl(trip, steps) {
-      if (trip.google_route && trip.google_route.startsWith('http')) return trip.google_route;
+      const raw = typeof trip.google_route === 'string' ? trip.google_route.trim() : '';
+      const mid = getMyMapsId(raw);
+      if (mid) return `https://www.google.com/maps/d/viewer?mid=${encodeURIComponent(mid)}`;
+      if (/^https:\/\//i.test(raw)) {
+        try {
+          const url = new URL(raw);
+          if (['google.com', 'www.google.com', 'maps.google.com'].includes(url.hostname.toLowerCase())) return url.href;
+        } catch (e) {}
+      }
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getRouteQuery(trip, steps))}`;
     }
 
     function getMapEmbedUrl(trip, steps) {
+      const mid = getMyMapsId(trip.google_route);
+      if (mid) return `https://www.google.com/maps/d/embed?mid=${encodeURIComponent(mid)}`;
       return `https://www.google.com/maps?q=${encodeURIComponent(getRouteQuery(trip, steps))}&output=embed`;
     }
 

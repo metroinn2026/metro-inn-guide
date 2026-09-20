@@ -97,7 +97,6 @@
         const summary = food.summary || '更多介紹即將補上。';
         const meta = getArea(food).toUpperCase();
         const href = `food.html?id=${encodeURIComponent(food.id)}`;
-        const hours = food.business_hours || '依店家公告為準';
 
         const card = document.createElement('a');
         card.className = 'directory-card';
@@ -113,7 +112,6 @@
             <div class="tag-list small">
               ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
-            <div class="hours-line">營業時間：${hours}</div>
             <span class="arrow">→</span>
           </div>
         `;

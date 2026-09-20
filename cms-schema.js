@@ -285,7 +285,6 @@ const definitions={
         "business_hours",
         "phone",
         "average_cost",
-        "price_range",
         "tags",
         "notes",
         "official_website"

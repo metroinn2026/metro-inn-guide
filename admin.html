@@ -187,6 +187,17 @@
 
 
   <style>
+    /* Keep all list filters and pagination settings on one deliberate desktop row. */
+    #listView > .toolbar{display:grid;grid-template-columns:minmax(190px,1fr) minmax(112px,145px) minmax(112px,145px) auto auto;align-items:center;gap:8px;margin-bottom:12px}
+    #listView > .toolbar > input,#listView > .toolbar > select{width:100%;min-width:0;box-sizing:border-box;margin:0}
+    #listView > .toolbar > button{white-space:nowrap;margin:0}
+    #listView .admin-list-controls{display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:8px;margin:0;white-space:nowrap}
+    #listView .admin-list-controls label{gap:4px}
+    #listView .admin-list-controls select{min-width:65px;width:auto;padding:8px 5px}
+    #listView .admin-list-controls .admin-page-jump{min-width:74px}
+    #listView .admin-bulk-bar{margin-top:0}
+    @media(max-width:1050px){#listView > .toolbar{grid-template-columns:minmax(180px,1fr) minmax(100px,135px) minmax(100px,135px) auto}#listView .admin-list-controls{grid-column:1/-1;justify-content:flex-end}}
+    @media(max-width:850px){#listView > .toolbar{grid-template-columns:minmax(0,1fr) minmax(110px,1fr)}#listView > .toolbar > input{grid-column:1/-1}#listView .admin-list-controls{grid-column:1/-1;justify-content:flex-start}#listView .admin-bulk-bar{flex-wrap:wrap}}
     /* Pagination: page-size control belongs in the upper list toolbar; page numbers stay below. */
     .admin-list-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-left:auto;font-size:13px;color:#475569}
     .admin-list-controls label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}

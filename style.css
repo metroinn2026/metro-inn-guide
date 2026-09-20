@@ -245,7 +245,7 @@ body:has(.editor-picks) .search-panel{background:#fff}
 
 /* 2026-09 首頁首屏微調：縮小 CI、清楚導覽、讓搜尋在首屏露出。僅作用於首頁。 */
 body:has(.editor-picks) .topbar{height:72px;background:#fff}
-body:has(.editor-picks) .topbar .container{width:min(1360px,calc(100% - 48px))}
+body:has(.editor-picks) .topbar .container{width:min(1180px,calc(100% - 56px))}
 body:has(.editor-picks) .topbar .nav{gap:24px;flex-wrap:nowrap}
 body:has(.editor-picks) .topbar .brand-ci{display:flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto;font-size:16px;white-space:nowrap}
 body:has(.editor-picks) .topbar .brand-logo-img{display:block;width:auto!important;height:34px!important;max-width:215px!important;object-fit:contain!important;flex:none}
@@ -311,7 +311,7 @@ body:not(:has(.editor-picks)){
  background:#fff;color:#4D4D4D;
 }
 body:not(:has(.editor-picks)) .topbar{height:72px;background:#fff;border-bottom:1px solid #e8e8e8;backdrop-filter:none}
-body:not(:has(.editor-picks)) .topbar .container{width:min(1360px,calc(100% - 48px))}
+body:not(:has(.editor-picks)) .topbar .container{width:min(1180px,calc(100% - 56px))}
 body:not(:has(.editor-picks)) .topbar .nav{gap:22px;flex-wrap:nowrap;min-width:0}
 body:not(:has(.editor-picks)) .topbar .brand,
 body:not(:has(.editor-picks)) .topbar .brand-ci{display:flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto;font-size:16px;line-height:1.3;white-space:nowrap}

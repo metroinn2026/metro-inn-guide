@@ -337,6 +337,11 @@ const definitions={
         "text"
       ],
       [
+        "transport_routes",
+        "大眾運輸交通指南",
+        "json"
+      ],
+      [
         "cover_image",
         "封面圖（1600×900）",
         "image"
@@ -374,7 +379,8 @@ const definitions={
         "trip_sections"
       ],
       "transport": [
-        "google_route"
+        "google_route",
+        "transport_routes"
       ],
       "images": [
         "cover_image",

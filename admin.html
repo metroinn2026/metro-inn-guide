@@ -260,6 +260,7 @@
         </div>
         <div class="nav-group"><div class="nav-group-title">投稿管理</div><a href="#submissions" data-workspace="submissions">民眾投稿審核</a></div>
         <div class="nav-group nav-group-last"><div class="nav-group-title">系統管理</div>
+          <a href="#audit" data-workspace="audit">操作紀錄</a>
           <a data-table="admin_profiles">帳號權限</a>
         </div>
       </nav>
@@ -288,7 +289,7 @@
           <div class="actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
             <button id="categoryImportBtn" type="button" hidden onclick="openCategoryImport()">匯入資料</button>
-            <button id="categoryReviewBtn" type="button" hidden onclick="openCategoryWorkflow('review')">審稿與發布</button>
+            <button id="categoryExportBtn" type="button" hidden onclick="exportCategoryExcel()">匯出 Excel</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
           </div>
         </div>
@@ -299,6 +300,8 @@
         </div>
 
         <div id="sectionHint" class="notice warning"></div>
+        <input id="categoryImportFile" type="file" accept=".xlsx,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden aria-label="選擇 Excel 或 JSON 匯入檔">
+        <p id="bulkDataMsg" class="msg" role="status" aria-live="polite" hidden></p>
         <section id="myAccountCard" class="account-self-card" hidden aria-label="我的帳號">
           <div><strong>我的帳號</strong><p id="myAccountInfo">登入帳號資訊</p><small>變更自己的登入密碼，不會修改其他管理員的密碼或權限。</small></div>
           <button type="button" onclick="showChangePassword()">變更密碼</button>
@@ -380,10 +383,6 @@
     </main>
   </div>
 
-  <dialog id="categoryImportDialog" aria-labelledby="categoryImportTitle" style="width:min(720px,calc(100% - 24px));max-height:90vh;border:1px solid #d6e2f2;border-radius:12px;padding:0;overflow:hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #d6e2f2"><h2 id="categoryImportTitle" style="margin:0">匯入資料</h2><button type="button" onclick="closeCategoryImport()" aria-label="關閉匯入視窗">關閉 ✕</button></div>
-    <iframe id="categoryImportFrame" title="匯入資料" style="display:block;width:100%;height:min(570px,70vh);border:0;background:#fff"></iframe>
-  </dialog>
   <dialog id="changePasswordDialog" style="width:min(440px,calc(100% - 32px));border:1px solid #d6e2f2;border-radius:12px;padding:24px">
     <form id="changePasswordForm" onsubmit="changeMyPassword(event)">
       <h2>變更自己的登入密碼</h2><p>需驗證目前密碼。此功能不會修改其他管理員帳號。</p>
@@ -398,6 +397,8 @@
   <script src="supabase-config.js"></script>
   <script src="secure-delete.js"></script>
   <script src="cms-schema.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="bulk-data.js"></script>
   <script src="transit-duration.js"></script>
   <script src="cms-editor.js"></script>
   <script src="route-timeline.js"></script>
@@ -667,8 +668,8 @@
       document.getElementById('userDisplayName').textContent = '管理員';
       await loadMyProfile(data.session.user);
       const initialWorkspace=location.hash;
-      switchTable('banners');
-      if(initialWorkspace==='#review')openWorkspace('review');else if(initialWorkspace==='#submissions')openWorkspace('submissions');
+      switchTable(['#spots','#foods','#trips'].includes(initialWorkspace)?initialWorkspace.slice(1):'banners');
+      if(['#submissions','#audit'].includes(initialWorkspace))openWorkspace(initialWorkspace.slice(1));
     }
 
     function showChangePassword(){
@@ -759,77 +760,61 @@
     }
 
 
-    // 匯入使用分類專屬彈窗，成功後回到原清單並重新讀取。
-    let importDialogTable=null;
-    document.getElementById('categoryImportDialog').addEventListener('close',()=>{document.getElementById('categoryImportFrame').src='about:blank';importDialogTable=null;});
+    // 同一顆「匯入資料」按鈕接受 .xlsx / .json；直接選檔，不進入舊審稿頁。
+    let bulkDataBusy=false;
+    const bulkInput=document.getElementById('categoryImportFile');
+    const bulkMsg=document.getElementById('bulkDataMsg');
+    function showBulkMessage(message){bulkMsg.hidden=false;bulkMsg.textContent=message;}
+    function setBulkBusy(busy){bulkDataBusy=busy;document.getElementById('categoryImportBtn').disabled=busy;document.getElementById('categoryExportBtn').disabled=busy;}
     function openCategoryImport(){
-      if(!['spots','foods','trips'].includes(currentTable))return;
-      importDialogTable=currentTable;
-      const dlg=document.getElementById('categoryImportDialog');
-      document.getElementById('categoryImportTitle').textContent=({spots:'景點',foods:'美食',trips:'行程'})[currentTable]+'｜匯入資料';
-      document.getElementById('categoryImportFrame').src='content-review.html?embedded=1&modal=1&category='+encodeURIComponent(currentTable)+'&mode=import';
-      if(!dlg.open)dlg.showModal();
+      if(bulkDataBusy||!['spots','foods','trips'].includes(currentTable))return;
+      bulkInput.value='';bulkInput.click();
     }
-    function closeCategoryImport(){
-      const dlg=document.getElementById('categoryImportDialog');
-      if(dlg.open)dlg.close();
-      document.getElementById('categoryImportFrame').src='about:blank';
-      importDialogTable=null;
-    }
-    window.addEventListener('message',event=>{
-      const frame=document.getElementById('categoryImportFrame');
-      if(event.origin!==location.origin||event.source!==frame.contentWindow)return;
-      if(event.data?.type==='metro-import-complete'&&event.data.table===importDialogTable){
-        const table=importDialogTable;
-        closeCategoryImport();
-        if(currentTable===table&&!document.getElementById('cmsPanel').hidden){
-          backToList();
-          loadCurrentTable();
-        }
-      }
+    bulkInput.addEventListener('change',async()=>{
+      const file=bulkInput.files?.[0];if(!file||bulkDataBusy)return;
+      const table=currentTable;setBulkBusy(true);showBulkMessage('正在解析 '+file.name+'…');
+      try{
+        const parsed=await MetroBulkData.parseFile(table,file);
+        const {records,warnings}=MetroBulkData.clean(table,parsed);
+        const found=await MetroBulkData.existing(db,table,records.map(r=>r.id));
+        const update=records.filter(r=>found.has(r.id)),created=records.length-update.length;
+        const live=update.filter(r=>found.get(r.id).is_published);
+        const summary=`檔案：${file.name}
+分類：${MetroBulkData.CATEGORIES[table]}
+新增 ${created} 筆／更新 ${update.length} 筆${live.length?`（其中已上架 ${live.length} 筆）`:''}。
+
+同 ID 只更新檔案提供的欄位，保留既有上架狀態；新資料一律草稿。
+${live.length?'注意：更新已上架文章會立即影響公開內容。':''}
+${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.length>6?'…':''):''}
+確定執行？`;
+        if(!confirm(summary)){showBulkMessage('已取消匯入，資料庫未變更。');return;}
+        const result=await MetroBulkData.write(db,table,records,found,(done,total)=>showBulkMessage('匯入中：'+done+' / '+total+' 筆…'));
+        showBulkMessage('匯入成功：新增 '+result.created+' 筆／更新 '+result.updated+' 筆。已讀回核對交通及行程欄位。'+(warnings.length?' 有 '+warnings.length+' 個不支援欄位已略過，請確認匯出表。':''));
+        if(currentTable===table){backToList(false);await loadCurrentTable();}
+      }catch(error){showBulkMessage('匯入停止：'+(error?.message||error)+'。若有部分筆數已寫入，請先重新匯出確認，不要直接整批重試。');console.error(error);}
+      finally{setBulkBusy(false);bulkInput.value='';}
     });
-    // 景點、美食、行程各自進入所屬分類的匯入與審稿，不再使用獨立的官方審核選單。
-    function openCategoryWorkflow(mode){
-      if(!['spots','foods','trips'].includes(currentTable))return;
-      const table=currentTable;
-      openWorkspace('review','category='+encodeURIComponent(table)+'&mode='+encodeURIComponent(mode));
-      document.getElementById('workspaceTitle').textContent=({spots:'景點',foods:'美食',trips:'行程'})[table]+'管理｜'+(mode==='import'?'匯入資料':'審稿與發布');
-      document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===table));
+    async function exportCategoryExcel(){
+      if(bulkDataBusy||!['spots','foods','trips'].includes(currentTable))return;
+      const table=currentTable;setBulkBusy(true);showBulkMessage('正在從資料庫讀取「'+MetroBulkData.CATEGORIES[table]+'」全部資料…');
+      try{
+        const records=await MetroBulkData.all(db,table);
+        const count=MetroBulkData.download(table,records);
+        showBulkMessage('已匯出 '+count+' 筆'+MetroBulkData.CATEGORIES[table]+'資料（含未上架）。交通、行程分段及延伸閱讀分列在不同工作表。');
+      }catch(error){showBulkMessage('匯出失敗：'+(error?.message||error));console.error(error);}
+      finally{setBulkBusy(false);}
     }
-    function openWorkspace(kind, query=''){
-      reviewEditNavigation++;
+    function openWorkspace(kind){
       history.replaceState(null,'','#'+kind);
       document.getElementById('cmsPanel').hidden=true;
       const panel=document.getElementById('workspacePanel');panel.hidden=false;panel.style.display='block';
-      document.getElementById('workspaceTitle').textContent=kind==='review'?'內容審核中心':'民眾投稿審核';
-      const url=kind==='review'?'content-review.html':'submissions-review.html';
-      const target=url+(kind==='review'?'?embedded=1'+(query?'&'+query:''):'?embedded=1');
+      document.getElementById('workspaceTitle').textContent=kind==='audit'?'操作紀錄':'民眾投稿審核';
+      const target=(kind==='audit'?'operation-audit.html':'submissions-review.html')+'?embedded=1';
       const frame=document.getElementById('workspaceFrame');if(frame.getAttribute('src')!==target)frame.src=target;
       document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.workspace===kind));
       window.scrollTo({top:0});
     }
     document.querySelectorAll('#sideNav a[data-workspace]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();openWorkspace(link.dataset.workspace);}));
-    // Review-to-admin navigation waits for the actual query, not an arbitrary 5-second poll.
-    // A newer navigation invalidates the older request before it can open an editor.
-    let reviewEditNavigation=0;
-    window.addEventListener('message',async event=>{
-      if(event.origin!==location.origin||event.source!==document.getElementById('workspaceFrame').contentWindow)return;
-      if(event.data?.type==='metro-review-close'&&['spots','foods','trips'].includes(event.data.table)){
-        await switchTable(event.data.table);return;
-      }
-      if(event.data?.type==='metro-edit'&&['spots','foods','trips'].includes(event.data.table)){
-        const table=event.data.table;
-        const target=String(event.data.id ?? '');
-        if(!target)return;
-        document.querySelectorAll('#sideNav a').forEach(x=>x.classList.toggle('active',x.dataset.table===table));
-        const loading=switchTable(table);
-        const navigation=reviewEditNavigation;
-        const loaded=await loading;
-        if(navigation!==reviewEditNavigation || !loaded || currentTable!==table || document.getElementById('cmsPanel').hidden)return;
-        if(cache.some(item=>String(item.id)===target))editItem(target);
-        else document.getElementById('listBody').textContent='找不到指定資料，可能已刪除或目前帳號無權讀取。';
-      }
-    });
     document.querySelectorAll('#sideNav a').forEach(a=>{
       a.addEventListener('click',()=>{
         if(!a.dataset.table) return;
@@ -846,7 +831,6 @@
     }
 
     function switchTable(table){
-      reviewEditNavigation++;
       if(location.hash)history.replaceState(null,'',location.pathname+location.search);
       
       document.getElementById('workspacePanel').hidden=true;document.getElementById('workspacePanel').style.display='none';document.getElementById('cmsPanel').hidden=false;
@@ -858,7 +842,8 @@
       document.querySelectorAll('#sideNav a[data-table]').forEach(a=>a.classList.toggle('active',a.dataset.table===(isFeatured?'featured_picks':table)));
       const categoryWorkflow=['spots','foods','trips'].includes(table);
       document.getElementById('categoryImportBtn').hidden=!categoryWorkflow;
-      document.getElementById('categoryReviewBtn').hidden=!categoryWorkflow;
+      document.getElementById('categoryExportBtn').hidden=!categoryWorkflow;
+      if(bulkMsg){bulkMsg.hidden=true;bulkMsg.textContent='';}
       const isAccount = table === 'admin_profiles';
       const accountCard = document.getElementById('myAccountCard');
       accountCard.hidden = !isAccount;

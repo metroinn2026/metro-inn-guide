@@ -170,14 +170,27 @@
       const route = routes.find(item => item && item.enabled !== false && Array.isArray(item.steps) && item.steps.length);
       const steps = [];
       if (route) {
-        for (const step of route.steps) {
+        for (let index = 0; index < route.steps.length; index++) {
+          const step = route.steps[index];
           if (!step) continue;
           const mode = step.type || step.mode || '';
           const name = step.name || step.station || '';
           if (name && (mode === '站點' || mode === '抵達' || !mode)) steps.push({station:name});
           else {
-            const bits = [step.line, step.direction, step.duration ? `約 ${String(step.duration).replace(/\s*分鐘$/, '')} 分鐘` : '', step.distance].filter(Boolean);
-            const description = [mode, bits.length ? `（${bits.join('，')}）` : '', step.detail || ''].filter(Boolean).join(' ');
+            const next = route.steps[index + 1];
+            if (mode === '轉乘' && next && (next.type === '捷運' || next.mode === '捷運')) {
+              const stations = String(next.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
+              const duration = next.duration ? `${String(next.duration).replace(/\s*分鐘$/, '')}分鐘` : '';
+              steps.push({leg:`站內轉乘（${[next.line, stations, duration].filter(Boolean).join('，')}）`});
+              index += 1;
+              continue;
+            }
+            const duration = step.duration ? `${String(step.duration).replace(/\s*分鐘$/, '')}分鐘` : '';
+            const stations = String(step.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
+            const routeText = [step.line, step.direction].filter(Boolean).join('');
+            const description = mode === '步行'
+              ? `步行｜${[duration, step.distance].filter(Boolean).join('・')}`
+              : `${routeText || mode}｜${[stations, duration].filter(Boolean).join('・')}`;
             if (description) steps.push({leg:description});
           }
         }

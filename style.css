@@ -645,3 +645,6 @@ body.trip-detail-page .route-grid {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* 前台目錄分頁按鈕 */
+.pagination{align-items:center;flex-wrap:wrap}.pagination button{font:inherit;background:transparent;border:0;border-bottom:1px solid transparent;padding:8px 4px;color:var(--muted);cursor:pointer}.pagination button.active,.pagination button:hover:not(:disabled){color:var(--orange);border-bottom-color:var(--orange)}.pagination button:disabled{opacity:.35;cursor:not-allowed}.pagination .pagination-summary{width:100%;text-align:center;font-size:13px;color:var(--muted);padding:0}

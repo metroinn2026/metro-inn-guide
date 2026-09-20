@@ -672,7 +672,7 @@
     let currentTable = 'banners';
     let cache = [];
     let currentList = [];
-    const ADMIN_PAGE_SIZE = 20;
+    let ADMIN_PAGE_SIZE = 20;
     let adminPage = 1;
     let adminViewSort = {key:'',direction:'asc'};
     function adminSortValue(item,key){
@@ -698,9 +698,15 @@
       const el=document.getElementById('listPagination');if(!el)return;
       const pages=Math.max(1,Math.ceil(total/ADMIN_PAGE_SIZE));adminPage=Math.min(Math.max(1,adminPage),pages);
       const start=total?(adminPage-1)*ADMIN_PAGE_SIZE+1:0,end=Math.min(total,adminPage*ADMIN_PAGE_SIZE);
-      el.innerHTML=`<span>共 ${total} 筆・顯示 ${start}–${end} 筆（每頁 20 筆）</span><div style="display:flex;align-items:center;gap:6px"><button type="button" ${adminPage===1?'disabled':''} onclick="changeAdminPage(${adminPage-1})">上一頁</button><span>第 ${adminPage} / ${pages} 頁</span><button type="button" ${adminPage===pages?'disabled':''} onclick="changeAdminPage(${adminPage+1})">下一頁</button></div>`;
+      const pageOptions=Array.from({length:pages},(_,i)=>`<option value="${i+1}" ${adminPage===i+1?'selected':''}>第 ${i+1} 頁</option>`).join('');
+      el.innerHTML=`<span>共 ${total} 筆・顯示 ${start}–${end} 筆</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><label for="adminPageSize">每頁</label><select id="adminPageSize" aria-label="每頁顯示筆數" onchange="changeAdminPageSize(this.value)" style="padding:7px;border:1px solid #cbd8ee;border-radius:5px">${[20,50,100].map(n=>`<option value="${n}" ${ADMIN_PAGE_SIZE===n?'selected':''}>${n} 筆</option>`).join('')}</select><button type="button" ${adminPage===1?'disabled':''} onclick="changeAdminPage(${adminPage-1})">上一頁</button><label for="adminPageJump">跳至</label><select id="adminPageJump" aria-label="快速跳至頁數" onchange="changeAdminPage(Number(this.value))" style="padding:7px;border:1px solid #cbd8ee;border-radius:5px">${pageOptions}</select><span>／共 ${pages} 頁</span><button type="button" ${adminPage===pages?'disabled':''} onclick="changeAdminPage(${adminPage+1})">下一頁</button></div>`;
     }
-    function changeAdminPage(page){adminPage=page;renderList();}
+    function changeAdminPageSize(size){
+      const next=Number(size);if(![20,50,100].includes(next))return;
+      const firstIndex=(adminPage-1)*ADMIN_PAGE_SIZE;
+      ADMIN_PAGE_SIZE=next;adminPage=Math.floor(firstIndex/next)+1;renderList();
+    }
+    function changeAdminPage(page){adminPage=Number(page)||1;renderList();}
     function visibleAdminRows(){return currentList.slice((adminPage-1)*ADMIN_PAGE_SIZE,adminPage*ADMIN_PAGE_SIZE);}
 
     let draggingId = '';

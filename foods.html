@@ -37,15 +37,14 @@
       <div id="foodsStatus" class="empty-state">美食資料載入中...</div>
       <div id="foodsGrid" class="directory-grid"></div>
 
-      <div class="pagination">
-        <span class="active">1</span>
-      </div>
+      <div class="pagination" aria-label="美食分頁"></div>
     </div>
   </section>
 
   <div id="footer"></div>
 
-  <script>
+  <script src="directory-pagination.js"></script>
+<script>
     document.getElementById('header').innerHTML = header();
     document.getElementById('footer').innerHTML = footer();
 
@@ -81,7 +80,7 @@
       return food.category || 'FOOD';
     }
 
-    function renderFoods(foods) {
+    function renderFoodsPage(foods) {
       gridEl.innerHTML = '';
 
       if (!foods.length) {
@@ -121,6 +120,9 @@
         gridEl.appendChild(card);
       });
     }
+
+    const directoryPager = createDirectoryPager(document, renderFoodsPage);
+    function renderFoods(items) { directoryPager.setRecords(items); }
 
     async function loadFoods() {
       try {

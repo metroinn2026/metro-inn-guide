@@ -635,3 +635,13 @@ body.food-detail-page .single-point .point-info{
 .route-related-panel .route-related-box{padding:24px 0 20px}
 .route-related-panel .route-related-grid{margin-left:0;margin-right:0}
 @media(max-width:900px){.route-related-panel .route-related-box{padding:20px 0}}
+
+/* 行程摘要：與上方標題及下方段落共用左右邊界，不另設內縮。 */
+body.trip-detail-page .route {
+  padding-left: 0;
+  padding-right: 0;
+}
+body.trip-detail-page .route-grid {
+  width: 100%;
+  box-sizing: border-box;
+}

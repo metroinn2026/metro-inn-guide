@@ -155,7 +155,7 @@
       const query = [item.title || item.name, item.address].filter(Boolean).join(' ').trim();
       const coords = mapCoordinates(item);
       const location = query || (coords ? coords.join(',') : '');
-      return location ? `https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed` : '';
+      return location ? `https://maps.google.com/maps?output=embed&q=${encodeURIComponent(location)}` : '';
     }
 
     function renderImageCaption(text){
@@ -368,7 +368,8 @@
           `<span class="tag">${tag}</span>`
         ).join('');
 
-        const mapUrl = food.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
+        const mapQuery = [title, food.address].filter(Boolean).join(' ').trim();
+        const mapUrl = /^https:\/\/(?:www\.)?(?:google\.[^/]+|maps\.google\.[^/]+)\//i.test(String(food.google_map || '')) ? food.google_map : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery || title)}`;
         document.getElementById('mapButton').href = mapUrl;
 
         if (food.official_website) {

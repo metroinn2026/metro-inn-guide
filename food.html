@@ -364,9 +364,12 @@
         ).join('');
 
         document.getElementById('tagListTop').innerHTML = tagHtml;
-        document.getElementById('sideTags').innerHTML = tags.slice(0, 3).map(tag =>
-          `<span class="tag">${tag}</span>`
-        ).join('');
+        const sideTags = document.getElementById('sideTags');
+        if (sideTags) {
+          sideTags.innerHTML = tags.slice(0, 3).map(tag =>
+            `<span class="tag">${tag}</span>`
+          ).join('');
+        }
 
         const mapQuery = [title, food.address].filter(Boolean).join(' ').trim();
         const mapUrl = /^https:\/\/(?:www\.)?(?:google\.[^/]+|maps\.google\.[^/]+)\//i.test(String(food.google_map || '')) ? food.google_map : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery || title)}`;

@@ -15,6 +15,15 @@
     .admin-sort-icon::after{border-top:6px solid currentColor}
     .admin-sort-icon[data-direction="asc"]::after,.admin-sort-icon[data-direction="desc"]::before{opacity:.25}
     .admin-sort-button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+  
+    /* Checkbox belongs in the selection column; summary is pinned to the toolbar's right edge. */
+    #listView .admin-select-heading{width:64px;white-space:nowrap}
+    #listView .admin-select-heading .admin-select-all{display:inline-flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;font-size:12px}
+    #listView .admin-select-heading input{margin:0;accent-color:#245ab9}
+    #listView .admin-toolbar-summary{margin-left:auto;display:flex;flex:0 0 auto;align-items:center;gap:9px;white-space:nowrap;font-size:12px;color:#475569}
+    #listView .admin-toolbar-summary #adminSelectedCount{white-space:nowrap}
+    #listView .admin-toolbar-summary .content-count-line{margin:0;padding:0;white-space:nowrap}
+    #listView .admin-bulk-bar #adminBulkDelete{padding:8px 9px}
   </style>
   <style>
     #workspacePanel[hidden]{display:none!important} #cmsPanel[hidden]{display:none!important}
@@ -383,9 +392,8 @@
               <label for="adminPageSize">每頁 <select id="adminPageSize" aria-label="每頁顯示筆數" onchange="changeAdminPageSize(this.value)"><option value="20">20 筆</option><option value="50">50 筆</option><option value="100">100 筆</option></select></label>
               <label for="adminPageJump">跳至 <select id="adminPageJump" class="admin-page-jump" aria-label="快速跳至頁數" onchange="changeAdminPage(Number(this.value))"></select></label>
             </div>
-          <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span>
-            <div id="contentCountCard" class="content-count-line" hidden aria-live="polite"><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span></div>
-          </div>
+          <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除</button><span id="adminBulkMsg" role="status"></span></div>
+          <div class="admin-toolbar-summary" aria-live="polite"><span id="adminSelectedCount">已選 0 筆</span><div id="contentCountCard" class="content-count-line" hidden><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span></div></div>
           </div>
 
           <div id="sortSaveBar" class="sort-save-bar">
@@ -1144,6 +1152,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       document.getElementById('adminSelectedCount').textContent=`已選 ${adminChecked.size} 筆`;
       const all=document.getElementById('adminSelectAll');
       const visible=visibleAdminRows();
+      if(!all)return;
       all.checked=!!visible.length&&visible.every(x=>adminChecked.has(String(x.id)));
       all.indeterminate=!all.checked&&visible.some(x=>adminChecked.has(String(x.id)));
       all.disabled=adminBusy||!visible.length;
@@ -1168,7 +1177,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
                    currentTable==='foods' ? '類型 / 價格' :
                    currentTable==='trips' ? '建議時間' :
                    currentTable==='coupons' ? '期限' : '日期';
-      const selectHead=bulkTables.has(currentTable)?'<th style="width:38px">勾選</th>':'';
+      const selectHead=bulkTables.has(currentTable)?'<th class="admin-select-heading"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" aria-label="全選目前頁面" onchange="toggleAdminAll(this.checked)">勾選</label></th>':'';
       const sortHead = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : '<th style="width:56px">排序</th>';
       document.getElementById('tableHead').innerHTML = `<tr>${selectHead}${sortHead?adminSortHeader('排序','sort_order'):''}${adminSortHeader('資料編號','id')}${adminSortHeader('名稱','name')}${adminSortHeader(second,'secondary')}${cfg.statusKey?adminSortHeader('狀態','status'):'<th>狀態</th>'}<th>操作</th></tr>`;
     }

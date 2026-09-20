@@ -363,6 +363,16 @@ const definitions={
         "text"
       ],
       [
+        "trip_main_image",
+        "行程主圖（時間表上方，建議 3:2）",
+        "image"
+      ],
+      [
+        "show_trip_main_image",
+        "顯示行程主圖",
+        "boolean"
+      ],
+      [
         "trip_sections",
         "行程分段",
         "sections"
@@ -395,7 +405,9 @@ const definitions={
       ],
       "images": [
         "cover_image",
-        "cover_image_source"
+        "cover_image_source",
+        "trip_main_image",
+        "show_trip_main_image"
       ],
       "settings": [
         "sort_order",

@@ -711,7 +711,7 @@
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
           ['summary','摘要','textarea'],['google_route','Google路線','text'],['transport_routes','大眾運輸路線（JSON）','json'],['cover_image','封面圖（3:2，建議 1500×1000）','image'],['cover_image_source','封面圖片來源','text'],
-          ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
+          ['trip_main_image','行程主圖（時間表上方，建議 3:2）','image'],['show_trip_main_image','顯示行程主圖','boolean'],['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
         ],
         columns:['title','duration','is_published'],
         subtitle:(x)=>x.duration || '-',
@@ -1201,7 +1201,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         if(type === 'image') return imageFieldTemplate(name,label);
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
         if(type === 'json') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="8" spellcheck="false" oninput="updateImagePreview()"></textarea><div class="help">請輸入合法 JSON 物件；格式錯誤時無法儲存。</div></div>`;
-        if(type === 'boolean') return `<div class="form-row" ${['spots','foods','trips'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">已上架</option><option value="false">草稿 / 下架</option></select></div>`;
+        if(type === 'boolean') return `<div class="form-row" ${['spots','foods','trips'].includes(currentTable)&&name==='is_published'?'style="display:none"':''}><label>${label}</label><select id="f_${name}"><option value="true">${name==='show_trip_main_image'?'顯示':'已上架'}</option><option value="false">${name==='show_trip_main_image'?'不顯示':'草稿 / 下架'}</option></select></div>`;
         if(type === 'booleanActive') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
         return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag==='auto'||flag==='fixed1'?'readonly':''} oninput="updateImagePreview()"></div>`;
       }).join('');

@@ -649,5 +649,7 @@ body.trip-detail-page .route-grid {
 /* 前台目錄分頁按鈕 */
 .pagination{align-items:center;flex-wrap:wrap}.pagination button{font:inherit;background:transparent;border:0;border-bottom:1px solid transparent;padding:8px 4px;color:var(--muted);cursor:pointer}.pagination button.active,.pagination button:hover:not(:disabled){color:var(--orange);border-bottom-color:var(--orange)}.pagination button:disabled{opacity:.35;cursor:not-allowed}.pagination .pagination-summary{width:100%;text-align:center;font-size:13px;color:var(--muted);padding:0}
 
-/* 景點、美食、行程交通指南統一英文小標字體與字級。 */
-body.food-detail-page .compact-transit-kicker,body.trip-detail-page .compact-transit-kicker{font-family:inherit;font-size:10px;letter-spacing:1.4px;font-weight:700;color:#777;margin:0 0 9px;line-height:1.5}
+/* 行程主圖：僅於後台勾選顯示且有圖片時出現，位於時間表上方。 */
+body.trip-detail-page .trip-main-image{margin:32px 0 0;width:100%;}
+body.trip-detail-page .trip-main-image[hidden]{display:none;}
+body.trip-detail-page .trip-main-image img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;}

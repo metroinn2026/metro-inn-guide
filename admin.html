@@ -187,17 +187,43 @@
 
 
   <style>
-    /* Keep all list filters and pagination settings on one deliberate desktop row. */
-    #listView > .toolbar{display:grid;grid-template-columns:minmax(190px,1fr) minmax(112px,145px) minmax(112px,145px) auto auto;align-items:center;gap:8px;margin-bottom:12px}
-    #listView > .toolbar > input,#listView > .toolbar > select{width:100%;min-width:0;box-sizing:border-box;margin:0}
-    #listView > .toolbar > button{white-space:nowrap;margin:0}
-    #listView .admin-list-controls{display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:8px;margin:0;white-space:nowrap}
-    #listView .admin-list-controls label{gap:4px}
-    #listView .admin-list-controls select{min-width:65px;width:auto;padding:8px 5px}
-    #listView .admin-list-controls .admin-page-jump{min-width:74px}
-    #listView .admin-bulk-bar{margin-top:0}
-    @media(max-width:1050px){#listView > .toolbar{grid-template-columns:minmax(180px,1fr) minmax(100px,135px) minmax(100px,135px) auto}#listView .admin-list-controls{grid-column:1/-1;justify-content:flex-end}}
-    @media(max-width:850px){#listView > .toolbar{grid-template-columns:minmax(0,1fr) minmax(110px,1fr)}#listView > .toolbar > input{grid-column:1/-1}#listView .admin-list-controls{grid-column:1/-1;justify-content:flex-start}#listView .admin-bulk-bar{flex-wrap:wrap}}
+    /* One compact management row: search, filters, pagination and bulk actions. */
+    #listView > .toolbar{
+      display:flex;align-items:center;gap:7px;flex-wrap:nowrap;
+      margin-bottom:10px;min-width:0;
+    }
+    #listView > .toolbar > input{
+      flex:1 1 170px;width:0;min-width:110px;box-sizing:border-box;margin:0;
+    }
+    #listView > .toolbar > select{
+      flex:0 1 112px;width:112px;min-width:88px;box-sizing:border-box;margin:0;
+    }
+    #listView > .toolbar > button{
+      flex:0 0 auto;white-space:nowrap;margin:0;padding-left:9px;padding-right:9px;
+    }
+    #listView .admin-list-controls{
+      display:flex;flex:0 0 auto;align-items:center;gap:5px;
+      margin:0;white-space:nowrap;font-size:12px;
+    }
+    #listView .admin-list-controls label{gap:3px}
+    #listView .admin-list-controls select{width:auto;min-width:62px;padding:7px 4px}
+    #listView .admin-list-controls .admin-page-jump{min-width:66px}
+    #listView .admin-bulk-bar{
+      display:flex;flex:0 0 auto;align-items:center;gap:5px;
+      padding:0;margin:0;border:0;background:transparent;white-space:nowrap;
+    }
+    #listView .admin-bulk-bar .admin-select-all{white-space:nowrap;font-size:12px}
+    #listView .admin-bulk-bar #adminSelectedCount{font-size:12px;white-space:nowrap}
+    #listView .admin-bulk-bar #adminBulkDelete{padding:8px 7px;font-size:12px;white-space:nowrap}
+    #listView .admin-bulk-bar #adminBulkMsg:empty{display:none}
+    #listView .content-count-line{margin:0 0 0 3px;padding:0;border:0;background:transparent;white-space:nowrap;font-size:12px}
+    #listView .content-count-line .count-main{display:none}
+    /* Keep one row on desktop; on narrow screens allow horizontal scrolling instead of scattered rows. */
+    @media(max-width:1400px){
+      #listView > .toolbar{overflow-x:auto;padding-bottom:5px;scrollbar-width:thin}
+      #listView > .toolbar > input{flex:1 0 150px;width:150px}
+      #listView > .toolbar > select{flex:0 0 104px;width:104px}
+    }
     /* Pagination: page-size control belongs in the upper list toolbar; page numbers stay below. */
     .admin-list-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-left:auto;font-size:13px;color:#475569}
     .admin-list-controls label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -207,7 +233,7 @@
     #listPagination button{min-width:36px;padding:7px 10px}
     #listPagination button[aria-current="page"]{background:#245ab9;color:white;border-color:#245ab9}
     #listPagination button:disabled{opacity:.45;cursor:not-allowed}
-    @media(max-width:850px){.admin-list-controls{margin-left:0;justify-content:flex-start;width:100%}}
+    @media(max-width:850px){#listView .admin-list-controls{margin:0;width:auto;justify-content:flex-start}}
     /* Focused content editor: the list toolbar belongs only to the list. */
     #cmsPanel.cms-editing > .panel-head,
     #cmsPanel.cms-editing > #featuredManagementTabs,
@@ -357,11 +383,11 @@
               <label for="adminPageSize">每頁 <select id="adminPageSize" aria-label="每頁顯示筆數" onchange="changeAdminPageSize(this.value)"><option value="20">20 筆</option><option value="50">50 筆</option><option value="100">100 筆</option></select></label>
               <label for="adminPageJump">跳至 <select id="adminPageJump" class="admin-page-jump" aria-label="快速跳至頁數" onchange="changeAdminPage(Number(this.value))"></select></label>
             </div>
-          </div>
-
           <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span>
             <div id="contentCountCard" class="content-count-line" hidden aria-live="polite"><span class="count-main">共 <strong id="contentCountNumber">—</strong> 筆</span><span id="contentCountDetail">顯示資料載入中…</span></div>
           </div>
+          </div>
+
           <div id="sortSaveBar" class="sort-save-bar">
             <span>排序已變更。請按「儲存排序」寫入資料庫，前台排序才會同步更新。</span>
             <div class="actions">

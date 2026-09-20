@@ -17,7 +17,7 @@ function mount(root,type,record,options={}){
     for(const [field,title,multiline] of [['time','時間',false],['title','段落標題',false],['text','段落說明',true],['image','圖片網址',false],['image_source','圖片來源',false]]){
       const labelEl=document.createElement('label');labelEl.textContent=title+' ';const el=document.createElement(multiline?'textarea':'input');if(multiline)el.rows=4;else el.type='text';el.value=section[field]??(field==='text'?section.description??'':'');el.oninput=()=>{section[field]=el.value;commit();};labelEl.append(el);card.append(labelEl);
     }
-    const imageToggle=document.createElement('label');imageToggle.textContent='顯示此段圖片 ';
+    const imageToggle=document.createElement('label');imageToggle.className='trip-section-image-toggle';const imageToggleText=document.createElement('span');imageToggleText.textContent='顯示此段圖片';imageToggle.append(imageToggleText);
     const imageToggleInput=document.createElement('input');imageToggleInput.type='checkbox';imageToggleInput.checked=section.show_image!==false;imageToggleInput.onchange=()=>{section.show_image=imageToggleInput.checked;commit();};imageToggle.prepend(imageToggleInput);card.append(imageToggle);
     const actions=document.createElement('div');actions.className='row';
     const sectionFile=document.createElement('input');sectionFile.type='file';sectionFile.accept='image/jpeg,image/png,image/webp,image/gif';sectionFile.hidden=true;

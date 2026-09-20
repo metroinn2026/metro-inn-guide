@@ -126,6 +126,21 @@
     .trip-section-card textarea{
       min-height:90px;
     }
+    .trip-section-image-toggle{
+      display:inline-flex!important;
+      flex-direction:row!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      gap:7px;
+      width:max-content;
+    }
+    .trip-section-image-toggle input[type="checkbox"]{
+      display:inline-block!important;
+      flex:0 0 auto;
+      width:auto!important;
+      margin:0!important;
+      order:-1;
+    }
     .trip-section-card.dragging{
       opacity:.5;
     }
@@ -1851,7 +1866,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
           </div>
           <div class="trip-section-image-row">
             <div class="form-row">
-              <label><input data-field="show_image" type="checkbox" ${s.show_image !== false ? 'checked' : ''} onchange="syncTripSections()"> 顯示此段圖片</label>
+              <label class="trip-section-image-toggle"><input data-field="show_image" type="checkbox" ${s.show_image !== false ? 'checked' : ''} onchange="syncTripSections()"><span>顯示此段圖片</span></label>
               <label>圖片網址（可留空）</label>
               <input data-field="image" value="${escapeHtml(s.image)}" placeholder="https://..." oninput="syncTripSections()">
               <div class="image-field-actions">

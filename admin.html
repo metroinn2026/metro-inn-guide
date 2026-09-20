@@ -312,13 +312,13 @@
 
         <div id="listView" class="list-view">
           <div class="toolbar">
-            <input id="searchInput" placeholder="搜尋標題、摘要、內容、標籤..." oninput="renderList()">
-            <select id="statusFilter" onchange="renderList()">
+            <input id="searchInput" placeholder="搜尋標題、摘要、內容、標籤..." oninput="adminPage=1;renderList()">
+            <select id="statusFilter" onchange="adminPage=1;renderList()">
               <option value="all">全部狀態</option>
               <option value="published">已上架 / 啟用</option>
               <option value="draft">草稿 / 停用</option>
             </select>
-            <select id="typeFilter" onchange="renderList()">
+            <select id="typeFilter" onchange="adminPage=1;renderList()">
               <option value="all">全部類別</option>
             </select>
             <button onclick="clearFilters()">清除篩選</button>
@@ -343,6 +343,7 @@
               </tbody>
             </table>
           </div>
+          <div id="listPagination" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0" aria-label="管理清單分頁"></div>
         </div>
 
         <div id="editorView" class="editor-view">
@@ -403,7 +404,7 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="bulk-data.js"></script>
   <script src="transit-duration.js"></script>
-  <script src="cms-editor.js?v=20260920-image-upload-fix"></script>
+  <script src="cms-editor.js"></script>
   <script src="route-timeline.js"></script>
   <link rel="stylesheet" href="route-timeline.css">
   <script src="cms-preview.js"></script>
@@ -661,6 +662,36 @@
     let currentTable = 'banners';
     let cache = [];
     let currentList = [];
+    const ADMIN_PAGE_SIZE = 20;
+    let adminPage = 1;
+    let adminViewSort = {key:'',direction:'asc'};
+    function adminSortValue(item,key){
+      if(key==='sort_order')return Number(item.sort_order??0);
+      if(key==='name')return String(item.title||item.name||item.footer_title||item.booking_text||item.id||'');
+      if(key==='secondary')return String(configs[currentTable].subtitle(item)||'').replace(/<[^>]*>/g,'');
+      if(key==='status')return item[configs[currentTable].statusKey] ? 1 : 0;
+      return String(item[key]??'');
+    }
+    function toggleAdminViewSort(key){
+      if(document.getElementById('sortSaveBar').classList.contains('active')){
+        alert('請先儲存或取消前台排序變更，再使用欄位排序。');return;
+      }
+      adminViewSort=adminViewSort.key===key?{key,direction:adminViewSort.direction==='asc'?'desc':'asc'}:{key,direction:'asc'};
+      adminPage=1;buildHead();renderList();
+    }
+    function adminSortHeader(label,key){
+      const active=adminViewSort.key===key;
+      return `<th><button type="button" onclick="toggleAdminViewSort('${key}')" aria-label="依${label}排序" aria-sort="${active?(adminViewSort.direction==='asc'?'ascending':'descending'):'none'}" style="background:none;border:0;padding:0;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;white-space:nowrap">${label} <span aria-hidden="true">${active?(adminViewSort.direction==='asc'?'▲':'▼'):'↕'}</span></button></th>`;
+    }
+    function renderAdminPagination(total){
+      const el=document.getElementById('listPagination');if(!el)return;
+      const pages=Math.max(1,Math.ceil(total/ADMIN_PAGE_SIZE));adminPage=Math.min(Math.max(1,adminPage),pages);
+      const start=total?(adminPage-1)*ADMIN_PAGE_SIZE+1:0,end=Math.min(total,adminPage*ADMIN_PAGE_SIZE);
+      el.innerHTML=`<span>共 ${total} 筆・顯示 ${start}–${end} 筆（每頁 20 筆）</span><div style="display:flex;align-items:center;gap:6px"><button type="button" ${adminPage===1?'disabled':''} onclick="changeAdminPage(${adminPage-1})">上一頁</button><span>第 ${adminPage} / ${pages} 頁</span><button type="button" ${adminPage===pages?'disabled':''} onclick="changeAdminPage(${adminPage+1})">下一頁</button></div>`;
+    }
+    function changeAdminPage(page){adminPage=page;renderList();}
+    function visibleAdminRows(){return currentList.slice((adminPage-1)*ADMIN_PAGE_SIZE,adminPage*ADMIN_PAGE_SIZE);}
+
     let draggingId = '';
     let editingId = '';
     let currentUserRole = 'admin';
@@ -871,6 +902,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       document.getElementById('imageTips').innerHTML = cfg.tips || imageTipsDefault;
       buildForm();
       setupFilters();
+      adminPage=1;adminViewSort={key:'',direction:'asc'};
       backToList(false);
       return manageAccounts ? loadCurrentTable() : Promise.resolve(false);
     }
@@ -887,7 +919,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       document.getElementById('searchInput').value = '';
       document.getElementById('statusFilter').value = 'all';
       document.getElementById('typeFilter').value = 'all';
-      renderList();
+      adminPage=1;renderList();
     }
 
 
@@ -1030,12 +1062,13 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       bar.style.display=active?'flex':'none';
       document.getElementById('adminSelectedCount').textContent=`已選 ${adminChecked.size} 筆`;
       const all=document.getElementById('adminSelectAll');
-      all.checked=!!currentList.length&&currentList.every(x=>adminChecked.has(String(x.id)));
-      all.indeterminate=!all.checked&&currentList.some(x=>adminChecked.has(String(x.id)));
-      all.disabled=adminBusy||!currentList.length;
+      const visible=visibleAdminRows();
+      all.checked=!!visible.length&&visible.every(x=>adminChecked.has(String(x.id)));
+      all.indeterminate=!all.checked&&visible.some(x=>adminChecked.has(String(x.id)));
+      all.disabled=adminBusy||!visible.length;
       document.getElementById('adminBulkDelete').disabled=adminBusy||!adminChecked.size;
     }
-    function toggleAdminAll(checked){currentList.forEach(x=>checked?adminChecked.add(String(x.id)):adminChecked.delete(String(x.id)));renderList();}
+    function toggleAdminAll(checked){visibleAdminRows().forEach(x=>checked?adminChecked.add(String(x.id)):adminChecked.delete(String(x.id)));renderList();}
     function toggleAdminRow(id,checked){checked?adminChecked.add(String(id)):adminChecked.delete(String(id));updateAdminBulk();}
     async function adminBulkDelete(){
       if(adminBusy||!adminChecked.size)return;
@@ -1056,7 +1089,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
                    currentTable==='coupons' ? '期限' : '日期';
       const selectHead=bulkTables.has(currentTable)?'<th style="width:38px">勾選</th>':'';
       const sortHead = (currentTable === 'site_settings' || currentTable === 'admin_profiles') ? '' : '<th style="width:56px">排序</th>';
-      document.getElementById('tableHead').innerHTML = `<tr>${selectHead}${sortHead}<th style="width:150px">資料編號</th><th>名稱</th><th>${second}</th><th>狀態</th><th>操作</th></tr>`;
+      document.getElementById('tableHead').innerHTML = `<tr>${selectHead}${sortHead?adminSortHeader('排序','sort_order'):''}${adminSortHeader('資料編號','id')}${adminSortHeader('名稱','name')}${adminSortHeader(second,'secondary')}${cfg.statusKey?adminSortHeader('狀態','status'):'<th>狀態</th>'}<th>操作</th></tr>`;
     }
 
     function nextId(){
@@ -1198,11 +1231,16 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         return matchKeyword && matchStatus && matchType;
       });
 
+      if(adminViewSort.key){
+        const {key,direction}=adminViewSort;
+        list.sort((a,b)=>{const x=adminSortValue(a,key),y=adminSortValue(b,key);const cmp=typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'zh-Hant',{numeric:true});return direction==='asc'?cmp:-cmp;});
+      }
       currentList = list;
+      renderAdminPagination(list.length);
       const detail = document.getElementById('contentCountDetail');
       if(!document.getElementById('contentCountCard').hidden) {
         const filtering = keyword || status !== 'all' || type !== 'all';
-        detail.textContent = filtering ? `符合條件 ${list.length} 筆（已載入清單）` : (list.length ? `顯示第 1–${list.length} 筆` : '目前沒有資料');
+        detail.textContent = filtering ? `符合條件 ${list.length} 筆（已載入清單）` : (list.length ? `顯示第 ${(adminPage-1)*ADMIN_PAGE_SIZE+1}–${Math.min(list.length,adminPage*ADMIN_PAGE_SIZE)} 筆` : '目前沒有資料');
       }
       updateAdminBulk();
       const tbody = document.getElementById('listBody');
@@ -1210,7 +1248,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
 
       if(!list.length){ tbody.innerHTML = '<tr><td colspan="7">沒有符合條件的資料。</td></tr>'; return; }
 
-      tbody.innerHTML = list.map(item=>{
+      tbody.innerHTML = visibleAdminRows().map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
@@ -1286,7 +1324,8 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
     function renderListFromCurrent(){
       const cfg = configs[currentTable];
       const tbody = document.getElementById('listBody');
-      tbody.innerHTML = currentList.map(item=>{
+      renderAdminPagination(currentList.length);
+      tbody.innerHTML = visibleAdminRows().map(item=>{
         const title = item.title || item.footer_title || item.booking_text || item.id;
         const statusHtml = currentTable === 'admin_profiles' ? roleLabel(item.role) : (cfg.statusKey
           ? `<span class="status ${item[cfg.statusKey]?'on':'draft'}">${item[cfg.statusKey]?(currentTable==='banners'?'啟用':'已上架'):(currentTable==='banners'?'停用':'草稿')}</span>`
@@ -1820,7 +1859,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       msg.textContent = '圖片上傳中...';
       const ext = isSvg ? 'svg' : (file.name.split('.').pop() || 'jpg').toLowerCase();
       const safeId = (document.getElementById('f_id')?.value || currentTable || 'item').replaceAll('/','-');
-      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName.replace(/[^a-zA-Z0-9_-]/g,'_')}.${ext}`;
+      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName}.${ext}`;
 
       const { error } = await db.storage.from('site-images').upload(path, file, {
         cacheControl:'3600',
@@ -1835,10 +1874,9 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       }
 
       const url = publicImageUrl(path);
-      const targetField=document.getElementById('f_' + fieldName);
-      if(targetField){targetField.value=url;updateFieldThumb(fieldName);updateImagePreview();}
-      // 行程段落圖片在共用編輯器中，由呼叫端更新段落資料。
-
+      document.getElementById('f_' + fieldName).value = url;
+      updateFieldThumb(fieldName);
+      updateImagePreview();
       msg.textContent = '圖片已上傳並帶入網址。';
       return url;
     }

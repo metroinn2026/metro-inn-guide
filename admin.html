@@ -187,6 +187,16 @@
 
 
   <style>
+    /* Pagination: page-size control belongs in the upper list toolbar; page numbers stay below. */
+    .admin-list-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-left:auto;font-size:13px;color:#475569}
+    .admin-list-controls label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .admin-list-controls select{width:auto;min-width:76px;padding:7px 9px;border:1px solid #cbd8ee;border-radius:5px;background:#fff;color:#334155}
+    .admin-list-controls .admin-page-jump{min-width:88px}
+    #listPagination{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+    #listPagination button{min-width:36px;padding:7px 10px}
+    #listPagination button[aria-current="page"]{background:#245ab9;color:white;border-color:#245ab9}
+    #listPagination button:disabled{opacity:.45;cursor:not-allowed}
+    @media(max-width:850px){.admin-list-controls{margin-left:0;justify-content:flex-start;width:100%}}
     /* Focused content editor: the list toolbar belongs only to the list. */
     #cmsPanel.cms-editing > .panel-head,
     #cmsPanel.cms-editing > #featuredManagementTabs,
@@ -332,6 +342,10 @@
               <option value="all">全部類別</option>
             </select>
             <button onclick="clearFilters()">清除篩選</button>
+            <div class="admin-list-controls" id="adminListControls" aria-label="管理清單顯示設定">
+              <label for="adminPageSize">每頁 <select id="adminPageSize" aria-label="每頁顯示筆數" onchange="changeAdminPageSize(this.value)"><option value="20">20 筆</option><option value="50">50 筆</option><option value="100">100 筆</option></select></label>
+              <label for="adminPageJump">跳至 <select id="adminPageJump" class="admin-page-jump" aria-label="快速跳至頁數" onchange="changeAdminPage(Number(this.value))"></select></label>
+            </div>
           </div>
 
           <div id="adminBulkBar" class="admin-bulk-bar" style="display:none"><label class="admin-select-all"><input type="checkbox" id="adminSelectAll" onchange="toggleAdminAll(this.checked)">全選目前清單</label><span id="adminSelectedCount">已選 0 筆</span><button class="danger" id="adminBulkDelete" onclick="adminBulkDelete()" disabled>批次刪除（超級管理員驗證）</button><span id="adminBulkMsg" role="status"></span>
@@ -353,7 +367,7 @@
               </tbody>
             </table>
           </div>
-          <div id="listPagination" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0" aria-label="管理清單分頁"></div>
+          <nav id="listPagination" aria-label="管理清單頁碼"></nav>
         </div>
 
         <div id="editorView" class="editor-view">
@@ -697,9 +711,22 @@
     function renderAdminPagination(total){
       const el=document.getElementById('listPagination');if(!el)return;
       const pages=Math.max(1,Math.ceil(total/ADMIN_PAGE_SIZE));adminPage=Math.min(Math.max(1,adminPage),pages);
-      const start=total?(adminPage-1)*ADMIN_PAGE_SIZE+1:0,end=Math.min(total,adminPage*ADMIN_PAGE_SIZE);
-      const pageOptions=Array.from({length:pages},(_,i)=>`<option value="${i+1}" ${adminPage===i+1?'selected':''}>第 ${i+1} 頁</option>`).join('');
-      el.innerHTML=`<span>共 ${total} 筆・顯示 ${start}–${end} 筆</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><label for="adminPageSize">每頁</label><select id="adminPageSize" aria-label="每頁顯示筆數" onchange="changeAdminPageSize(this.value)" style="padding:7px;border:1px solid #cbd8ee;border-radius:5px">${[20,50,100].map(n=>`<option value="${n}" ${ADMIN_PAGE_SIZE===n?'selected':''}>${n} 筆</option>`).join('')}</select><button type="button" ${adminPage===1?'disabled':''} onclick="changeAdminPage(${adminPage-1})">上一頁</button><label for="adminPageJump">跳至</label><select id="adminPageJump" aria-label="快速跳至頁數" onchange="changeAdminPage(Number(this.value))" style="padding:7px;border:1px solid #cbd8ee;border-radius:5px">${pageOptions}</select><span>／共 ${pages} 頁</span><button type="button" ${adminPage===pages?'disabled':''} onclick="changeAdminPage(${adminPage+1})">下一頁</button></div>`;
+      const sizeSelect=document.getElementById('adminPageSize');
+      if(sizeSelect)sizeSelect.value=String(ADMIN_PAGE_SIZE);
+      const jump=document.getElementById('adminPageJump');
+      if(jump){
+        jump.innerHTML=Array.from({length:pages},(_,i)=>`<option value="${i+1}">第 ${i+1} 頁</option>`).join('');
+        jump.value=String(adminPage);
+        jump.disabled=pages<=1;
+      }
+      const pageButtons=Array.from({length:pages},(_,i)=>i+1).filter(n=>pages<=7||n===1||n===pages||Math.abs(n-adminPage)<=1);
+      const buttons=[];let last=0;
+      pageButtons.forEach(n=>{
+        if(n-last>1)buttons.push('<span aria-hidden="true" style="padding:0 3px;color:#64748b">…</span>');
+        buttons.push(`<button type="button" ${n===adminPage?'aria-current="page"':''} onclick="changeAdminPage(${n})" aria-label="第 ${n} 頁">${n}</button>`);
+        last=n;
+      });
+      el.innerHTML=`<button type="button" ${adminPage===1?'disabled':''} onclick="changeAdminPage(${adminPage-1})">上一頁</button>${buttons.join('')}<button type="button" ${adminPage===pages?'disabled':''} onclick="changeAdminPage(${adminPage+1})">下一頁</button>`;
     }
     function changeAdminPageSize(size){
       const next=Number(size);if(![20,50,100].includes(next))return;

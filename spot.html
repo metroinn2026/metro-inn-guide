@@ -202,17 +202,24 @@
             const next = route.steps[index + 1];
             if (mode === '轉乘' && next && (next.type === '捷運' || next.mode === '捷運')) {
               const stations = String(next.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
-              const duration = next.duration ? `${String(next.duration).replace(/\s*分鐘$/, '')}分鐘` : '';
-              steps.push({leg:`站內轉乘（${[next.line, stations, duration].filter(Boolean).join('，')}）`});
+              const duration = next.duration ? `約${String(next.duration).replace(/\s*分鐘$/, '')}分` : '';
+              const directionName = String(next.direction || '').replace(/^往/, '').replace(/方向$/, '');
+              const direction = directionName ? `${directionName}方向` : '';
+              steps.push({leg:`站內轉乘${next.line || '捷運'}${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`});
               index += 1;
               continue;
             }
-            const duration = step.duration ? `${String(step.duration).replace(/\s*分鐘$/, '')}分鐘` : '';
+            const duration = step.duration ? `約${String(step.duration).replace(/\s*分鐘$/, '')}分` : '';
             const stations = String(step.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
-            const routeText = [step.line, step.direction].filter(Boolean).join('');
+            const directionName = String(step.direction || '').replace(/^往/, '').replace(/方向$/, '');
+            const direction = directionName ? `${directionName}方向` : '';
             const description = mode === '步行'
-              ? `步行｜${[duration, step.distance].filter(Boolean).join('・')}`
-              : `${routeText || mode}｜${[stations, duration].filter(Boolean).join('・')}`;
+              ? `步行｜${[step.distance, duration].filter(Boolean).join('・')}`
+              : mode === '捷運'
+                ? `${step.line || '捷運'}${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`
+                : mode === '公車'
+                  ? `${step.line || ''}公車${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`
+                  : `${mode}｜${[stations, duration].filter(Boolean).join('・')}`;
             if (description) steps.push({leg:description});
           }
         }

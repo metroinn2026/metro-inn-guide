@@ -304,6 +304,52 @@
     @media(max-width:850px){#editorView .editor-top{align-items:flex-start}#editorView .editor-actions{width:100%}#editorView .editor-heading h2{font-size:20px}#editorView .editor-grid > .card{padding:14px!important}}
   </style>
 <script src="font-size-controls.js" defer></script>
+
+  <style id="admin-toolbar-unified-20260920">
+    /* Unified, low-chroma list controls. All controls share one 40px baseline. */
+    #listView > .toolbar {
+      display:flex !important; align-items:center !important; flex-wrap:nowrap !important;
+      gap:8px !important; width:100%; min-width:0; box-sizing:border-box;
+      padding:0 0 5px !important; margin:0 0 8px !important;
+      overflow-x:auto !important; overflow-y:hidden !important;
+      scrollbar-width:thin; scrollbar-color:#cbd5e1 transparent;
+    }
+    #listView > .toolbar > input,
+    #listView > .toolbar > select,
+    #listView > .toolbar > button,
+    #listView > .toolbar .admin-list-controls select,
+    #listView > .toolbar #adminBulkDelete {
+      height:40px !important; min-height:40px !important; max-height:40px !important;
+      box-sizing:border-box !important; margin:0 !important;
+      border:1px solid #d6dce5 !important; border-radius:5px !important;
+      background:#fff !important; color:#334155 !important;
+      font-size:13px !important; font-weight:500 !important; line-height:1.25 !important;
+      box-shadow:none !important; vertical-align:middle !important;
+    }
+    #listView > .toolbar > input {flex:1 1 230px !important; min-width:160px !important; width:0 !important; padding:0 12px !important;}
+    #listView > .toolbar > select {flex:0 0 108px !important; width:108px !important; min-width:108px !important; padding:0 8px !important;}
+    #listView > .toolbar > button {flex:0 0 auto !important; padding:0 10px !important; white-space:nowrap;}
+    #listView > .toolbar .admin-list-controls {display:flex !important; align-items:center !important; flex:0 0 auto !important; gap:8px !important; margin:0 !important; width:auto !important; white-space:nowrap;}
+    #listView > .toolbar .admin-list-controls label {display:inline-flex !important; align-items:center !important; gap:5px !important; margin:0 !important; color:#64748b !important; font-size:12px !important; font-weight:500 !important; white-space:nowrap;}
+    #listView > .toolbar .admin-list-controls select {width:74px !important; min-width:74px !important; padding:0 6px !important;}
+    #listView > .toolbar .admin-list-controls .admin-page-jump {width:80px !important; min-width:80px !important;}
+    #listView > .toolbar .admin-bulk-bar {display:flex !important; align-items:center !important; flex:0 0 auto !important; gap:0 !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important;}
+    #listView > .toolbar #adminBulkDelete {padding:0 10px !important; color:#9f3a3a !important; border-color:#e2d6d6 !important; white-space:nowrap;}
+    #listView > .toolbar #adminBulkDelete:hover:not(:disabled) {background:#faf5f5 !important;}
+    #listView > .toolbar #adminBulkDelete:disabled {color:#94a3b8 !important; border-color:#d6dce5 !important; opacity:1 !important; cursor:not-allowed;}
+    #listView > .toolbar .admin-toolbar-summary {display:flex !important; align-items:center !important; flex:0 0 auto !important; margin-left:auto !important; gap:8px !important; white-space:nowrap; font-size:12px !important; color:#64748b !important;}
+    #listView > .toolbar .content-count-line {font-size:12px !important; color:#64748b !important; margin:0 !important; padding:0 !important; background:transparent !important; border:0 !important;}
+    #listView > .toolbar #adminBulkMsg:not(:empty) {font-size:12px; color:#475569;}
+    #listView > .toolbar :is(input,select,button):focus-visible {outline:2px solid #64748b !important; outline-offset:2px;}
+    /* Remove decorative tint only from the management list, preserving semantic publish status. */
+    #listView .table-card thead, #listView .table-card th {background:#f8fafc !important; color:#334155 !important;}
+    #listView .admin-sort-button {color:#475569 !important;}
+    #listView .admin-select-heading input {accent-color:#475569 !important;}
+    @media (max-width:1400px) {
+      #listView > .toolbar > input {flex:1 0 190px !important; width:190px !important;}
+      #listView > .toolbar > select {flex:0 0 108px !important; width:108px !important;}
+    }
+  </style>
 </head>
 <body>
   <div class="admin-shell">

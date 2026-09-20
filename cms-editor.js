@@ -54,11 +54,18 @@ function mount(root,type,record,options={}){
    if(modes.has(steps[0].type)||modes.has(steps[steps.length-1].type))throw Error('第一行與最後一行請填寫起點及目的地名稱');
    return [{title:'大眾運輸推薦路線',enabled:true,steps}];
   }
+  // 與交通路線一起存於既有 JSONB；三類內容皆可獨立指定導航終點。
+  const navigationLabel=document.createElement('label');navigationLabel.textContent='導航目的地網址（Google Maps）';navigationLabel.style.cssText='display:block;font-weight:700;margin:16px 0 8px';wrap.append(navigationLabel);
+  const navigationInput=document.createElement('input');navigationInput.type='url';navigationInput.placeholder='貼上 Google Maps 導航連結；留空則依交通路線終點導航';navigationInput.style.cssText='width:100%;box-sizing:border-box';navigationLabel.append(navigationInput);
+  const navigationHint=document.createElement('p');navigationHint.textContent='只影響交通指南的「在 Google Maps 查看即時路線」按鈕，不影響行程地圖。';navigationHint.style.cssText='font-size:12px;color:#64748b;margin:6px 0 12px';wrap.append(navigationHint);
+  function navigationValue(){return Array.isArray(record[key]) ? record[key].find(r=>r&&typeof r.navigation_url==='string'&&r.navigation_url)?.navigation_url||'' : '';}
+  navigationInput.value=navigationValue();
+  navigationInput.oninput=()=>{const value=navigationInput.value.trim();if(value){try{const url=new URL(value);if(url.protocol!=='https:'||!/(^|\.)google\.[a-z.]+$|(^|\.)goo\.gl$|(^|\.)maps\.app\.goo\.gl$/.test(url.hostname.toLowerCase()))throw Error();navigationInput.setCustomValidity('');}catch{navigationInput.setCustomValidity('請輸入有效的 Google Maps HTTPS 網址');invalid.add('導航目的地網址');options.onInvalid?.(key);return;}}navigationInput.setCustomValidity('');invalid.delete('導航目的地網址');if(!Array.isArray(record[key]))return;if(!record[key].length&&value)record[key].push({title:'大眾運輸推薦路線',enabled:true,steps:[]});for(const route of record[key]){if(!route||typeof route!=='object')continue;if(value)route.navigation_url=value;else delete route.navigation_url;}options.onChange?.(key);};
   const existing=record[key];if(existing==null||(typeof existing==='object'&&!Array.isArray(existing)&&!Object.keys(existing).length))record[key]=[];
   if(!Array.isArray(record[key])){invalid.add(key);status.textContent='原有交通資料不是路線清單，請先備份確認後再編輯。';status.style.color='#b91c1c';return wrap;}
   editor.value=stringify(record[key]);const totalStatus=document.createElement('p');totalStatus.setAttribute('aria-live','polite');totalStatus.style.cssText='font-size:14px;font-weight:600;margin:8px 0;color:#444';wrap.append(totalStatus);function refreshTotal(){const route=record[key]?.find(r=>r?.enabled!==false);totalStatus.textContent=global.MetroTransitDuration?.label(global.MetroTransitDuration.calculate(route))||'請重新載入分鐘計算元件';}refreshTotal();
   if(record[key].filter(r=>r?.enabled!==false).length>1){status.textContent='原資料有多條路線：文字框僅顯示第一條。為避免遺失其他路線，請先備份並確認。';status.style.color='#b91c1c';invalid.add(key);return wrap;}
-  editor.oninput=()=>{try{record[key]=parse(editor.value);refreshTotal();invalid.delete(key);status.textContent='已更新草稿預覽；按「儲存草稿」或「儲存並上架」才會寫入資料庫。';status.style.color='#64748b';options.onChange?.(key);}catch(err){invalid.add(key);status.textContent=err.message;status.style.color='#b91c1c';options.onInvalid?.(key);}};
+  editor.oninput=()=>{try{const previousNavigation=navigationInput.value.trim();record[key]=parse(editor.value);if(previousNavigation){if(!record[key].length)record[key].push({title:'大眾運輸推薦路線',enabled:true,steps:[]});record[key][0].navigation_url=previousNavigation;}refreshTotal();invalid.delete(key);status.textContent='已更新草稿預覽；按「儲存草稿」或「儲存並上架」才會寫入資料庫。';status.style.color='#64748b';options.onChange?.(key);}catch(err){invalid.add(key);status.textContent=err.message;status.style.color='#b91c1c';options.onInvalid?.(key);}};
   return wrap;
  }
  function makeImage(key,label,rule){

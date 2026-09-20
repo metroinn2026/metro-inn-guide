@@ -339,13 +339,30 @@
     // 交通欄位可在 Supabase 補充；尚未查核的路線不顯示虛構站數與時間。
     const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
     function setupHotelRoutes(item) {
-      const destination = [item.title, item.address].filter(Boolean).join(' ');
+      let destination = item.title || '北投';
+      let destinationRoutes = item.transport_routes;
+      if (typeof destinationRoutes === 'string') { try { destinationRoutes = JSON.parse(destinationRoutes); } catch (_) { destinationRoutes = []; } }
+      const lastRoute = Array.isArray(destinationRoutes) ? destinationRoutes.find(r => r && r.enabled !== false && Array.isArray(r.steps) && r.steps.length) : null;
+      const finalStop = lastRoute?.steps[lastRoute.steps.length - 1];
+      if (finalStop?.name) destination = finalStop.name;
       const url = new URL('https://www.google.com/maps/dir/');
       url.searchParams.set('api', '1');
       url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
       url.searchParams.set('destination', destination || item.title || '北投');
       url.searchParams.set('travelmode', 'transit');
-      document.getElementById('travelMapLink').href = url.toString();
+      // 導航網址儲存在既有 transport_routes JSONB，無須新增資料庫欄位。
+      // 此連結只控制交通指南，不影響行程 My Maps 或店家地圖。
+      let navigationRoutes = item.transport_routes;
+      if (typeof navigationRoutes === 'string') { try { navigationRoutes = JSON.parse(navigationRoutes); } catch (_) { navigationRoutes = []; } }
+      const customNavigation = Array.isArray(navigationRoutes) ? navigationRoutes.find(r => r && typeof r.navigation_url === 'string' && r.navigation_url.trim())?.navigation_url.trim() : '';
+      let navigationUrl = url.toString();
+      if (customNavigation) {
+        try {
+          const parsed = new URL(customNavigation);
+          if (parsed.protocol === 'https:' && /(^|\.)google\.[a-z.]+$|(^|\.)goo\.gl$|(^|\.)maps\.app\.goo\.gl$/.test(parsed.hostname.toLowerCase())) navigationUrl = parsed.href;
+        } catch (_) { /* 不合法網址使用預設導航 */ }
+      }
+      document.getElementById('travelMapLink').href = navigationUrl;
       const root = document.getElementById('transitSteps');
       const total = document.getElementById('transitTotal');
       root.replaceChildren();

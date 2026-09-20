@@ -403,7 +403,7 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="bulk-data.js"></script>
   <script src="transit-duration.js"></script>
-  <script src="cms-editor.js"></script>
+  <script src="cms-editor.js?v=20260920-image-upload-fix"></script>
   <script src="route-timeline.js"></script>
   <link rel="stylesheet" href="route-timeline.css">
   <script src="cms-preview.js"></script>
@@ -1820,7 +1820,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       msg.textContent = '圖片上傳中...';
       const ext = isSvg ? 'svg' : (file.name.split('.').pop() || 'jpg').toLowerCase();
       const safeId = (document.getElementById('f_id')?.value || currentTable || 'item').replaceAll('/','-');
-      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName}.${ext}`;
+      const path = `${currentTable}/${safeId}/${Date.now()}-${fieldName.replace(/[^a-zA-Z0-9_-]/g,'_')}.${ext}`;
 
       const { error } = await db.storage.from('site-images').upload(path, file, {
         cacheControl:'3600',
@@ -1835,9 +1835,10 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       }
 
       const url = publicImageUrl(path);
-      document.getElementById('f_' + fieldName).value = url;
-      updateFieldThumb(fieldName);
-      updateImagePreview();
+      const targetField=document.getElementById('f_' + fieldName);
+      if(targetField){targetField.value=url;updateFieldThumb(fieldName);updateImagePreview();}
+      // 行程段落圖片在共用編輯器中，由呼叫端更新段落資料。
+
       msg.textContent = '圖片已上傳並帶入網址。';
       return url;
     }

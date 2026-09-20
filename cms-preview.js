@@ -12,7 +12,7 @@ function render(frame,type,data,dirty){
  function section(label,value){if(value===null||value===undefined||value==='')return;const sec=el('section','story');sec.append(el('h2','',label),el('p','',typeof value==='string'?value:JSON.stringify(value,null,2)));main.append(sec);}
  function image(url,alt){if(typeof url!=='string'||!/^https?:\/\//i.test(url))return;const img=el('img','',undefined);img.src=url;img.alt=alt||'';img.loading='lazy';main.append(img);}
  image(data.cover_image,data.title);
- section('介紹',data.content);section('地址',data.address);section('營業時間',data.business_hours);section('建議停留',data.stay_time);section('最近捷運站',data.station);
+ section('介紹',data.content);section('地址',data.address);section('營業時間',data.business_hours);section('建議停留',data.stay_time);section('最近捷運站',data.station);section('備註',data.notes);
  if(type==='trips'&&Array.isArray(data.trip_sections)){data.trip_sections.forEach((s,i)=>{const sec=el('section','story numbered-story');sec.append(el('h2','',String(i+1).padStart(2,'0')+'｜'+[s.time,s.title].filter(Boolean).join(' ')),el('p','',s.text||s.description||''));if(typeof s.image==='string'&&/^https?:\/\//i.test(s.image)){const img=el('img');img.src=s.image;img.alt=s.title||'';sec.append(img);}if(s.image_source)sec.append(el('small','',`圖片來源：${s.image_source}`));main.append(sec);});}
  else{section('捷運交通',data.transport_metro);section('公車及轉乘',data.transport_bus);section('開車資訊',data.transport_car);if(data.transport_routes)section('交通路線',data.transport_routes);}
  if(data.google_map){const a=el('a','button outline','查看 Google Maps ↗');if(/^https:\/\//i.test(data.google_map)){a.href=data.google_map;a.target='_blank';a.rel='noopener noreferrer';main.append(a);}}

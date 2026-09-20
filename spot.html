@@ -372,7 +372,7 @@
         setText('infoStation', spot.station ? `${spot.station}附近` : '');
         setText('infoStayTime', spot.stay_time);
         setText('infoTags', tags.join('、'));
-        setText('infoNote', '實際開放時間、票價與活動資訊，請以官方公告為準。');
+        setText('infoNote', spot.notes, '實際開放時間、票價與活動資訊，請以官方公告為準。');
 
         setupHotelRoutes(spot);
 

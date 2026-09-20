@@ -68,6 +68,11 @@ const definitions={
         "text"
       ],
       [
+        "notes",
+        "備註",
+        "textarea"
+      ],
+      [
         "google_map",
         "Google Map連結",
         "text"
@@ -128,6 +133,7 @@ const definitions={
         "address",
         "stay_time",
         "tags",
+        "notes",
         "official_website"
       ],
       "detail": [
@@ -213,6 +219,11 @@ const definitions={
         "text"
       ],
       [
+        "notes",
+        "備註",
+        "textarea"
+      ],
+      [
         "google_map",
         "Google Map連結",
         "text"
@@ -276,6 +287,7 @@ const definitions={
         "average_cost",
         "price_range",
         "tags",
+        "notes",
         "official_website"
       ],
       "detail": [

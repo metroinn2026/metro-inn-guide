@@ -10,7 +10,7 @@ function render(root,data){if(!root)return;root.replaceChildren();let routes=dat
  const usable=routes.filter(r=>r&&r.enabled!==false&&Array.isArray(r.steps)&&r.steps.length);root.hidden=!usable.length;if(!usable.length)return;
  root.append(text('h3','大眾運輸交通指南'));
  usable.forEach((route,index)=>{const card=document.createElement('section');card.className='metro-route';if(usable.length>1)card.append(text('h4',route.title||'推薦路線 '+(index+1)));
- const total=(String(route.title||'').match(/全程\s*約?\s*(\d+(?:\.\d+)?)\s*分鐘/)||[])[1];if(total)card.append(text('p','全程約 '+total+' 分鐘','metro-route-total'));
+ const calc=global.MetroTransitDuration?.calculate(route);if(calc?.count)card.append(text('p',global.MetroTransitDuration.label(calc),'metro-route-total'));
  const list=document.createElement('ol');list.className='metro-route-steps';
  route.steps.forEach((st,i)=>{if(!st||typeof st!=='object')return;const mode=st.type||'步行';const isStation=mode==='站點'||mode==='抵達';const li=document.createElement('li');li.className='metro-route-step '+(isStation?'metro-route-station':'metro-route-leg');
  const marker=text('span',isStation?'':'','metro-route-marker');marker.setAttribute('aria-hidden','true');li.append(marker);

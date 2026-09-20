@@ -9,6 +9,7 @@
   <script src="related-reading.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="transit-duration.js"></script>
 </head>
 
 <body id="top" class="food-detail-page">
@@ -204,6 +205,11 @@
         const duration = String(route.total_duration || route.total_time || route.duration);
         total.textContent = /全程/.test(duration) ? duration : `全程約 ${duration}${/分鐘|小時/.test(duration) ? '' : ' 分鐘'}`;
         total.hidden = false;
+      }
+      if (route && window.MetroTransitDuration) {
+        const result = MetroTransitDuration.calculate(route);
+        total.textContent = MetroTransitDuration.label(result);
+        total.hidden = !result.count;
       }
       if (!steps.length) {
         const item = document.createElement('li'); item.className = 'transit-empty';

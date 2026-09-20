@@ -6,9 +6,9 @@
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
-  <script src="related-reading.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="transit-duration.js"></script>
 </head>
 
 <body id="top" class="spot-detail-page">
@@ -55,11 +55,6 @@
         <div id="storyContent" class="detail-prose">景點資料載入中...</div>
       </section>
 
-      <section class="detail-map-frame" aria-labelledby="detailMapHeading">
-        <h2 id="detailMapHeading">景點位置</h2>
-        <iframe id="mapEmbed" class="map-embed small" loading="lazy" title="景點位置 Google 地圖" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </section>
-
       <section id="info" class="info-card point-info">
         <div class="info-head-row">
           <div>
@@ -81,7 +76,7 @@
           <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
         </div>
 
-
+        <iframe id="mapEmbed" class="map-embed small" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </section>
     </article>
 
@@ -103,7 +98,34 @@
     </aside>
   </main>
 
-  <section id="related" class="section related" hidden></section>
+  <section id="related" class="section related">
+    <div class="container">
+      <div class="kicker">MORE STORIES</div>
+      <h2>延伸閱讀</h2>
+      <div class="rel-grid">
+        <a class="rel" href="trips.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Beitou%20Thermal%20Valley.jpg" alt=""></div>
+          <div class="meta">BEITOU</div>
+          <h3>北投溫泉半日遊</h3>
+        </a>
+        <a class="rel" href="spots.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Yangmingshan%20National%20Park.jpg" alt=""></div>
+          <div class="meta">YANGMINGSHAN</div>
+          <h3>山裡的一天，給想被風景接住的你</h3>
+        </a>
+        <a class="rel" href="spots.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/2020%20Sunset%20of%20Tamsui%20Fisherman%27s%20Wharf.jpg" alt=""></div>
+          <div class="meta">TAMSUI</div>
+          <h3>把傍晚留給淡水</h3>
+        </a>
+        <a class="rel" href="foods.html">
+          <div class="rel-img"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taiwan%20Shilin%20Night%20Market.jpg" alt=""></div>
+          <div class="meta">SHILIN</div>
+          <h3>夜晚才開始熱鬧的城市散步</h3>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <div id="footer"></div>
 
@@ -206,6 +228,11 @@
         total.textContent = /全程/.test(duration) ? duration : `全程約 ${duration}${/分鐘|小時/.test(duration) ? '' : ' 分鐘'}`;
         total.hidden = false;
       }
+      if (route && window.MetroTransitDuration) {
+        const result = MetroTransitDuration.calculate(route);
+        total.textContent = MetroTransitDuration.label(result);
+        total.hidden = !result.count;
+      }
       if (!steps.length) {
         const item = document.createElement('li'); item.className = 'transit-empty';
         item.textContent = '交通路線尚待補充，請使用下方即時導航。'; root.append(item); return;
@@ -304,7 +331,6 @@
         setText('infoTags', tags.join('、'));
         setText('infoNote', '實際開放時間、票價與活動資訊，請以官方公告為準。');
 
-        renderRelatedReading(spot,document.getElementById('related'));
         setupHotelRoutes(spot);
 
         const tagHtml = tags.map((tag, index) =>

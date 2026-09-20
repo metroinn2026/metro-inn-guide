@@ -79,7 +79,7 @@ const definitions={
       ],
       [
         "cover_image",
-        "封面圖（1600×900）",
+        "封面圖（3:2，建議 1500×1000）",
         "image"
       ],
       [
@@ -234,7 +234,7 @@ const definitions={
       ],
       [
         "cover_image",
-        "封面圖（1200×900）",
+        "封面圖（3:2，建議 1500×1000）",
         "image"
       ],
       [
@@ -343,7 +343,7 @@ const definitions={
       ],
       [
         "cover_image",
-        "封面圖（1600×900）",
+        "封面圖（3:2，建議 1500×1000）",
         "image"
       ],
       [

@@ -157,6 +157,9 @@
     }
     .image-thumb small{display:block;color:#6B7280;line-height:1.6;word-break:break-all}
     .source-hint{font-size:12px;color:#6B7280;line-height:1.6}
+    .cms-shared-image>label{font-weight:700;color:#334155}
+    .cms-shared-image>input[type="url"]{width:100%;box-sizing:border-box}
+    .cms-image-3x2 .image-thumb img{width:150px;height:100px}
     .trip-section-image-row{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -542,7 +545,7 @@
           ['address','地址','text'],['business_hours','營業時間','text'],['stay_time','建議停留','text'],['tags','標籤','text'],
           ['google_map','Google Map連結','text'],['official_website','官方網站','text'],
           ['transport_routes','交通路線（JSON）','json'],['transport_metro','捷運交通資訊','textarea'],['transport_bus','公車交通資訊','textarea'],['transport_car','自行開車資訊','textarea'],
-          ['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['cover_image','封面圖（3:2，建議 1500×1000）','image'],['cover_image_source','封面圖片來源','text'],
           ['is_published','狀態','boolean']
         ],
         columns:['title','area','is_published'],
@@ -551,7 +554,7 @@
         typeOptions:[['all','全部地區'],['北投','北投'],['新北投','新北投'],['陽明山','陽明山'],['士林','士林'],['淡水','淡水']],
         order:'sort_order',
         idPrefix:'spot',
-        tips:`<ul class="tip-list"><li>景點封面建議：1600 × 900 px。</li><li>內容照也建議橫式，避免列表裁切。</li></ul>`
+        tips:`<ul class="tip-list"><li>景點封面建議：3:2（1500 × 1000 px）。</li><li>可貼圖片網址或上傳照片；內容照也建議使用橫式圖片。</li></ul>`
       },
       foods: {
         label:'美食管理', kicker:'FOODS', table:'foods', preview:'food.html?id=',
@@ -561,7 +564,7 @@
           ['address','地址','text'],['business_hours','營業時間','text'],['phone','電話','text'],['average_cost','平均消費','text'],
           ['price_range','價格區間','text'],['tags','標籤','text'],['google_map','Google Map連結','text'],['official_website','官方網站','text'],
           ['station','鄰近捷運站','textarea'],['transport_routes','交通路線（JSON）','json'],
-          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖（1200×900）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
+          ['summary','摘要','textarea'],['content','介紹內容','textarea'],['cover_image','封面圖（3:2，建議 1500×1000）','image'],['cover_image_source','封面圖片來源','text'],['is_published','狀態','boolean']
         ],
         columns:['title','category','is_published'],
         subtitle:(x)=>x.category || x.average_cost || '-',
@@ -569,14 +572,14 @@
         typeOptions:[['all','全部類型'],['小吃','小吃'],['咖啡','咖啡'],['餐廳','餐廳'],['甜點','甜點']],
         order:'sort_order',
         idPrefix:'food',
-        tips:`<ul class="tip-list"><li>美食封面建議：1200 × 900 px。</li><li>餐點照可用 4:3，店面照建議橫式。</li></ul>`
+        tips:`<ul class="tip-list"><li>美食封面建議：3:2（1500 × 1000 px）。</li><li>可貼圖片網址或上傳照片，餐點與店面主體請置中避免裁切。</li></ul>`
       },
       trips: {
         label:'行程管理', kicker:'TRIPS', table:'trips', preview:'trip.html?id=',
         hint:'行程改為分段管理。先看列表，點編輯後可自由新增 3 段、4 段或 6 段，每段可填時間、標題、說明與圖片，並可拖曳排序。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','行程名稱','text','required'],['duration','建議時間','text'],
-          ['summary','摘要','textarea'],['google_route','Google路線','text'],['transport_routes','大眾運輸路線（JSON）','json'],['cover_image','封面圖（1600×900）','image'],['cover_image_source','封面圖片來源','text'],
+          ['summary','摘要','textarea'],['google_route','Google路線','text'],['transport_routes','大眾運輸路線（JSON）','json'],['cover_image','封面圖（3:2，建議 1500×1000）','image'],['cover_image_source','封面圖片來源','text'],
           ['trip_sections','行程分段','sections'],['is_published','狀態','boolean']
         ],
         columns:['title','duration','is_published'],
@@ -585,7 +588,7 @@
         typeOptions:[['all','全部類型'],['半日','半日'],['一日','一日'],['親子','親子'],['雨天','雨天']],
         order:'sort_order',
         idPrefix:'trip',
-        tips:`<ul class="tip-list"><li>行程封面建議：1600 × 900 px。</li><li>分段建議：每段填「時間、標題、說明、圖片網址」。</li><li>可新增任意段數，例如 3 段、4 段或 6 段，並拖曳調整順序。</li><li>若圖片留空，前台只顯示文字段落。</li></ul>`
+        tips:`<ul class="tip-list"><li>行程封面建議：3:2（1500 × 1000 px）。</li><li>封面可貼圖片網址或上傳照片；分段可填時間、標題、說明與圖片。</li><li>可新增任意段數，例如 3 段、4 段或 6 段，並拖曳調整順序。</li><li>若圖片留空，前台只顯示文字段落。</li></ul>`
       },
       coupons: {
         label:'優惠管理', kicker:'COUPONS', table:'coupons', preview:'coupon.html?id=',
@@ -979,7 +982,11 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         else document.getElementById('adminPreviewError').textContent='原始表單模式下，請返回完整表單更新預覽。';
         if(!legacyMode)scheduleAdminDraftPreview();
       };
-      adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{layout:'all',onChange:(name)=>{
+      adminSharedEditor=MetroCmsEditor.mount(mount,currentTable,record,{layout:'all',uploadImage:async(name,file)=>{
+        const url=await uploadImageForField(name,file);
+        if(!url)throw Error(document.getElementById('formMsg')?.textContent||'圖片上傳失敗');
+        return url;
+      },onChange:(name)=>{
         const el=document.getElementById('f_'+name);
         if(!el)return;
         const value=record[name];
@@ -1786,18 +1793,18 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
     }
 
     async function uploadImageForField(fieldName, file){
-      if(!file) return;
+      if(!file) return null;
       const msg = document.getElementById('formMsg');
       const isLogo = fieldName === 'logo_url';
       const allowed = isLogo ? ['image/svg+xml','image/png','image/webp'] : ['image/jpeg','image/png','image/webp','image/gif'];
       const isSvg = isLogo && (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name));
       if(!allowed.includes(file.type) && !isSvg){
         msg.textContent = isLogo ? '網站 CI 僅接受 SVG、PNG 或 WEBP。' : '請上傳 JPG、PNG、WEBP 或 GIF 圖片。';
-        return;
+        return null;
       }
       if(file.size > 3 * 1024 * 1024){
         msg.textContent = '檔案不可超過 3MB。';
-        return;
+        return null;
       }
       // Browser-side checks improve feedback only; Storage policy/server must also restrict uploads.
       if(isSvg){
@@ -1806,7 +1813,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         const bad = /<parsererror|<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<iframe\b|<object\b|<embed\b|<image\b|\bon[a-z]+\s*=|\b(?:href|xlink:href)\s*=\s*["']\s*(?:https?:|data:|javascript:)|url\s*\(\s*["']?\s*(?:https?:|data:|javascript:)/i;
         if(xml.querySelector('parsererror') || xml.documentElement.localName !== 'svg' || bad.test(svgText)){
           msg.textContent = 'SVG 含有不支援的外部資源或動態內容，請改用純向量路徑的 SVG。';
-          return;
+          return null;
         }
       }
 
@@ -1824,7 +1831,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       if(error){
         console.error(error);
         msg.textContent = '圖片上傳失敗：' + error.message + (isSvg ? '。請確認 Supabase site-images 儲存桶允許 image/svg+xml，並確認上傳權限。' : '。請確認 site-images 儲存桶與上傳權限。');
-        return;
+        return null;
       }
 
       const url = publicImageUrl(path);
@@ -1832,6 +1839,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       updateFieldThumb(fieldName);
       updateImagePreview();
       msg.textContent = '圖片已上傳並帶入網址。';
+      return url;
     }
 
     function updateFieldThumb(fieldName){

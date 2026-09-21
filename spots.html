@@ -124,7 +124,7 @@
           throw new Error('找不到 Supabase 設定，請檢查 supabase-config.js');
         }
 
-        const url = `${SUPABASE_URL}/rest/v1/spots?select=id,slug,title,area,station,summary,tags,cover_image,is_published&is_published=eq.true&order=id.asc`;
+        const url = `${SUPABASE_URL}/rest/v1/spots?select=id,slug,title,area,station,summary,tags,cover_image,is_published,sort_order&is_published=eq.true&order=sort_order.asc,id.asc`;
 
         const response = await fetch(url, {
           headers: {

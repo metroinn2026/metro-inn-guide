@@ -125,7 +125,7 @@
     async function loadFoods() {
       try {
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/foods?is_published=eq.true&select=*&order=id.asc`,
+          `${SUPABASE_URL}/rest/v1/foods?is_published=eq.true&select=*&order=sort_order.asc,id.asc`,
           {
             headers: {
               apikey: SUPABASE_ANON_KEY,

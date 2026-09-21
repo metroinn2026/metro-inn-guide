@@ -1075,10 +1075,22 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       });
     });
 
-    function openFeaturedSection(table){
+    async function openFeaturedSection(table){
       if(!['featured_picks','featured_topics'].includes(table))return;
       // 兩張資料表維持各自的資料與編輯表單，但統一由「首頁精選管理」進入。
-      switchTable(table);
+      // 立即清除上一個分頁的資料，避免非同步讀取期間誤把精選內容
+      // 顯示成分類標籤（或反向顯示）。
+      cache=[];
+      currentList=[];
+      const tbody=document.getElementById('listBody');
+      if(tbody)tbody.textContent='資料載入中...';
+      const tabs=[document.getElementById('featuredPicksTab'),document.getElementById('featuredTopicsTab')];
+      tabs.forEach(button=>{if(button)button.disabled=true;});
+      try{
+        await switchTable(table);
+      }finally{
+        tabs.forEach(button=>{if(button)button.disabled=false;});
+      }
     }
 
     function switchTable(table){

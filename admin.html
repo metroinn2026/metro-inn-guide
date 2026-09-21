@@ -282,9 +282,10 @@
     #editorView .editor-status.published {background:#e8f7ef;color:#167044}
     #editorView .editor-actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     #editorView .editor-actions .button,#editorView .editor-actions button {white-space:nowrap}
-    #editorView .editor-actions .publish-save {order:3}
-    #editorView .editor-actions .draft-save,#editorView .editor-actions .normal-save {order:2}
+    #editorView .editor-actions .editor-back {order:0;margin-right:4px}
     #editorView .editor-actions #previewLink {order:1}
+    #editorView .editor-actions .draft-save,#editorView .editor-actions .normal-save {order:2}
+    #editorView .editor-actions .publish-save {order:3}
     #editorView .editor-grid > .card {padding:22px!important;border:1px solid #e3eaf4;border-radius:12px}
     #sharedAdminEditor .cms-editor-tabs {display:flex;gap:0;flex-wrap:wrap;border-bottom:1px solid #e1e8f2;margin-bottom:22px}
     #sharedAdminEditor .cms-editor-tabs > button {border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;background:transparent!important;color:#64748b!important;padding:12px 15px!important;box-shadow:none!important;font-weight:600}
@@ -479,10 +480,11 @@
         <div id="editorView" class="editor-view">
           <div class="editor-top">
             <div>
-              <div class="editor-heading"><button type="button" class="editor-back" onclick="backToList()" aria-label="返回管理清單">← 返回</button><h2 id="formTitle">編輯內容</h2><span id="editorStatus" class="editor-status" hidden></span></div>
+              <div class="editor-heading"><h2 id="formTitle">編輯內容</h2><span id="editorStatus" class="editor-status" hidden></span></div>
               <p id="editorContext" class="editor-context"></p>
             </div>
             <div class="editor-actions">
+              <button type="button" class="editor-back" onclick="backToList()" aria-label="返回管理清單">← 返回</button>
               <a id="previewLink" class="button" href="#" target="_blank" rel="noopener" style="display:none">預覽</a>
               <button class="primary normal-save" onclick="saveItem()">儲存</button><button class="draft-save" style="display:none" onclick="saveItem('draft')">儲存草稿</button><button class="publish-save primary" style="display:none" onclick="saveItem('publish')">儲存並上架</button>
             </div>

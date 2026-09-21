@@ -233,9 +233,13 @@
     function getMyMapsId(value) {
       if (typeof value !== 'string' || !value.trim()) return '';
       try {
-        const url = new URL(value.trim());
+        // The admin may paste either the URL itself or Google's iframe snippet.
+        const raw = value.trim();
+        const iframeSrc = raw.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
+        const url = new URL((iframeSrc || raw).replaceAll('&amp;', '&'));
         if (!['google.com', 'www.google.com'].includes(url.hostname.toLowerCase())) return '';
-        if (!/^\/maps\/d\/(?:edit|viewer|embed)(?:\/|$)/.test(url.pathname)) return '';
+        // Signed-in My Maps links can contain /u/0/ before edit/viewer/embed.
+        if (!/^\/maps\/d\/(?:u\/\d+\/)?(?:edit|viewer|embed)(?:\/|$)/.test(url.pathname)) return '';
         const mid = url.searchParams.get('mid') || '';
         return /^[a-zA-Z0-9_-]+$/.test(mid) ? mid : '';
       } catch (e) { return ''; }

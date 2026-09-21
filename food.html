@@ -155,7 +155,7 @@
       const query = [item.title || item.name, item.address].filter(Boolean).join(' ').trim();
       const coords = mapCoordinates(item);
       const location = query || (coords ? coords.join(',') : '');
-      return location ? `https://maps.google.com/maps?output=embed&q=${encodeURIComponent(location)}` : '';
+      return location ? `https://maps.google.com/maps?output=embed&q=${encodeURIComponent(location)}&z=17` : '';
     }
 
     function renderImageCaption(text){

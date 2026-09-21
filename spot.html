@@ -177,7 +177,9 @@
         return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${lat},${lon}`)}`;
       }
       const query = [item.title, item.address].filter(Boolean).join(' ');
-      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+      // Use the exact title + address and a close zoom so the current attraction
+      // remains the primary pin instead of showing a wide-area search result.
+      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=17&output=embed`;
     }
 
     function renderImageCaption(text){

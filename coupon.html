@@ -8,7 +8,7 @@
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
 </head>
-<body id="top">
+<body id="top" class="coupon-detail-page">
   <div id="header"></div>
 
   <section class="hero">
@@ -36,6 +36,8 @@
 
   <main class="container article-wrap single-point">
     <article>
+      <div id="storyMeta" class="meta detail-eyebrow">OFFER</div>
+      <h1 id="articleTitle" class="spot-article-title">優惠名稱</h1>
       <p id="leadText" class="lead">優惠資料載入中...</p>
 
       <div class="tag-list">
@@ -45,13 +47,11 @@
       </div>
 
       <section class="story">
-        <div id="storyMeta" class="meta">OFFER STORY</div>
-        <h2 id="storyTitle">優惠說明</h2>
-        <p id="storyContent">優惠資料載入中...</p>
         <div class="story-img">
           <img id="storyImage" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85" alt="">
         </div>
         <p id="storyImageSource" class="image-source-caption"></p>
+        <div id="storyContent" class="detail-prose">優惠資料載入中...</div>
       </section>
 
       <section id="info" class="info-card point-info">
@@ -184,9 +184,9 @@
         setText('heroSubtitle', summary);
         setText('heroDate', `活動期間：${range}`);
         setText('breadcrumb', `首頁 〉 優惠介紹 〉 ${title}`);
+        setText('articleTitle', title);
         setText('leadText', summary);
         setText('storyMeta', (coupon.slug || 'offer').replaceAll('-', ' ').toUpperCase());
-        setText('storyTitle', title);
         setText('storyContent', content);
 
         setText('infoTitle', `${title}優惠資訊`);

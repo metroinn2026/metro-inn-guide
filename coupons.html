@@ -1,141 +1,189 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>優惠目錄｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script>
-  <script src="supabase-config.js"></script>
-</head>
-<body id="top">
-  <div id="header"></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>優惠目錄｜Metro Inn Guide 北投旅圖</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js"></script>
+    <script src="supabase-config.js"></script>
+  </head>
+  <body id="top">
+    <div id="header"></div>
 
-  <section class="directory-hero">
-    <div class="container">
-      <div class="kicker">OFFERS DIRECTORY</div>
-      <h1>優惠目錄</h1>
-      <p>合作店家優惠與旅遊推薦集中管理，未來可串接景點、行程與美食頁，提高招商曝光價值。</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="filter-row">
-        <div class="filter-pills">
-          <a class="pill active" data-keyword="all">全部</a>
-          <a class="pill" data-keyword="北捷行旅">北捷行旅</a>
-          <a class="pill" data-keyword="北投">北投</a>
-          <a class="pill" data-keyword="親子">親子</a>
-          <a class="pill" data-keyword="美食">美食</a>
-          <a class="pill" data-keyword="陽明山">陽明山</a>
-        </div>
-        <a class="section-link" href="index.html">回首頁搜尋 →</a>
+    <section class="directory-hero">
+      <div class="container">
+        <div class="kicker">OFFERS DIRECTORY</div>
+        <h1 id="directoryTitle">優惠目錄</h1>
+        <p id="directorySummary">
+          合作店家優惠與旅遊推薦集中管理，未來可串接景點、行程與美食頁，提高招商曝光價值。
+        </p>
       </div>
+    </section>
 
-      <div id="couponsStatus" class="empty-state">優惠資料載入中...</div>
-      <div id="couponsGrid" class="directory-grid"></div>
+    <section class="section">
+      <div class="container">
+        <div class="filter-row">
+          <div class="filter-pills" id="directoryTags"></div>
+          <a class="section-link" href="index.html">回首頁搜尋 →</a>
+        </div>
 
-      <div class="pagination"><span class="active">1</span></div>
-    </div>
-  </section>
+        <div id="couponsStatus" class="empty-state">優惠資料載入中...</div>
+        <div id="couponsGrid" class="directory-grid"></div>
 
-  <div id="footer"></div>
+        <div class="pagination"><span class="active">1</span></div>
+      </div>
+    </section>
 
-  <script>
-    document.getElementById('header').innerHTML = header();
-    document.getElementById('footer').innerHTML = footer();
+    <div id="footer"></div>
 
-    const statusEl = document.getElementById('couponsStatus');
-    const gridEl = document.getElementById('couponsGrid');
-    let allCoupons = [];
-    const fallbackImage = 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85';
+    <script>
+      document.getElementById("header").innerHTML = header();
+      document.getElementById("footer").innerHTML = footer();
 
-    function getMeta(coupon) {
-      const text = `${coupon.title || ''} ${coupon.summary || ''} ${coupon.content || ''}`;
-      if (text.includes('北捷行旅') || text.includes('住宿')) return 'METRO INN';
-      if (text.includes('親子')) return 'FAMILY';
-      if (text.includes('美食') || text.includes('市場') || text.includes('餐')) return 'FOOD';
-      if (text.includes('陽明山')) return 'YANGMINGSHAN';
-      if (text.includes('北投')) return 'BEITOU';
-      return 'OFFER';
-    }
+      const statusEl = document.getElementById("couponsStatus");
+      const gridEl = document.getElementById("couponsGrid");
+      let allCoupons = [];
+      const fallbackImage =
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85";
 
-    function formatDateRange(coupon) {
-      if (!coupon.start_date && !coupon.end_date) return '';
-      if (coupon.start_date && coupon.end_date) return `${coupon.start_date} - ${coupon.end_date}`;
-      return coupon.start_date || coupon.end_date || '';
-    }
-
-    function renderCoupons(coupons) {
-      gridEl.innerHTML = '';
-      if (!coupons.length) {
-        statusEl.textContent = '目前沒有符合條件的優惠資料。';
-        statusEl.style.display = 'block';
-        return;
+      function getMeta(coupon) {
+        const text = `${coupon.title || ""} ${coupon.summary || ""} ${coupon.content || ""}`;
+        if (text.includes("北捷行旅") || text.includes("住宿"))
+          return "METRO INN";
+        if (text.includes("親子")) return "FAMILY";
+        if (
+          text.includes("美食") ||
+          text.includes("市場") ||
+          text.includes("餐")
+        )
+          return "FOOD";
+        if (text.includes("陽明山")) return "YANGMINGSHAN";
+        if (text.includes("北投")) return "BEITOU";
+        return "OFFER";
       }
-      statusEl.style.display = 'none';
 
-      coupons.forEach(coupon => {
-        const image = coupon.cover_image || fallbackImage;
-        const summary = coupon.summary || '更多優惠說明即將補上。';
-        const dateText = formatDateRange(coupon);
-        const card = document.createElement('a');
-        card.className = 'directory-card';
-        card.href = `coupon.html?id=${encodeURIComponent(coupon.id)}`;
-        card.innerHTML = `
-          <div class="directory-img"><img src="${image}" alt="${coupon.title || ''}"></div>
+      function formatDateRange(coupon) {
+        if (!coupon.start_date && !coupon.end_date) return "";
+        if (coupon.start_date && coupon.end_date)
+          return `${coupon.start_date} - ${coupon.end_date}`;
+        return coupon.start_date || coupon.end_date || "";
+      }
+
+      function renderCoupons(coupons) {
+        gridEl.innerHTML = "";
+        if (!coupons.length) {
+          statusEl.textContent = "目前沒有符合條件的優惠資料。";
+          statusEl.style.display = "block";
+          return;
+        }
+        statusEl.style.display = "none";
+
+        coupons.forEach((coupon) => {
+          const image = coupon.cover_image || fallbackImage;
+          const summary = coupon.summary || "更多優惠說明即將補上。";
+          const dateText = formatDateRange(coupon);
+          const card = document.createElement("a");
+          card.className = "directory-card";
+          card.href = `coupon.html?id=${encodeURIComponent(coupon.id)}`;
+          card.innerHTML = `
+          <div class="directory-img"><img src="${image}" alt="${coupon.title || ""}"></div>
           <div class="directory-body">
             <div class="meta">${getMeta(coupon)}</div>
-            <h3>${coupon.title || '未命名優惠'}</h3>
+            <h3>${coupon.title || "未命名優惠"}</h3>
             <p>${summary}</p>
-            ${dateText ? `<div class="hours-line">活動期間：${dateText}</div>` : ''}
+            ${dateText ? `<div class="hours-line">活動期間：${dateText}</div>` : ""}
             <span class="arrow">→</span>
           </div>
         `;
-        gridEl.appendChild(card);
-      });
-    }
-
-    async function loadCoupons() {
-      try {
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/coupons?is_published=eq.true&select=*&order=sort_order.asc,id.asc`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
-          }
-        );
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'Supabase 讀取失敗');
-
-        allCoupons = result;
-        renderCoupons(allCoupons);
-      } catch (error) {
-        console.error(error);
-        statusEl.textContent = '優惠資料暫時無法載入，請稍後再試。';
+          gridEl.appendChild(card);
+        });
       }
-    }
 
-    document.querySelectorAll('.pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
-        pill.classList.add('active');
-        const keyword = pill.dataset.keyword;
-        if (keyword === 'all') renderCoupons(allCoupons);
-        else {
-          renderCoupons(allCoupons.filter(coupon => {
-            const text = `${coupon.title || ''} ${coupon.summary || ''} ${coupon.content || ''}`;
-            return text.includes(keyword);
-          }));
+      async function loadCoupons() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/coupons?is_published=eq.true&select=*&order=sort_order.asc,id.asc`,
+            {
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+            },
+          );
+
+          const result = await response.json();
+          if (!response.ok)
+            throw new Error(result.message || "Supabase 讀取失敗");
+
+          allCoupons = result;
+          renderCoupons(allCoupons);
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = "優惠資料暫時無法載入，請稍後再試。";
         }
-      });
-    });
+      }
 
-    loadCoupons();
-  </script>
-</body>
+      function bindFilters() {
+        document.querySelectorAll("#directoryTags .pill").forEach((pill) => {
+          pill.addEventListener("click", () => {
+            document
+              .querySelectorAll(".pill")
+              .forEach((item) => item.classList.remove("active"));
+            pill.classList.add("active");
+            const keyword = pill.dataset.keyword;
+            if (keyword === "all") renderCoupons(allCoupons);
+            else {
+              renderCoupons(
+                allCoupons.filter((coupon) => {
+                  const text = `${coupon.title || ""} ${coupon.summary || ""} ${coupon.content || ""}`;
+                  return text.includes(keyword);
+                }),
+              );
+            }
+          });
+        });
+      }
+
+      async function loadDirectorySettings() {
+        const defaults = ["全部", "北捷行旅", "北投", "親子", "美食", "陽明山"];
+        let tags = defaults;
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=coupons_directory_title,coupons_directory_summary,coupons_directory_tags`,
+            {
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+            },
+          );
+          const [settings] = await response.json();
+          if (response.ok && settings) {
+            document.getElementById("directoryTitle").textContent =
+              settings.coupons_directory_title || "優惠目錄";
+            document.getElementById("directorySummary").textContent =
+              settings.coupons_directory_summary || "";
+            tags = (settings.coupons_directory_tags || "")
+              .split(/[、,，\n]/)
+              .map((x) => x.trim())
+              .filter(Boolean);
+          }
+        } catch (error) {
+          console.warn("優惠目錄設定載入失敗", error);
+        }
+        if (!tags.length) tags = defaults;
+        tags = ["全部", ...tags.filter((x) => x !== "全部")];
+        document.getElementById("directoryTags").innerHTML = tags
+          .map(
+            (tag, index) =>
+              `<a class="pill ${index === 0 ? "active" : ""}" data-keyword="${tag === "全部" ? "all" : tag}">${tag}</a>`,
+          )
+          .join("");
+        bindFilters();
+      }
+
+      Promise.all([loadDirectorySettings(), loadCoupons()]);
+    </script>
+  </body>
 </html>

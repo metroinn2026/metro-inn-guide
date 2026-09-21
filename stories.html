@@ -1,1 +1,92 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>旅人遊記｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="header"></div><main class="container section"><h1>旅人遊記</h1><p>看看旅人分享的北投故事。所有內容均經編輯審核後公開。</p><p><a class="button" href="submit.html">分享你的故事 ↗</a></p><div id="stories" aria-live="polite">載入中…</div></main><div id="footer"></div><script>document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);(async()=>{const wrap=document.getElementById('stories');const {data,error}=await db.rpc('get_published_travel_stories');wrap.replaceChildren();if(error){wrap.textContent='遊記尚未開放，請稍後再試。';return;}const list=(data||[]).filter(x=>x.submission_type==='travel_story');if(!list.length){wrap.textContent='目前尚無已上架的旅人遊記。';return;}for(const s of list){const article=document.createElement('article');article.className='travel-story-entry';article.id='story-'+s.id;const h=document.createElement('h2');h.textContent=s.title;const by=document.createElement('p');by.textContent=`旅人 ${s.public_name}｜${s.area||'北投'}`;const content=document.createElement('p');content.textContent=s.content;content.style.whiteSpace='pre-wrap';by.className='travel-story-byline';content.className='travel-story-content';article.append(h,by,content);wrap.append(article);}if(location.hash){const target=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(target)target.scrollIntoView();}})();</script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>旅人遊記｜北投旅圖</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="header"></div>
+    <main class="container section">
+      <h1>旅人遊記</h1>
+      <p>看看旅人分享的北投故事。所有內容均經編輯審核後公開。</p>
+      <p><a class="button" href="submit.html">分享你的故事 ↗</a></p>
+      <div id="stories" aria-live="polite">載入中…</div>
+    </main>
+    <div id="footer"></div>
+    <script>
+      document.getElementById("header").innerHTML = header();
+      document.getElementById("footer").innerHTML = footer();
+      const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      (async () => {
+        const wrap = document.getElementById("stories");
+        const { data, error } = await db.rpc("get_published_travel_stories");
+        wrap.replaceChildren();
+        if (error) {
+          wrap.textContent = "遊記尚未開放，請稍後再試。";
+          return;
+        }
+        const list = (data || []).filter(
+          (x) => x.submission_type === "travel_story",
+        );
+        if (!list.length) {
+          wrap.textContent = "目前尚無已上架的旅人遊記。";
+          return;
+        }
+        for (const s of list) {
+          const article = document.createElement("article");
+          article.className = "travel-story-entry";
+          article.id = "story-" + s.id;
+          const h = document.createElement("h2");
+          h.textContent = s.title;
+          const by = document.createElement("p");
+          by.textContent = `旅人 ${s.public_name}｜${s.area || "北投"}`;
+          const content = document.createElement("div");
+          try {
+            const parsed = JSON.parse(s.content);
+            if (!Array.isArray(parsed?.blocks)) throw Error("legacy");
+            parsed.blocks.forEach((block) => {
+              if (block.type === "text" && block.text) {
+                const p = document.createElement("p");
+                p.textContent = block.text;
+                p.style.whiteSpace = "pre-wrap";
+                content.append(p);
+              }
+              if (block.type === "image" && block.url) {
+                const img = document.createElement("img");
+                img.src = block.url;
+                img.alt = block.alt || "";
+                img.style.cssText =
+                  "display:block;width:100%;max-height:680px;object-fit:contain;margin:18px 0";
+                content.append(img);
+                if (block.alt) {
+                  const caption = document.createElement("p");
+                  caption.textContent = block.alt;
+                  caption.className = "muted";
+                  content.append(caption);
+                }
+              }
+            });
+          } catch (error) {
+            content.textContent = s.content;
+            content.style.whiteSpace = "pre-wrap";
+          }
+          by.className = "travel-story-byline";
+          content.className = "travel-story-content";
+          article.append(h, by, content);
+          wrap.append(article);
+        }
+        if (location.hash) {
+          const target = document.getElementById(
+            decodeURIComponent(location.hash.slice(1)),
+          );
+          if (target) target.scrollIntoView();
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,1 +1,316 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>旅人投稿｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>.submit-wrap{max-width:760px;margin:auto}.submit-wrap label{display:block;margin:16px 0 6px}.submit-wrap input,.submit-wrap textarea,.submit-wrap select{width:100%;padding:12px;border:1px solid #bbb;border-radius:0}.submit-wrap textarea{min-height:180px}.submit-wrap .check{display:flex;gap:8px;align-items:flex-start}.submit-wrap .check input{width:auto;margin-top:5px}.submit-wrap button{margin-top:18px}.submit-wrap .note{color:#666;font-size:14px}</style></head><body><div id="header"></div><main class="container section submit-wrap"><h1>分享你的北投故事</h1><p>分享景點心得、完整遊記或推薦新景點。投稿須經編輯審核，通過後才會公開。</p><p class="notice">第一階段已開放文字投稿。圖片上傳尚未啟用，請勿在內容中填入私人相簿或未授權圖片連結。</p><form id="submissionForm"><label for="type">投稿類型 *</label><select id="type" required><option value="spot_review">景點心得</option><option value="travel_story">旅人遊記</option><option value="new_spot">推薦新景點</option></select><label for="title">標題 *</label><input id="title" maxlength="120" minlength="2" required><label for="spot">對應景點編號（景點心得可填，例如 spot_0001）</label><input id="spot" maxlength="60" placeholder="可留空，由編輯協助關聯"><label for="area">地區</label><select id="area"><option value="">未指定</option><option>北投</option><option>新北投</option><option>陽明山</option><option>士林</option><option>淡水</option></select><label for="content">投稿內容 *（至少 20 字）</label><textarea id="content" minlength="20" maxlength="10000" required></textarea><label for="author">投稿人姓名／暱稱 *</label><input id="author" maxlength="60" required><label for="publicName">公開署名 *</label><input id="publicName" maxlength="60" required><label for="email">聯絡 Email *（不會公開）</label><input id="email" type="email" maxlength="254" required><label class="check"><input id="rights" type="checkbox" required><span>我確認文字為本人創作或已取得必要授權，同意網站經審核後刊登；如需撤稿可透過網站聯絡管道提出。</span></label><label class="check"><input id="privacy" type="checkbox" required><span>我了解投稿資料及聯絡 Email 將用於審稿與聯繫，公開頁面僅顯示我填寫的公開署名與核准內容。</span></label><p class="note">請勿提供他人的電話、地址或其他個人資料。正式上線前，請管理者補齊完整隱私告知及投稿授權條款。</p><button class="button" id="send" type="submit">送出投稿</button><p id="msg" role="status" aria-live="polite"></p></form></main><div id="footer"></div><script>document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);document.getElementById('submissionForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,btn=document.getElementById('send'),msg=document.getElementById('msg');btn.disabled=true;msg.textContent='投稿送出中…';try{const payload={submission_type:document.getElementById('type').value,title:document.getElementById('title').value.trim(),spot_id:document.getElementById('spot').value.trim()||null,area:document.getElementById('area').value||null,content:document.getElementById('content').value.trim(),author_name:document.getElementById('author').value.trim(),public_name:document.getElementById('publicName').value.trim(),author_email:document.getElementById('email').value.trim(),rights_confirmed:document.getElementById('rights').checked,privacy_confirmed:document.getElementById('privacy').checked};if(payload.content.length<20)throw Error('投稿內容至少 20 字。');const {error}=await db.from('travel_submissions').insert(payload);if(error)throw error;f.reset();msg.textContent='投稿已送出，待編輯審核後才會公開。';}catch(err){msg.textContent='送出失敗：'+err.message+'。若尚未建立投稿資料表，請管理者先執行 submissions.sql。';}finally{btn.disabled=false;}});</script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>旅人投稿｜北投旅圖</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      .submit-wrap {
+        max-width: 820px;
+        margin: auto;
+      }
+      .submit-wrap > form > label {
+        display: block;
+        margin: 16px 0 6px;
+      }
+      .submit-wrap input,
+      .submit-wrap textarea,
+      .submit-wrap select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #bbb;
+        border-radius: 0;
+        box-sizing: border-box;
+      }
+      .submit-wrap .check {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        margin-top: 16px;
+      }
+      .submit-wrap .check input {
+        width: auto;
+        margin-top: 5px;
+      }
+      .submit-wrap .note {
+        color: #666;
+        font-size: 14px;
+      }
+      .story-tools {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 10px 0 14px;
+      }
+      .story-tools button,
+      .block-actions button {
+        margin: 0;
+      }
+      .story-block {
+        border: 1px solid #d8e0d5;
+        background: #fff;
+        padding: 14px;
+        margin: 10px 0;
+      }
+      .story-block-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .block-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .story-block textarea {
+        min-height: 140px;
+      }
+      .story-block img {
+        display: block;
+        max-width: 240px;
+        max-height: 160px;
+        object-fit: cover;
+        margin: 10px 0;
+      }
+      .upload-status {
+        font-size: 14px;
+        color: #58705b;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header"></div>
+    <main class="container section submit-wrap">
+      <h1>分享你的北投故事</h1>
+      <p>
+        可選擇相關景點，並自由加入文字與圖片、調整順序。投稿經小編審核通過後才會公開。
+      </p>
+      <form id="submissionForm">
+        <label for="type">投稿類型 *</label
+        ><select id="type" required>
+          <option value="spot_review">景點心得</option>
+          <option value="travel_story">旅人遊記</option>
+          <option value="new_spot">推薦新景點</option>
+        </select>
+        <label for="title">標題 *</label
+        ><input id="title" maxlength="120" minlength="2" required />
+        <label for="spot">對應景點（選填）</label
+        ><select id="spot">
+          <option value="">不指定／由小編協助關聯</option>
+        </select>
+        <p class="note" id="spotStatus">已發布景點載入中…</p>
+        <label for="area">地區</label
+        ><select id="area">
+          <option value="">未指定</option>
+          <option>北投</option>
+          <option>新北投</option>
+          <option>陽明山</option>
+          <option>士林</option>
+          <option>淡水</option>
+        </select>
+        <label>投稿內容 *</label>
+        <p class="note">
+          可新增多個文字或圖片段落，並用上下箭頭安排圖文穿插順序。文字合計至少
+          20 字。
+        </p>
+        <div class="story-tools">
+          <button type="button" onclick="addBlock('text')">＋新增文字</button
+          ><button type="button" onclick="addBlock('image')">＋新增圖片</button>
+        </div>
+        <div id="blocks"></div>
+        <p id="uploadStatus" class="upload-status" role="status"></p>
+        <label for="author">投稿人姓名／暱稱 *</label
+        ><input id="author" maxlength="60" required /><label for="publicName"
+          >公開署名 *</label
+        ><input id="publicName" maxlength="60" required /><label for="email"
+          >聯絡 Email *（不會公開）</label
+        ><input id="email" type="email" maxlength="254" required />
+        <label class="check"
+          ><input id="rights" type="checkbox" required /><span
+            >我確認文字及圖片為本人創作或已取得必要授權，同意網站經審核後刊登。</span
+          ></label
+        ><label class="check"
+          ><input id="privacy" type="checkbox" required /><span
+            >我了解投稿資料及聯絡 Email
+            將用於審稿與聯繫，公開頁面僅顯示公開署名與核准內容。</span
+          ></label
+        >
+        <p class="note">
+          請勿提供他人的個人資料；單張圖片限 3MB，接受 JPG、PNG、WEBP、GIF。
+        </p>
+        <button class="button" id="send" type="submit">送出投稿</button>
+        <p id="msg" role="status" aria-live="polite"></p>
+      </form>
+    </main>
+    <div id="footer"></div>
+    <script>
+      document.getElementById("header").innerHTML = header();
+      document.getElementById("footer").innerHTML = footer();
+      const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      let blocks = [];
+      function esc(v) {
+        return String(v || "").replace(
+          /[&<>'\"]/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '\"': "&quot;",
+            })[c],
+        );
+      }
+      function syncBlocks() {
+        document.querySelectorAll(".story-block").forEach((card, i) => {
+          if (blocks[i]?.type === "text")
+            blocks[i].text = card.querySelector("textarea").value;
+        });
+      }
+      function addBlock(type) {
+        syncBlocks();
+        blocks.push(
+          type === "text"
+            ? { type: "text", text: "" }
+            : { type: "image", url: "", alt: "" },
+        );
+        renderBlocks();
+      }
+      function removeBlock(i) {
+        syncBlocks();
+        blocks.splice(i, 1);
+        renderBlocks();
+      }
+      function moveBlock(i, d) {
+        syncBlocks();
+        const t = i + d;
+        if (t < 0 || t >= blocks.length) return;
+        const [b] = blocks.splice(i, 1);
+        blocks.splice(t, 0, b);
+        renderBlocks();
+      }
+      function renderBlocks() {
+        document.getElementById("blocks").innerHTML = blocks
+          .map(
+            (b, i) =>
+              `<section class="story-block"><div class="story-block-head"><strong>${b.type === "text" ? "文字段落" : "圖片段落"}</strong><div class="block-actions"><button type="button" onclick="moveBlock(${i},-1)" ${i === 0 ? "disabled" : ""}>↑</button><button type="button" onclick="moveBlock(${i},1)" ${i === blocks.length - 1 ? "disabled" : ""}>↓</button><button type="button" onclick="removeBlock(${i})">刪除</button></div></div>${b.type === "text" ? `<textarea maxlength="10000" placeholder="輸入這一段文字…">${esc(b.text)}</textarea>` : `${b.url ? `<img src="${esc(b.url)}" alt="${esc(b.alt)}">` : ""}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadBlockImage(${i},this.files[0])"><input type="text" maxlength="120" value="${esc(b.alt)}" placeholder="圖片說明（選填）" oninput="blocks[${i}].alt=this.value">`}</section>`,
+          )
+          .join("");
+      }
+      async function uploadBlockImage(i, file) {
+        if (!file) return;
+        const status = document.getElementById("uploadStatus");
+        if (
+          !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(
+            file.type,
+          )
+        ) {
+          status.textContent = "圖片格式不支援。";
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          status.textContent = "單張圖片不可超過 3MB。";
+          return;
+        }
+        status.textContent = "圖片上傳中…";
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase(),
+          path = `public/${crypto.randomUUID()}-${Date.now()}.${ext}`;
+        const { error } = await db.storage
+          .from("submission-images")
+          .upload(path, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
+        if (error) {
+          status.textContent =
+            "圖片上傳失敗：" + error.message + "。請確認已執行隨附 SQL。";
+          return;
+        }
+        blocks[i].url = db.storage
+          .from("submission-images")
+          .getPublicUrl(path).data.publicUrl;
+        status.textContent = "圖片已上傳。";
+        renderBlocks();
+      }
+      async function loadSpots() {
+        const status = document.getElementById("spotStatus");
+        try {
+          const { data, error } = await db
+            .from("spots")
+            .select("id,title,area")
+            .eq("is_published", true)
+            .order("sort_order", { ascending: true })
+            .limit(500);
+          if (error) throw error;
+          const select = document.getElementById("spot");
+          (data || []).forEach((s) => {
+            const o = document.createElement("option");
+            o.value = s.id;
+            o.textContent = `${s.title}${s.area ? "｜" + s.area : ""}`;
+            select.append(o);
+          });
+          status.textContent = `可從 ${(data || []).length} 個已發布景點中選擇。`;
+        } catch (e) {
+          status.textContent = "景點清單暫時無法載入，可留空送出。";
+        }
+      }
+      document
+        .getElementById("submissionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          syncBlocks();
+          const textLength = blocks
+              .filter((b) => b.type === "text")
+              .reduce((n, b) => n + b.text.trim().length, 0),
+            valid = blocks.filter((b) =>
+              b.type === "text" ? b.text.trim() : b.url,
+            ),
+            msg = document.getElementById("msg"),
+            btn = document.getElementById("send");
+          if (textLength < 20) {
+            msg.textContent = "投稿文字合計至少 20 字。";
+            return;
+          }
+          btn.disabled = true;
+          msg.textContent = "投稿送出中…";
+          try {
+            const payload = {
+              submission_type: document.getElementById("type").value,
+              title: document.getElementById("title").value.trim(),
+              spot_id: document.getElementById("spot").value || null,
+              area: document.getElementById("area").value || null,
+              content: JSON.stringify({ version: 1, blocks: valid }),
+              image_url:
+                (valid.find((b) => b.type === "image") || {}).url || null,
+              author_name: document.getElementById("author").value.trim(),
+              public_name: document.getElementById("publicName").value.trim(),
+              author_email: document.getElementById("email").value.trim(),
+              rights_confirmed: document.getElementById("rights").checked,
+              privacy_confirmed: document.getElementById("privacy").checked,
+            };
+            const { error } = await db
+              .from("travel_submissions")
+              .insert(payload);
+            if (error) throw error;
+            e.currentTarget.reset();
+            blocks = [{ type: "text", text: "" }];
+            renderBlocks();
+            msg.textContent = "投稿已送出，待小編審核後才會公開。";
+          } catch (err) {
+            msg.textContent = "送出失敗：" + err.message;
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      blocks = [{ type: "text", text: "" }];
+      renderBlocks();
+      loadSpots();
+    </script>
+  </body>
+</html>

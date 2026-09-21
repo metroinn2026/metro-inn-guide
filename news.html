@@ -1,123 +1,192 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>最新消息｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script>
-  <script src="supabase-config.js"></script>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>最新消息｜Metro Inn Guide 北投旅圖</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js"></script>
+    <script src="supabase-config.js"></script>
+  </head>
 
-<body id="top">
-  <div id="header"></div>
+  <body id="top">
+    <div id="header"></div>
 
-  <section class="directory-hero">
-    <div class="container">
-      <div class="kicker">NEWS</div>
-      <h1>最新消息</h1>
-      <p>整理北投會館最新活動、住宿專案與旅遊推薦，旅客可以先看活動，再延伸安排景點、美食與優惠。</p>
-    </div>
-  </section>
+    <section class="directory-hero">
+      <div class="container">
+        <div class="kicker">NEWS</div>
+        <h1 id="directoryTitle">最新消息</h1>
+        <p id="directorySummary">
+          整理北投會館最新活動、住宿專案與旅遊推薦，旅客可以先看活動，再延伸安排景點、美食與優惠。
+        </p>
+      </div>
+    </section>
 
-  <section class="section">
-    <div class="container">
-      <div class="filter-row">
-        <div class="filter-pills">
-          <a class="pill active" data-keyword="all">全部</a>
-          <a class="pill" data-keyword="親子">親子活動</a>
-          <a class="pill" data-keyword="住宿">住宿專案</a>
-          <a class="pill" data-keyword="北投">北投小旅行</a>
+    <section class="section">
+      <div class="container">
+        <div class="filter-row">
+          <div class="filter-pills" id="directoryTags"></div>
+          <a class="section-link" href="index.html">回首頁搜尋 →</a>
         </div>
-        <a class="section-link" href="index.html">回首頁搜尋 →</a>
+
+        <div id="newsStatus" class="empty-state">最新消息載入中...</div>
+        <div id="newsGrid" class="directory-grid"></div>
+
+        <div class="pagination">
+          <span class="active">1</span>
+        </div>
       </div>
+    </section>
 
-      <div id="newsStatus" class="empty-state">最新消息載入中...</div>
-      <div id="newsGrid" class="news-line-list news-directory-list"></div>
+    <div id="footer"></div>
 
-      <div class="pagination">
-        <span class="active">1</span>
-      </div>
-    </div>
-  </section>
+    <script>
+      document.getElementById("header").innerHTML = header();
+      document.getElementById("footer").innerHTML = footer();
 
-  <div id="footer"></div>
+      const statusEl = document.getElementById("newsStatus");
+      const gridEl = document.getElementById("newsGrid");
+      let allNews = [];
 
-  <script>
-    document.getElementById('header').innerHTML = header();
-    document.getElementById('footer').innerHTML = footer();
+      const fallbackImage =
+        "https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg";
 
-    const statusEl = document.getElementById('newsStatus');
-    const gridEl = document.getElementById('newsGrid');
-    let allNews = [];
-
-    function renderNews(items) {
-      gridEl.innerHTML = '';
-
-      if (!items.length) {
-        statusEl.textContent = '目前沒有符合條件的最新消息。';
-        statusEl.style.display = 'block';
-        return;
+      function getMeta(item) {
+        const text = `${item.title || ""} ${item.summary || ""} ${item.content || ""} ${item.event_name || ""} ${item.event_content || ""}`;
+        if (text.includes("親子")) return "FAMILY";
+        if (text.includes("住宿") || text.includes("住房")) return "STAY";
+        if (text.includes("北投")) return "BEITOU";
+        return "NEWS";
       }
 
-      statusEl.style.display = 'none';
+      function renderNews(items) {
+        gridEl.innerHTML = "";
 
-      items.forEach(item => {
-        const href = `news-detail.html?id=${encodeURIComponent(item.id)}`;
-        const link=document.createElement('a');link.className='news-line';link.href=href;
-        const time=document.createElement('time');time.textContent=item.publish_date||'日期未設定';if(item.publish_date)time.dateTime=item.publish_date;
-        const title=document.createElement('strong');title.textContent=item.title||'未命名消息';
-        const arrow=document.createElement('span');arrow.className='news-chevron';arrow.setAttribute('aria-hidden','true');arrow.textContent='›';
-        link.append(time,title,arrow);gridEl.appendChild(link);
-      });
-    }
+        if (!items.length) {
+          statusEl.textContent = "目前沒有符合條件的最新消息。";
+          statusEl.style.display = "block";
+          return;
+        }
 
-    async function loadNews() {
-      try {
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/news?is_published=eq.true&select=*&order=publish_date.desc`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
+        statusEl.style.display = "none";
+
+        items.forEach((item) => {
+          const image = item.cover_image || fallbackImage;
+          const summary = item.summary || "更多內容即將補上。";
+          const date = item.publish_date
+            ? `發布日期：${item.publish_date}`
+            : "";
+          const href = `news-detail.html?id=${encodeURIComponent(item.id)}`;
+
+          const card = document.createElement("a");
+          card.className = "directory-card";
+          card.href = href;
+          card.innerHTML = `
+          <div class="directory-img">
+            <img src="${image}" alt="${item.title || ""}">
+          </div>
+          <div class="directory-body">
+            <div class="meta">${getMeta(item)}</div>
+            <h3>${item.title || "未命名消息"}</h3>
+            <p>${summary}</p>
+            ${date ? `<div class="hours-line">${date}</div>` : ""}
+            <span class="arrow">→</span>
+          </div>
+        `;
+          gridEl.appendChild(card);
+        });
+      }
+
+      async function loadNews() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/news?is_published=eq.true&select=*&order=publish_date.desc`,
+            {
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+            },
+          );
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            console.error("Supabase error:", result);
+            throw new Error(result.message || "Supabase 讀取失敗");
           }
-        );
 
-        const result = await response.json();
-
-        if (!response.ok) {
-          console.error('Supabase error:', result);
-          throw new Error(result.message || 'Supabase 讀取失敗');
-        }
-
-        allNews = result;
-        renderNews(allNews);
-      } catch (error) {
-        console.error(error);
-        statusEl.textContent = '最新消息資料暫時無法載入，請稍後再試。';
-      }
-    }
-
-    document.querySelectorAll('.pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
-        pill.classList.add('active');
-
-        const keyword = pill.dataset.keyword;
-
-        if (keyword === 'all') {
+          allNews = result;
           renderNews(allNews);
-        } else {
-          renderNews(allNews.filter(item => {
-            const text = `${item.title || ''} ${item.summary || ''} ${item.content || ''} ${item.event_name || ''} ${item.event_content || ''}`;
-            return text.includes(keyword);
-          }));
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = "最新消息資料暫時無法載入，請稍後再試。";
         }
-      });
-    });
+      }
 
-    loadNews();
-  </script>
-</body>
+      function bindFilters() {
+        document.querySelectorAll("#directoryTags .pill").forEach((pill) => {
+          pill.addEventListener("click", () => {
+            document
+              .querySelectorAll(".pill")
+              .forEach((item) => item.classList.remove("active"));
+            pill.classList.add("active");
+
+            const keyword = pill.dataset.keyword;
+
+            if (keyword === "all") {
+              renderNews(allNews);
+            } else {
+              renderNews(
+                allNews.filter((item) => {
+                  const text = `${item.title || ""} ${item.summary || ""} ${item.content || ""} ${item.event_name || ""} ${item.event_content || ""}`;
+                  return text.includes(keyword);
+                }),
+              );
+            }
+          });
+        });
+      }
+
+      async function loadDirectorySettings() {
+        const defaults = ["全部", "親子", "住宿", "北投"];
+        let tags = defaults;
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=news_directory_title,news_directory_summary,news_directory_tags`,
+            {
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+            },
+          );
+          const [settings] = await response.json();
+          if (response.ok && settings) {
+            document.getElementById("directoryTitle").textContent =
+              settings.news_directory_title || "最新消息";
+            document.getElementById("directorySummary").textContent =
+              settings.news_directory_summary || "";
+            tags = (settings.news_directory_tags || "")
+              .split(/[、,，\n]/)
+              .map((x) => x.trim())
+              .filter(Boolean);
+          }
+        } catch (error) {
+          console.warn("最新消息目錄設定載入失敗", error);
+        }
+        if (!tags.length) tags = defaults;
+        tags = ["全部", ...tags.filter((x) => x !== "全部")];
+        document.getElementById("directoryTags").innerHTML = tags
+          .map(
+            (tag, index) =>
+              `<a class="pill ${index === 0 ? "active" : ""}" data-keyword="${tag === "全部" ? "all" : tag}">${tag}</a>`,
+          )
+          .join("");
+        bindFilters();
+      }
+
+      Promise.all([loadDirectorySettings(), loadNews()]);
+    </script>
+  </body>
 </html>

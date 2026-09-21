@@ -27,47 +27,7 @@
       <p id="leadText" class="lead">消息資料載入中...</p>
       <div id="newsContentBlocks" class="news-content-blocks" aria-live="polite"></div>
 
-      <section id="eventInfo" class="info-card point-info" hidden>
-        <div class="info-head-row">
-          <div>
-            <div class="kicker">INFORMATION</div>
-            <h3>活動資訊</h3>
-          </div>
-          <button class="share-mini" type="button" aria-label="分享消息">⇪</button>
-        </div>
-
-        <div class="info-row"><span class="info-label">活動名稱</span><span id="eventName">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">活動日期</span><span id="eventDate">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">活動地點（地址）</span><span id="eventAddress">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">電話</span><span id="phone">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">活動內容</span><span id="eventContent">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">備註</span><span id="remark">尚未提供</span></div>
-
-        <div class="info-actions multi">
-          <a class="button" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a>
-          <a class="button outline" href="trips.html">查看推薦行程</a>
-        </div>
-      </section>
     </article>
-
-    <aside class="sidebar">
-      <div class="sticky-panel">
-        <div class="sidebox compact">
-          <div class="kicker">RELATED</div>
-          <h3>延伸閱讀</h3>
-          <p><a href="trips.html">北投溫泉半日遊</a></p>
-          <p><a href="spots.html">地熱谷景點介紹</a></p>
-          <p><a href="coupons.html">合作店家優惠</a></p>
-        </div>
-
-        <div class="sidebox compact dark">
-          <div class="kicker" style="color:white">BOOKING</div>
-          <h3>入住北投會館</h3>
-          <p>活動搭配住宿更輕鬆，從旅館出發探索北投周邊。</p>
-          <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a>
-        </div>
-      </div>
-    </aside>
   </main>
 
   <div id="footer"></div>
@@ -113,6 +73,14 @@
             figure.append(caption);
           }
           root.append(figure);
+        }else if(block?.type==='button'&&block.label&&block.href){
+          const href=String(block.href).trim();
+          if(!/^(https?:\/\/|\/|\.\.?\/)/i.test(href))return;
+          const wrap=document.createElement('div');wrap.className='news-content-button';
+          const link=document.createElement('a');link.className=block.style==='outline'?'button outline':'button';
+          link.href=href;link.textContent=block.label;
+          if(block.new_window!==false){link.target='_blank';link.rel='noopener noreferrer';}
+          wrap.append(link);root.append(wrap);
         }else if(block?.text){
           const paragraph=document.createElement('div');
           paragraph.className='news-content-text';
@@ -170,14 +138,6 @@
         setText('leadText', news.summary, '');
         document.getElementById('leadText').hidden=!String(news.summary||'').trim();
         renderContentBlocks(news);
-
-        setText('eventName', news.event_name);
-        setText('eventDate', news.event_date);
-        setText('eventAddress', news.event_address);
-        setText('phone', news.phone);
-        setText('eventContent', news.event_content);
-        setText('remark', news.remark);
-        document.getElementById('eventInfo').hidden=![news.event_name,news.event_date,news.event_address,news.phone,news.event_content,news.remark].some(value=>String(value||'').trim());
 
       } catch (error) {
         console.error(error);

@@ -653,13 +653,11 @@
 
       news: {
         label:'最新消息', kicker:'NEWS', table:'news', preview:'news-detail.html?id=',
-        hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、活動日期、內容。',
+        hint:'先從列表找到消息，再點「編輯」進入修改頁。可用關鍵字搜尋標題、發布日期與內容。',
         fields:[
           ['id','ID','text','auto'],['sort_order','排序數字','number'],['slug','網址代稱 slug','text'],['title','標題','text','required'],
           ['summary','摘要（選填，顯示於目錄與內頁標題下方）','textarea'],['content','內頁圖文內容','newsBlocks'],['cover_image','目錄封面圖（1200×630，內頁是否顯示請用下方圖片段落設定）','image'],['cover_image_source','封面圖片來源','text'],
-          ['publish_date','發布日期','date'],['event_name','活動名稱','text'],['event_date','活動日期','text'],
-          ['event_address','活動地點（地址）','text'],['phone','電話','text'],['event_content','活動內容','textarea'],
-          ['remark','備註','textarea'],['is_published','狀態','boolean']
+          ['publish_date','發布日期','date'],['is_published','狀態','boolean']
         ],
         columns:['title','publish_date','is_published'],
         subtitle:(x)=>x.publish_date || x.event_date || '-',
@@ -667,7 +665,7 @@
         typeOptions:[['all','全部類別'],['親子','親子'],['住宿','住宿'],['北投','北投']],
         order:'sort_order',
         idPrefix:'news',
-        tips:`<ul class="tip-list"><li>內頁固定顯示標題與發布日期。</li><li>內容可新增文字段落或圖片段落，支援純文字、純圖片及圖文交錯，並可上下調整順序。</li><li>目錄封面建議：1200 × 630 px；只用於首頁及最新消息目錄。</li></ul>`
+        tips:`<ul class="tip-list"><li>內頁固定顯示標題與發布日期。</li><li>內容可新增文字、圖片或連結按鈕，並可上下調整順序。</li><li>連結按鈕適合導向活動報名、官方公告或訂房網站。</li><li>目錄封面建議：1200 × 630 px；只用於首頁及最新消息目錄。</li></ul>`
       },
       spots: {
         label:'景點管理', kicker:'SPOTS', table:'spots', preview:'spot.html?id=',
@@ -1271,7 +1269,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
         if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
-        if(type === 'newsBlocks') return `<div class="form-row"><label>${label}</label><div class="help">可自由加入文字或圖片並調整順序；未加入圖片段落時，內頁不會強制顯示目錄封面。</div><div id="newsBlocksEditor" class="trip-section-editor"></div><div class="actions"><button type="button" onclick="addNewsBlock('text')">＋新增文字</button><button type="button" onclick="addNewsBlock('image')">＋新增圖片</button></div><input id="f_${name}" type="hidden"></div>`;
+        if(type === 'newsBlocks') return `<div class="form-row"><label>${label}</label><div class="help">可自由加入文字、圖片或連結按鈕並調整順序；未加入圖片段落時，內頁不會強制顯示目錄封面。</div><div id="newsBlocksEditor" class="trip-section-editor"></div><div class="actions"><button type="button" onclick="addNewsBlock('text')">＋新增文字</button><button type="button" onclick="addNewsBlock('image')">＋新增圖片</button><button type="button" onclick="addNewsBlock('button')">＋新增連結按鈕</button></div><input id="f_${name}" type="hidden"></div>`;
         if(type === 'featuredCategory') return `<input id="f_${name}" type="hidden">`;
         if(type === 'featuredContent') return featuredContentTemplate(name,label);
         if(type === 'image') return imageFieldTemplate(name,label);
@@ -1645,7 +1643,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         const el = document.getElementById('f_'+name);
         if(!el) return;
         if(type==='sections') payload[name] = collectTripSections();
-        else if(type==='newsBlocks') payload[name] = JSON.stringify(collectNewsBlocks().filter(block=>block.type==='image'?block.image:block.text));
+        else if(type==='newsBlocks') payload[name] = JSON.stringify(collectNewsBlocks().filter(block=>block.type==='image'?block.image:block.type==='button'?(block.label&&block.href):block.text));
         else if(name === 'transport_routes') {
           // Supabase JSONB expects an object/array, not a string containing JSON.
           // Reject malformed input instead of overwriting the original JSONB value.
@@ -2084,11 +2082,15 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       const hidden=document.getElementById('f_content');
       if(!editor||!hidden)return;
       const blocks=normalizeNewsBlocks(value).map(block=>({
-        type:block?.type==='image'?'image':'text',
+        type:['image','button'].includes(block?.type)?block.type:'text',
         text:String(block?.text||''),
         image:String(block?.image||block?.url||''),
         image_source:String(block?.image_source||block?.source||''),
-        alt:String(block?.alt||'')
+        alt:String(block?.alt||''),
+        label:String(block?.label||''),
+        href:String(block?.href||block?.link||''),
+        style:block?.style==='outline'?'outline':'primary',
+        new_window:block?.new_window!==false
       }));
       hidden.value=JSON.stringify(blocks);
       if(!blocks.length){
@@ -2098,7 +2100,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       editor.innerHTML=blocks.map((block,index)=>`
         <div class="trip-section-card news-block-card" data-index="${index}">
           <div class="trip-section-head">
-            <strong>第 ${String(index+1).padStart(2,'0')} 段｜${block.type==='image'?'圖片':'文字'}</strong>
+            <strong>第 ${String(index+1).padStart(2,'0')} 段｜${block.type==='image'?'圖片':block.type==='button'?'連結按鈕':'文字'}</strong>
             <div class="actions">
               <button type="button" onclick="moveNewsBlock(${index},-1)" ${index===0?'disabled':''}>↑ 上移</button>
               <button type="button" onclick="moveNewsBlock(${index},1)" ${index===blocks.length-1?'disabled':''}>↓ 下移</button>
@@ -2110,6 +2112,13 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
             <div class="image-field-actions"><input id="news_block_upload_${index}" type="file" accept="image/*" style="display:none" onchange="uploadNewsBlockImage(${index},this.files[0])"><button type="button" onclick="document.getElementById('news_block_upload_${index}').click()">上傳本機圖片</button></div>
             <div class="form-row"><label>圖片替代文字</label><input data-field="alt" value="${escapeHtml(block.alt)}" placeholder="簡短描述圖片內容" oninput="syncNewsBlocks()"></div>
             <div class="form-row"><label>圖片來源</label><input data-field="image_source" value="${escapeHtml(block.image_source)}" placeholder="例：臺北市政府觀光傳播局" oninput="syncNewsBlocks()"></div>
+          `:block.type==='button'?`
+            <div class="trip-section-grid">
+              <div class="form-row"><label>按鈕文字</label><input data-field="label" value="${escapeHtml(block.label)}" placeholder="查看活動詳情" oninput="syncNewsBlocks()"></div>
+              <div class="form-row"><label>按鈕樣式</label><select data-field="style" onchange="syncNewsBlocks()"><option value="primary" ${block.style!=='outline'?'selected':''}>橘色主按鈕</option><option value="outline" ${block.style==='outline'?'selected':''}>白色外框按鈕</option></select></div>
+            </div>
+            <div class="form-row"><label>連結網址</label><input data-field="href" value="${escapeHtml(block.href)}" placeholder="https://..." oninput="syncNewsBlocks()"></div>
+            <label class="trip-section-image-toggle"><input data-field="new_window" type="checkbox" ${block.new_window!==false?'checked':''} onchange="syncNewsBlocks()"><span>另開新視窗</span></label>
           `:`<div class="form-row"><label>文字內容</label><textarea data-field="text" rows="8" placeholder="輸入這一段內文" oninput="syncNewsBlocks()">${escapeHtml(block.text)}</textarea></div>`}
         </div>`).join('');
     }
@@ -2117,11 +2126,18 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
     function collectNewsBlocks(){
       return [...document.querySelectorAll('.news-block-card')].map(card=>{
         const isImage=!!card.querySelector('[data-field="image"]');
+        const isButton=!!card.querySelector('[data-field="href"]');
         return isImage?{
           type:'image',
           image:card.querySelector('[data-field="image"]')?.value.trim()||'',
           alt:card.querySelector('[data-field="alt"]')?.value.trim()||'',
           image_source:card.querySelector('[data-field="image_source"]')?.value.trim()||''
+        }:isButton?{
+          type:'button',
+          label:card.querySelector('[data-field="label"]')?.value.trim()||'',
+          href:card.querySelector('[data-field="href"]')?.value.trim()||'',
+          style:card.querySelector('[data-field="style"]')?.value==='outline'?'outline':'primary',
+          new_window:card.querySelector('[data-field="new_window"]')?.checked!==false
         }:{type:'text',text:card.querySelector('[data-field="text"]')?.value.trim()||''};
       });
     }
@@ -2133,7 +2149,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
 
     function addNewsBlock(type){
       const blocks=collectNewsBlocks();
-      blocks.push(type==='image'?{type:'image',image:'',alt:'',image_source:''}:{type:'text',text:''});
+      blocks.push(type==='image'?{type:'image',image:'',alt:'',image_source:''}:type==='button'?{type:'button',label:'',href:'',style:'primary',new_window:true}:{type:'text',text:''});
       renderNewsBlocks(blocks);
     }
 

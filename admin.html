@@ -419,6 +419,7 @@
           </div>
           <div class="actions">
             <button class="primary" id="newBtn" onclick="newItem()">新增</button>
+            <button id="directorySettingsBtn" type="button" hidden onclick="openDirectorySettings()">目錄頁設定</button>
             <button id="categoryImportBtn" type="button" hidden onclick="openCategoryImport()">匯入資料</button>
             <button id="categoryExportBtn" type="button" hidden onclick="exportCategoryExcel()">匯出 Excel</button>
             <button onclick="loadCurrentTable()">重新讀取</button>
@@ -529,6 +530,19 @@
       <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" onclick="closeChangePassword()">取消</button><button type="submit" id="changePasswordSubmit" class="primary">確認變更</button></div>
     </form>
   </dialog>
+  <dialog id="directorySettingsDialog" style="width:min(720px,calc(100% - 32px));border:1px solid #d6e2f2;border-radius:12px;padding:0">
+    <form id="directorySettingsForm" style="padding:26px" onsubmit="saveDirectorySettings(event)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+        <div><h2 id="directorySettingsTitle" style="margin:0 0 6px">目錄頁設定</h2><p style="margin:0;color:#64748b">管理前台目錄頁上方的文字及分類篩選標籤。</p></div>
+        <button type="button" aria-label="關閉" onclick="closeDirectorySettings()">關閉</button>
+      </div>
+      <div class="form-row"><label for="directoryPageTitle">目錄頁標題</label><input id="directoryPageTitle" type="text" required></div>
+      <div class="form-row"><label for="directoryPageSummary">目錄頁摘要</label><textarea id="directoryPageSummary" rows="4"></textarea><div class="help">不手動換行時，前台會依可用寬度自然排列；若在此換行，前台也會保留該換行。</div></div>
+      <div class="form-row"><label for="directoryPageTags">分類標籤</label><textarea id="directoryPageTags" rows="3" placeholder="全部,北投,新北投,陽明山"></textarea><div class="help">請以逗號分隔。「全部」會固定顯示在第一個；其他文字同時作為前台篩選關鍵字。</div></div>
+      <p id="directorySettingsMsg" class="msg" role="status" aria-live="polite"></p>
+      <div class="actions" style="justify-content:flex-end"><button type="button" onclick="closeDirectorySettings()">取消</button><button id="directorySettingsSave" type="submit" class="primary">儲存設定</button></div>
+    </form>
+  </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="secure-delete.js"></script>
@@ -614,15 +628,6 @@
           ['facebook_url','Facebook 連結','text'],
           ['instagram_url','Instagram 連結','text'],
           ['line_url','LINE 連結','text'],
-          ['spots_directory_title','景點目錄標題','text'],
-          ['spots_directory_summary','景點目錄摘要','textarea'],
-          ['spots_directory_tags','景點分類標籤（以逗號分隔）','textarea'],
-          ['foods_directory_title','美食目錄標題','text'],
-          ['foods_directory_summary','美食目錄摘要','textarea'],
-          ['foods_directory_tags','美食分類標籤（以逗號分隔）','textarea'],
-          ['trips_directory_title','行程目錄標題','text'],
-          ['trips_directory_summary','行程目錄摘要','textarea'],
-          ['trips_directory_tags','行程分類標籤（以逗號分隔）','textarea'],
           ['map_iframe','Google Map iframe','textarea'],
           ['copyright_text','版權文字','text']
         ],
@@ -635,8 +640,6 @@
         tips:`<ul class="tip-list">
           <li><b>Logo</b>：建議 SVG 或透明 PNG，高度約 80px。</li>
           <li><b>頁首</b>：訂房按鈕文字建議 4～6 字，例如「立即訂房」。</li>
-          <li><b>目錄文字</b>：可管理景點、美食、行程頁的標題、摘要及分類標籤；標籤請用逗號分隔。</li>
-          <li><b>摘要換行</b>：只有在文字框中手動換行時，前台才會依該位置換行；其餘由瀏覽器依畫面寬度排列。</li>
           <li><b>頁尾</b>：地址、電話、Email 建議完整填寫，避免旅客找不到聯絡資訊。</li>
           <li><b>Google Map</b>：可貼 iframe，但若不熟悉可先留空。</li>
           <li><b>社群圖示</b>：若未來使用圖片，建議 64 × 64 px PNG。</li>
@@ -1102,6 +1105,68 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       }
     }
 
+    const directorySettingMap = {
+      spots:{label:'景點',prefix:'spots'},
+      foods:{label:'美食',prefix:'foods'},
+      trips:{label:'行程',prefix:'trips'}
+    };
+
+    async function openDirectorySettings(){
+      const setting = directorySettingMap[currentTable];
+      if(!setting) return;
+      const dialog = document.getElementById('directorySettingsDialog');
+      const msg = document.getElementById('directorySettingsMsg');
+      const save = document.getElementById('directorySettingsSave');
+      document.getElementById('directorySettingsTitle').textContent = setting.label + '目錄頁設定';
+      document.getElementById('directoryPageTitle').value = '';
+      document.getElementById('directoryPageSummary').value = '';
+      document.getElementById('directoryPageTags').value = '';
+      msg.textContent = '設定載入中…';
+      save.disabled = true;
+      dialog.showModal();
+      const fields = [`${setting.prefix}_directory_title`,`${setting.prefix}_directory_summary`,`${setting.prefix}_directory_tags`];
+      const {data,error} = await db.from('site_settings').select(fields.join(',')).eq('id',1).single();
+      if(error){
+        msg.textContent = '讀取失敗：' + error.message + '。請先執行「目錄文字與分類標籤欄位.sql」。';
+        return;
+      }
+      if(currentTable !== Object.keys(directorySettingMap).find(key=>directorySettingMap[key]===setting) || !dialog.open) return;
+      document.getElementById('directoryPageTitle').value = data[fields[0]] || '';
+      document.getElementById('directoryPageSummary').value = data[fields[1]] || '';
+      document.getElementById('directoryPageTags').value = data[fields[2]] || '';
+      msg.textContent = '';
+      save.disabled = false;
+    }
+
+    function closeDirectorySettings(){
+      const dialog = document.getElementById('directorySettingsDialog');
+      if(dialog.open) dialog.close();
+    }
+
+    async function saveDirectorySettings(event){
+      event.preventDefault();
+      const setting = directorySettingMap[currentTable];
+      if(!setting) return;
+      const title = document.getElementById('directoryPageTitle').value.trim();
+      const summary = document.getElementById('directoryPageSummary').value.trim();
+      const tags = document.getElementById('directoryPageTags').value.split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean);
+      const normalizedTags = ['全部', ...tags.filter(x=>x !== '全部')].filter((x,index,list)=>list.indexOf(x)===index).join(',');
+      const payload = {
+        [`${setting.prefix}_directory_title`]:title,
+        [`${setting.prefix}_directory_summary`]:summary,
+        [`${setting.prefix}_directory_tags`]:normalizedTags
+      };
+      const msg = document.getElementById('directorySettingsMsg');
+      const save = document.getElementById('directorySettingsSave');
+      save.disabled = true;
+      msg.textContent = '設定儲存中…';
+      const {error} = await db.from('site_settings').update(payload).eq('id',1);
+      if(error){msg.textContent='儲存失敗：'+error.message;save.disabled=false;return;}
+      document.getElementById('directoryPageTags').value=normalizedTags;
+      msg.textContent = '儲存成功，重新整理前台目錄頁即可看到更新。';
+      save.disabled = false;
+    }
+
     function switchTable(table){
       if(location.hash)history.replaceState(null,'',location.pathname+location.search);
       
@@ -1113,6 +1178,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       document.getElementById('featuredTopicsTab').classList.toggle('active',table==='featured_topics');
       document.querySelectorAll('#sideNav a[data-table]').forEach(a=>a.classList.toggle('active',a.dataset.table===(isFeatured?'featured_picks':table)));
       const categoryWorkflow=['spots','foods','trips'].includes(table);
+      document.getElementById('directorySettingsBtn').hidden=!categoryWorkflow;
       document.getElementById('categoryImportBtn').hidden=!categoryWorkflow;
       document.getElementById('categoryExportBtn').hidden=!categoryWorkflow;
       if(bulkMsg){bulkMsg.hidden=true;bulkMsg.textContent='';}

@@ -1,19 +1,145 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>搜尋結果｜北捷行旅</title><link rel="stylesheet" href="style.css"><script src="data.js"></script></head><body id="top"><div id="header"></div>
-<section class="directory-hero"><div class="container"><div class="eyebrow">SEARCH</div><h1 id="resultTitle">搜尋結果</h1><p>這是本機展示版，先用示意資料呈現搜尋後的分類結果。未來正式版可串接資料庫，依關鍵字即時篩選景點、行程、美食與優惠。</p></div></section>
-<section class="section"><div class="container"><div class="search-box search-box-simple" style="margin-bottom:44px"><div class="field keyword-only"><label>KEYWORD SEARCH</label><div class="keyword-row"><input id="kw2" placeholder="搜尋景點、美食、行程，例如：地熱谷、泡湯、親子景點、拉麵"><a class="button" href="#" onclick="const q=document.getElementById('kw2').value.trim(); location.href='search.html'+(q?'?q='+encodeURIComponent(q):''); return false;">搜尋</a></div></div></div>
-<div class="filter-row"><h2 class="quick-search-title">依類型快速查看</h2><div class="filter-pills"><a class="pill active" href="spots.html">景點</a><a class="pill" href="trips.html">行程</a><a class="pill" href="foods.html">美食</a><a class="pill" href="coupons.html">優惠</a></div></div>
-<div class="directory-grid" id="results"></div></div></section><div id="footer"></div><script>
-const q=new URLSearchParams(location.search).get('q')||'';document.getElementById('resultTitle').textContent=q?`「${q}」的搜尋結果`:'搜尋景點、美食、行程';document.getElementById('kw2').value=q;
-const cards=[
- {type:'景點',href:'spot-thermal-valley.html',img:'assets/valley.jpg',meta:'BEITOU · 新北投站',title:'地熱谷',text:'北投最經典的溫泉地景，白煙升起時很有旅行感。'},
- {type:'行程',href:'trip-beitou.html',img:'assets/hero.jpg',meta:'BEITOU · HALF DAY',title:'北投溫泉半日遊',text:'把地熱谷、溫泉博物館與泡湯安排成剛剛好的午後。'},
- {type:'美食',href:'food-beitou-dining.html',img:'assets/dining.jpg',meta:'BEITOU · 晚餐',title:'山城食堂',text:'適合作為散步後的收尾晚餐，安靜又舒服。'},
- {type:'優惠',href:'coupon.html',img:'assets/coffee.jpg',meta:'SPECIAL OFFER',title:'平日下午限定優惠',text:'出示優惠畫面，即享合作店家限定折抵。'},
- {type:'景點',href:'spots.html',img:'assets/museum.jpg',meta:'BEITOU · 新北投站',title:'北投溫泉博物館',text:'認識北投溫泉文化的經典景點。'},
- {type:'美食',href:'foods.html',img:'assets/beef.jpg',meta:'BEITOU · 拉麵',title:'北投拉麵推薦',text:'把熱湯與溫泉旅行放在同一天。'},
- {type:'行程',href:'trips.html',img:'assets/tamsui.jpg',meta:'TAMSUI · SUNSET',title:'淡水夕陽散策',text:'河岸、老街與夕陽，適合慢慢走。'},
- {type:'景點',href:'spots.html',img:'assets/yang.jpg',meta:'YANGMINGSHAN',title:'陽明山小油坑',text:'山景、雲霧與自然地景。'}
-];
-const filtered=q?cards.filter(c=>(c.title+c.text+c.meta+c.type).includes(q)):cards;
-document.getElementById('results').innerHTML=(filtered.length?filtered:cards).map(c=>`<a class="directory-card" href="${c.href}"><div class="directory-img"><img src="${c.img}"></div><div class="directory-body"><div class="eyebrow">${c.type} · ${c.meta}</div><h3>${c.title}</h3><p>${c.text}</p><span class="section-link">查看內容</span></div></a>`).join('');
-</script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>搜尋結果｜北投旅圖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body id="top">
+  <div id="header"></div>
+  <section class="directory-hero">
+    <div class="container">
+      <div class="eyebrow">SEARCH</div>
+      <h1 id="resultTitle">搜尋結果</h1>
+      <p>搜尋目前已上架的景點、美食、行程與優惠。</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="search-box search-box-simple" style="margin-bottom:44px">
+        <div class="field keyword-only">
+          <label for="kw2">KEYWORD SEARCH</label>
+          <div class="keyword-row">
+            <input id="kw2" placeholder="搜尋景點、美食、行程，例如：地熱谷、泡湯、親子景點、拉麵">
+            <button class="button" id="searchBtn" type="button">搜尋</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <h2 class="quick-search-title">依類型快速查看</h2>
+        <div class="filter-pills">
+          <a class="pill" href="spots.html">景點</a>
+          <a class="pill" href="trips.html">行程</a>
+          <a class="pill" href="foods.html">美食</a>
+          <a class="pill" href="coupons.html">優惠</a>
+        </div>
+      </div>
+      <p id="searchStatus" aria-live="polite">搜尋資料載入中…</p>
+      <div class="directory-grid" id="results"></div>
+    </div>
+  </section>
+  <div id="footer"></div>
+  <script>
+    document.getElementById('header').innerHTML=header();
+    document.getElementById('footer').innerHTML=footer();
+
+    const params=new URLSearchParams(location.search);
+    const query=(params.get('q')||'').trim();
+    const input=document.getElementById('kw2');
+    const results=document.getElementById('results');
+    const status=document.getElementById('searchStatus');
+    input.value=query;
+    document.getElementById('resultTitle').textContent=query?`「${query}」的搜尋結果`:'搜尋景點、美食、行程與優惠';
+
+    const sources=[
+      {table:'spots',type:'景點',page:'spot.html'},
+      {table:'foods',type:'美食',page:'food.html'},
+      {table:'trips',type:'行程',page:'trip.html'},
+      {table:'coupons',type:'優惠',page:'coupon.html'}
+    ];
+
+    function startSearch(){
+      const value=input.value.trim();
+      location.href='search.html'+(value?'?q='+encodeURIComponent(value):'');
+    }
+    document.getElementById('searchBtn').addEventListener('click',startSearch);
+    input.addEventListener('keydown',event=>{if(event.key==='Enter')startSearch();});
+
+    function searchableText(item){
+      return [item.title,item.summary,item.content,item.area,item.station,item.category,item.tags,item.notes,item.address,item.duration]
+        .map(value=>typeof value==='string'?value:JSON.stringify(value||''))
+        .join(' ')
+        .toLowerCase();
+    }
+    function validImage(url){
+      return /^https?:\/\//i.test(String(url||'').trim());
+    }
+    function appendCard(item){
+      const card=document.createElement('a');
+      card.className='directory-card';
+      card.href=`${item.page}?id=${encodeURIComponent(item.id)}`;
+      const imageWrap=document.createElement('div');
+      imageWrap.className='directory-img';
+      const image=document.createElement('img');
+      image.src=item.cover_image;
+      image.alt=item.title||'';
+      image.loading='lazy';
+      imageWrap.append(image);
+      const body=document.createElement('div');
+      body.className='directory-body';
+      const meta=document.createElement('div');
+      meta.className='eyebrow';
+      meta.textContent=[item.type,item.area||item.category||item.station].filter(Boolean).join(' · ');
+      const title=document.createElement('h3');
+      title.textContent=item.title||'未命名內容';
+      const summary=document.createElement('p');
+      summary.textContent=item.summary||'';
+      const more=document.createElement('span');
+      more.className='section-link';
+      more.textContent='查看內容';
+      body.append(meta,title,summary,more);
+      card.append(imageWrap,body);
+      results.append(card);
+    }
+
+    async function loadSearchResults(){
+      if(!query){
+        status.textContent='請輸入關鍵字開始搜尋。';
+        return;
+      }
+      if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined'){
+        status.textContent='搜尋服務目前無法使用，請稍後再試。';
+        return;
+      }
+      const settled=await Promise.allSettled(sources.map(async source=>{
+        const response=await fetch(`${SUPABASE_URL}/rest/v1/${source.table}?is_published=eq.true&select=*&order=sort_order.asc,id.asc`,{
+          cache:'no-store',
+          headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+        });
+        const rows=await response.json();
+        if(!response.ok)throw new Error(`${source.type}資料讀取失敗`);
+        return (rows||[]).map(row=>({...row,...source}));
+      }));
+      const keyword=query.toLowerCase();
+      const items=settled
+        .filter(result=>result.status==='fulfilled')
+        .flatMap(result=>result.value)
+        .filter(item=>item.id&&item.title&&validImage(item.cover_image)&&searchableText(item).includes(keyword));
+      results.replaceChildren();
+      items.forEach(appendCard);
+      if(items.length){
+        status.textContent=`共找到 ${items.length} 筆已上架內容。`;
+      }else{
+        status.textContent=`目前沒有符合「${query}」且具備封面圖片的已上架內容。`;
+      }
+      if(settled.every(result=>result.status==='rejected')){
+        status.textContent='搜尋資料暫時無法載入，請稍後再試。';
+      }
+    }
+    loadSearchResults();
+  </script>
+</body>
+</html>

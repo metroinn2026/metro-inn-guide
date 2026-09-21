@@ -30,7 +30,7 @@
         </div>
 
         <div id="newsStatus" class="empty-state">最新消息載入中...</div>
-        <div id="newsGrid" class="directory-grid"></div>
+        <div id="newsGrid" class="news-line-list news-directory-list"></div>
 
         <div class="pagination">
           <span class="active">1</span>
@@ -48,17 +48,6 @@
       const gridEl = document.getElementById("newsGrid");
       let allNews = [];
 
-      const fallbackImage =
-        "https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg";
-
-      function getMeta(item) {
-        const text = `${item.title || ""} ${item.summary || ""} ${item.content || ""} ${item.event_name || ""} ${item.event_content || ""}`;
-        if (text.includes("親子")) return "FAMILY";
-        if (text.includes("住宿") || text.includes("住房")) return "STAY";
-        if (text.includes("北投")) return "BEITOU";
-        return "NEWS";
-      }
-
       function renderNews(items) {
         gridEl.innerHTML = "";
 
@@ -71,29 +60,21 @@
         statusEl.style.display = "none";
 
         items.forEach((item) => {
-          const image = item.cover_image || fallbackImage;
-          const summary = item.summary || "更多內容即將補上。";
-          const date = item.publish_date
-            ? `發布日期：${item.publish_date}`
-            : "";
           const href = `news-detail.html?id=${encodeURIComponent(item.id)}`;
-
-          const card = document.createElement("a");
-          card.className = "directory-card";
-          card.href = href;
-          card.innerHTML = `
-          <div class="directory-img">
-            <img src="${image}" alt="${item.title || ""}">
-          </div>
-          <div class="directory-body">
-            <div class="meta">${getMeta(item)}</div>
-            <h3>${item.title || "未命名消息"}</h3>
-            <p>${summary}</p>
-            ${date ? `<div class="hours-line">${date}</div>` : ""}
-            <span class="arrow">→</span>
-          </div>
-        `;
-          gridEl.appendChild(card);
+          const link = document.createElement("a");
+          link.className = "news-line";
+          link.href = href;
+          const time = document.createElement("time");
+          time.textContent = item.publish_date || "日期未設定";
+          if (item.publish_date) time.dateTime = item.publish_date;
+          const title = document.createElement("strong");
+          title.textContent = item.title || "未命名消息";
+          const arrow = document.createElement("span");
+          arrow.className = "news-chevron";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = "›";
+          link.append(time, title, arrow);
+          gridEl.appendChild(link);
         });
       }
 

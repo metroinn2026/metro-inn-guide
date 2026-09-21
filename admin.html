@@ -565,9 +565,9 @@
       featured_picks:{
         label:'首頁精選管理',kicker:'FEATURED',table:'featured_picks',preview:'index.html#picks',
         hint:'最多啟用 10 筆，拖曳排序後按「儲存排序」。請填寫已上架景點／美食／行程的資料編號及其封面圖片網址。',
-        fields:[['id','ID','text','auto'],['sort_order','顯示順序','number'],['title','精選標題','text','required'],['category','內容類型（spot／food／trip）','text','required'],['content_id','對應內容 ID（例如 spot_0001）','text','required'],['summary','簡短介紹','textarea'],['cover_image','封面圖片網址','image'],['topics','分類代碼（至「分類標籤」查詢，多個以逗號分隔）','text'],['is_active','狀態','booleanActive']],
+        fields:[['id','ID','text','auto'],['sort_order','顯示順序','number'],['category','內容類型','featuredCategory','required'],['content_id','選擇已發布內容','featuredContent','required'],['title','精選標題','text','required'],['summary','簡短介紹','textarea'],['cover_image','封面圖片網址','image'],['topics','分類代碼（至「分類標籤」查詢，多個以逗號分隔）','text'],['is_active','狀態','booleanActive']],
         columns:['title','category','is_active'],subtitle:x=>x.category+' / '+x.content_id,statusKey:'is_active',typeOptions:[['all','全部類別'],['spot','景點'],['food','美食'],['trip','行程']],order:'sort_order',idPrefix:'pick',
-        tips:'<ul class="tip-list"><li>最多 10 筆啟用精選；建議封面 1600×900。</li><li>內容類型填 spot、food 或 trip；內容 ID 必須是已上架的資料。</li><li>分類標籤請填「分類標籤」設定的分類代碼，以逗號分隔。</li><li>首次使用請先執行隨包附上的 featured_picks.sql。</li></ul>'
+        tips:'<ul class="tip-list"><li>最多 10 筆啟用精選；建議封面 1600×900。</li><li>從已發布的景點、美食或行程中搜尋選取，系統會自動帶入標題、摘要與封面，仍可再修改。</li><li>分類標籤請填「分類標籤」設定的分類代碼，以逗號分隔。</li><li>首次使用請先執行隨包附上的 featured_picks.sql。</li></ul>'
       },
       banners: {
         label:'Banner 管理', kicker:'BANNER', table:'banners', preview:'index.html',
@@ -749,6 +749,65 @@
     let relatedCatalog=[];
     let relatedSelection=[];
     let relatedRequest=0;
+
+    let featuredContentCatalog=[];
+    let featuredContentRequest=0;
+    const featuredTypeLabel={spot:'景點',food:'美食',trip:'行程'};
+    function featuredContentTemplate(name,label){
+      return `<div class="form-row"><label>${label}</label>
+        <div style="display:grid;grid-template-columns:160px minmax(220px,1fr);gap:10px;margin-bottom:10px">
+          <select id="featuredContentType" onchange="renderFeaturedContentOptions()"><option value="all">全部類型</option><option value="spot">景點</option><option value="food">美食</option><option value="trip">行程</option></select>
+          <input id="featuredContentSearch" type="search" placeholder="搜尋文章名稱或資料編號" oninput="renderFeaturedContentOptions()">
+        </div>
+        <select id="featuredContentSelect" onchange="applyFeaturedContentSelection()"><option value="">正在載入已發布內容…</option></select>
+        <input id="f_${name}" type="hidden">
+        <div id="featuredContentStatus" class="help">只會顯示已發布的景點、美食與行程。</div>
+      </div>`;
+    }
+    function renderFeaturedContentOptions(){
+      const select=document.getElementById('featuredContentSelect');
+      if(!select)return;
+      const type=document.getElementById('featuredContentType')?.value||'all';
+      const keyword=(document.getElementById('featuredContentSearch')?.value||'').trim().toLowerCase();
+      const currentCategory=document.getElementById('f_category')?.value||'';
+      const currentId=document.getElementById('f_content_id')?.value||'';
+      const currentKey=currentCategory&&currentId?currentCategory+':'+currentId:'';
+      const items=featuredContentCatalog.filter(item=>(type==='all'||item.category===type)&&(!keyword||`${item.title} ${item.id}`.toLowerCase().includes(keyword)));
+      select.innerHTML='<option value="">請選擇已發布內容</option>'+items.map(item=>`<option value="${relatedEsc(item.category+':'+item.id)}" ${item.category+':'+item.id===currentKey?'selected':''}>[${featuredTypeLabel[item.category]}] ${relatedEsc(item.title)}（${relatedEsc(item.id)}）</option>`).join('');
+      const status=document.getElementById('featuredContentStatus');
+      if(status)status.textContent=`已載入 ${featuredContentCatalog.length} 篇已發布內容，目前顯示 ${items.length} 篇。`;
+    }
+    function applyFeaturedContentSelection(){
+      const key=document.getElementById('featuredContentSelect')?.value||'';
+      if(!key)return;
+      const item=featuredContentCatalog.find(x=>x.category+':'+x.id===key);
+      if(!item)return;
+      document.getElementById('f_category').value=item.category;
+      document.getElementById('f_content_id').value=item.id;
+      document.getElementById('f_title').value=item.title||'';
+      document.getElementById('f_summary').value=item.summary||'';
+      document.getElementById('f_cover_image').value=item.cover_image||'';
+      refreshAllImageThumbs();
+      updateImagePreview();
+      scheduleAdminDraftPreview();
+    }
+    async function loadFeaturedContentPicker(){
+      if(currentTable!=='featured_picks')return;
+      const token=++featuredContentRequest;
+      const status=document.getElementById('featuredContentStatus');
+      if(status)status.textContent='正在讀取已發布內容…';
+      const sources=[['spots','spot'],['foods','food'],['trips','trip']];
+      const results=await Promise.allSettled(sources.map(async ([table,category])=>{
+        const {data,error}=await db.from(table).select('id,title,summary,cover_image,is_published,sort_order').eq('is_published',true).order('sort_order',{ascending:true}).limit(500);
+        if(error)throw Error(`${featuredTypeLabel[category]}：${error.message}`);
+        return (data||[]).map(item=>({...item,category}));
+      }));
+      if(token!==featuredContentRequest||currentTable!=='featured_picks')return;
+      featuredContentCatalog=results.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
+      renderFeaturedContentOptions();
+      const errors=results.filter(x=>x.status==='rejected').map(x=>x.reason.message);
+      if(status&&errors.length)status.textContent='部分內容無法讀取：'+errors.join('；');
+    }
     const relatedEsc=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const relatedKey=item=>item.type+':'+item.id;
     function relatedTerms(text){return String(text||'').toLowerCase().split(/[\s,，、｜|/]+/).filter(t=>t.length>1);}
@@ -1200,6 +1259,8 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
         if(type === 'role') return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="admin">管理員</option><option value="super_admin">超級管理員</option></select></div>`;
         if(type === 'password') return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="password" autocomplete="new-password"><div class="readonly-note">編輯既有帳號時若不改密碼，請留空。</div></div>`;
         if(type === 'sections') return `<div class="form-row"><label>${label}</label><div class="help">每段可填時間、標題、說明、圖片網址；可按住段落標題拖曳排序。</div><div id="tripSectionsEditor" class="trip-section-editor"></div><button type="button" onclick="addTripSection()">＋新增一段</button><input id="f_${name}" type="hidden"></div>`;
+        if(type === 'featuredCategory') return `<input id="f_${name}" type="hidden">`;
+        if(type === 'featuredContent') return featuredContentTemplate(name,label);
         if(type === 'image') return imageFieldTemplate(name,label);
         if(type === 'textarea') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
         if(type === 'json') return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="8" spellcheck="false" oninput="updateImagePreview()"></textarea><div class="help">請輸入合法 JSON 物件；格式錯誤時無法儲存。</div></div>`;
@@ -1307,6 +1368,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       document.getElementById('cmsPanel').classList.add('cms-editing');
       mountAdminSharedEditor();
       relatedSelection=[];loadRelatedPicker();
+      loadFeaturedContentPicker();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -1557,6 +1619,7 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       mountAdminSharedEditor();
       relatedSelection=Array.isArray(item.related_items)?item.related_items.filter(x=>x&&typeof x.type==='string'&&x.id!=null).slice(0,4).map(relatedKey):[];
       loadRelatedPicker();
+      loadFeaturedContentPicker();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 

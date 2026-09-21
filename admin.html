@@ -1069,6 +1069,10 @@
             <div class="nav-group-title">投稿管理</div>
             <a href="#submissions" data-workspace="submissions">民眾投稿審核</a>
           </div>
+          <div class="nav-group">
+            <div class="nav-group-title">電子報管理</div>
+            <a href="#newsletter" data-workspace="newsletter">訂閱者與寄送</a>
+          </div>
           <div class="nav-group nav-group-last">
             <div class="nav-group-title">系統管理</div>
             <a href="#audit" data-workspace="audit">操作紀錄</a>
@@ -1338,16 +1342,17 @@
                 <div id="sharedAdminEditor" hidden></div>
                 <div id="formFields"></div>
                 <section id="relatedPicker" class="related-picker" hidden>
-                  <h3>延伸閱讀／行程關聯文章</h3>
+                  <h3 id="relatedPickerTitle">延伸閱讀</h3>
                   <p>
-                    在此搜尋並選擇文章：行程頁的「這趟旅程會經過」優先顯示你選的景點與美食；其他選文會顯示於頁面下方的「延伸閱讀」。依標題、地區與標籤推薦已上架內容；最多選取
-                    4
-                    篇，選好後按儲存。注意：若目前文章已上架，既有儲存草稿功能仍會更新公開資料；如需先審稿，請先下架該篇。
+                    <span id="relatedPickerHelp"
+                      >依標題、地區與標籤搜尋已上架內容，最多選取 4 篇。</span
+                    >
+                    選好後請按儲存。注意：若目前文章已上架，儲存草稿仍會更新公開資料；如需先審稿，請先下架該篇。
                   </p>
                   <input
                     id="relatedSearch"
                     type="search"
-                    placeholder="搜尋景點、美食、行程、遊記"
+                    placeholder="搜尋已上架內容"
                     oninput="renderRelatedPicker()"
                   />
                   <div id="relatedSelected"></div>
@@ -1929,7 +1934,8 @@
       }
 
       const relatedTypes = ["spots", "foods", "trips"];
-      const relatedCatalogTables = ["spots", "foods", "trips", "stories"];
+      const genericRelatedTables = ["spots", "foods", "trips", "stories"];
+      const tripRelatedTables = ["spots", "foods", "coupons"];
       let relatedCatalog = [];
       let relatedSelection = [];
       let relatedRequest = 0;
@@ -2049,6 +2055,20 @@
             })[c],
         );
       const relatedKey = (item) => item.type + ":" + item.id;
+      const relatedLimit = () => (currentTable === "trips" ? 10 : 4);
+      const relatedTypeLimit = (type) =>
+        currentTable === "trips"
+          ? { spots: 4, foods: 3, coupons: 3 }[type] || 0
+          : 4;
+      function canAddRelated(key) {
+        if (relatedSelection.includes(key)) return true;
+        if (relatedSelection.length >= relatedLimit()) return false;
+        const type = key.split(":")[0];
+        return (
+          relatedSelection.filter((x) => x.startsWith(type + ":")).length <
+          relatedTypeLimit(type)
+        );
+      }
       function relatedTerms(text) {
         return String(text || "")
           .toLowerCase()
@@ -2099,7 +2119,9 @@
         document.getElementById("relatedSelected").innerHTML =
           "<strong>已選 " +
           relatedSelection.length +
-          "/4（依此順序顯示）</strong>" +
+          "/" +
+          relatedLimit() +
+          "（依此順序顯示）</strong>" +
           (selected.length
             ? selected
                 .map(
@@ -2131,7 +2153,7 @@
             ? options
                 .map(
                   (x) =>
-                    `<div class="related-picker-row"><span>${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')" ${relatedSelection.length >= 4 ? "disabled" : ""}>＋加入</button></div>`,
+                    `<div class="related-picker-row"><span>${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')" ${canAddRelated(relatedKey(x)) ? "" : "disabled"}>＋加入</button></div>`,
                 )
                 .join("")
             : "<p>沒有符合條件的已上架文章。</p>");
@@ -2139,7 +2161,7 @@
       function toggleRelated(key) {
         const index = relatedSelection.indexOf(key);
         if (index >= 0) relatedSelection.splice(index, 1);
-        else if (relatedSelection.length < 4) relatedSelection.push(key);
+        else if (canAddRelated(key)) relatedSelection.push(key);
         renderRelatedPicker();
         scheduleAdminDraftPreview();
       }
@@ -2159,8 +2181,16 @@
         const panel = document.getElementById("relatedPicker");
         panel.hidden = !relatedTypes.includes(currentTable);
         if (panel.hidden) return;
+        document.getElementById("relatedPickerTitle").textContent =
+          currentTable === "trips" ? "這趟旅程會經過" : "延伸閱讀";
+        document.getElementById("relatedPickerHelp").textContent =
+          currentTable === "trips"
+            ? "前台三欄完全依此處設定：景點最多 4 筆、美食最多 3 筆、優惠最多 3 筆，共 10 筆。未選取的內容不會由系統自動補入。"
+            : "依標題、地區與標籤搜尋已上架內容，最多選取 4 篇。";
         const msg = document.getElementById("relatedPickerMsg");
         msg.textContent = "正在載入已上架文章…";
+        const relatedCatalogTables =
+          currentTable === "trips" ? tripRelatedTables : genericRelatedTables;
         const results = await Promise.allSettled(
           relatedCatalogTables.map(async (table) => {
             const { data, error } =
@@ -2193,6 +2223,7 @@
                   foods: "美食",
                   trips: "行程",
                   stories: "遊記",
+                  coupons: "優惠",
                 }[table],
               }));
           }),
@@ -2335,7 +2366,9 @@
             ? initialWorkspace.slice(1)
             : "banners",
         );
-        if (["#submissions", "#audit"].includes(initialWorkspace))
+        if (
+          ["#submissions", "#newsletter", "#audit"].includes(initialWorkspace)
+        )
           openWorkspace(initialWorkspace.slice(1));
       }
 
@@ -2617,11 +2650,17 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         panel.hidden = false;
         panel.style.display = "block";
         document.getElementById("workspaceTitle").textContent =
-          kind === "audit" ? "操作紀錄" : "民眾投稿審核";
+          kind === "audit"
+            ? "操作紀錄"
+            : kind === "newsletter"
+              ? "電子報管理"
+              : "民眾投稿審核";
         const target =
           (kind === "audit"
             ? "operation-audit.html"
-            : "submissions-review.html") + "?embedded=1";
+            : kind === "newsletter"
+              ? "newsletter-admin.html"
+              : "submissions-review.html") + "?embedded=1";
         const frame = document.getElementById("workspaceFrame");
         if (frame.getAttribute("src") !== target) frame.src = target;
         document
@@ -3629,7 +3668,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         relatedSelection = Array.isArray(item.related_items)
           ? item.related_items
               .filter((x) => x && typeof x.type === "string" && x.id != null)
-              .slice(0, 4)
+              .slice(0, relatedLimit())
               .map(relatedKey)
           : [];
         loadRelatedPicker();

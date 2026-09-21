@@ -1,531 +1,753 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>行程介紹｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="data.js"></script>
-  <script src="related-reading.js"></script>
-  <script src="supabase-config.js"></script>
-<script src="transit-duration.js"></script>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>行程介紹｜Metro Inn Guide 北投旅圖</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js"></script>
+    <script src="related-reading.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="transit-duration.js"></script>
+  </head>
 
-<body id="top" class="trip-detail-page">
-  <div id="header"></div>
+  <body id="top" class="trip-detail-page">
+    <div id="header"></div>
 
-  <section class="hero">
-    <img id="heroImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
-    <div class="container">
-      <div class="hero-content">
-        <div id="heroKicker" class="kicker">ROUTE DETAIL</div>
-        <h1 id="heroTitle">行程介紹</h1>
-        <p id="heroSubtitle">行程資料載入中...</p>
-        <div class="hero-icons">
-          <span id="heroDuration">建議時間</span>
-          <span>捷運＋步行</span>
-          <span>可搭配景點美食</span>
-          <span>人工精選路線</span>
+    <section class="hero">
+      <img
+        id="heroImage"
+        src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg"
+      />
+      <div class="container">
+        <div class="hero-content">
+          <div id="heroKicker" class="kicker">ROUTE DETAIL</div>
+          <h1 id="heroTitle">行程介紹</h1>
+          <p id="heroSubtitle">行程資料載入中...</p>
+          <div class="hero-icons">
+            <span id="heroDuration">建議時間</span>
+            <span>捷運＋步行</span>
+            <span>可搭配景點美食</span>
+            <span>人工精選路線</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="crumb">
-    <div class="container">
-      <div id="breadcrumb">首頁　›　行程</div>
-      <button class="share-icon" type="button" aria-label="分享此頁">⇪</button>
-    </div>
-  </div>
-
-  <main class="container article-wrap">
-    <article>
-      <div id="articleKicker" class="meta detail-eyebrow">TRIP</div>
-      <h1 id="articleTitle" class="spot-article-title">行程名稱</h1>
-      <p id="leadText" class="lead">行程資料載入中...</p>
-
-      <figure id="tripMainImageWrap" class="trip-main-image" hidden>
-        <img id="tripMainImage" alt="行程主圖" loading="lazy">
-      </figure>
-
-      <div class="route">
-        <div class="kicker">TODAY'S ROUTE</div>
-        <div id="routeGrid" class="route-grid"></div>
+    <div class="crumb">
+      <div class="container">
+        <div id="breadcrumb">首頁　›　行程</div>
+        <button class="share-icon" type="button" aria-label="分享此頁">
+          ⇪
+        </button>
       </div>
-
-      <div id="storySections"></div>
-
-      <section class="route-map-section" id="route-map">
-        <div class="route-map-head">
-          <div>
-            <div class="kicker">ROUTE MAP</div>
-            <h2>本次路線地圖</h2>
-          </div>
-          <p>依照後台設定的行程地圖顯示路線；可使用 Google 我的地圖（My Maps）分享網址。</p>
-        </div>
-        <iframe id="mapEmbed" class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <div style="margin-top:18px">
-          <a id="mapButton" class="button outline" href="#" target="_blank">開啟 Google Maps</a>
-        </div>
-      </section>
-
-      <section class="route-related-panel">
-        <div class="kicker">CONNECTED CONTENT</div>
-        <h2>這趟旅程會經過</h2>
-        <div class="route-related-grid">
-          <div class="route-related-box">
-            <div class="meta">SPOTS</div>
-            <h3>景點</h3>
-            <div id="relatedSpots"></div>
-          </div>
-          <div class="route-related-box food">
-            <div class="meta">FOOD</div>
-            <h3>美食</h3>
-            <div id="relatedFoods"></div>
-          </div>
-          <div class="route-related-box offer">
-            <div class="meta">OFFERS</div>
-            <h3>優惠</h3>
-            <div id="relatedCoupons"></div>
-          </div>
-        </div>
-      </section>
-    </article>
-
-    <aside class="sidebar">
-      <div class="sticky-panel">
-      <section class="sidebox compact metro-transit compact-transit" aria-labelledby="transitTitle">
-        <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
-        <div class="compact-transit-head"><h2 id="transitTitle">大眾運輸交通指南</h2><span id="transitTotal" class="compact-transit-total" hidden></span></div>
-        <ol id="transitSteps" class="compact-transit-steps"><li class="transit-empty">交通路線整理中，請使用下方即時導航。</li></ol>
-        <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
-        <a id="travelMapLink" class="compact-transit-map" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">在 Google Maps 查看即時路線 ↗</a>
-      </section>
-
-        <div class="sidebox compact dark">
-          <div class="kicker" style="color:white">STAY NEARBY</div>
-          <h3>如果還想再慢一點</h3>
-          <p>把一晚留給北投，讓散步、泡湯與晚風都不用趕著結束。</p>
-          <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a>
-        </div>
-      </div>
-    </aside>
-  </main>
-
-  <section id="relatedReading" class="section related" hidden></section>
-
-  <section class="cta">
-    <div class="container">
-      <div class="kicker">PLAN YOUR STAY</div>
-      <h2>下一次出發，就從一晚舒服的停留開始</h2>
-      <p style="color:var(--muted)">把步調交給城市，把休息留給自己。從北捷行旅出發，重新認識你以為熟悉的台北。</p>
-      <a class="button" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房</a>
     </div>
-  </section>
 
-  <div id="footer"></div>
+    <main class="container article-wrap">
+      <article>
+        <div id="articleKicker" class="meta detail-eyebrow">TRIP</div>
+        <h1 id="articleTitle" class="spot-article-title">行程名稱</h1>
+        <p id="leadText" class="lead">行程資料載入中...</p>
 
-  <script>
-    document.getElementById('header').innerHTML = header();
-    document.getElementById('footer').innerHTML = footer();
+        <figure id="tripMainImageWrap" class="trip-main-image" hidden>
+          <img id="tripMainImage" alt="行程主圖" loading="lazy" />
+        </figure>
 
-    const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
+        <div class="route">
+          <div class="kicker">TODAY'S ROUTE</div>
+          <div id="routeGrid" class="route-grid"></div>
+        </div>
 
-    function getParam(name) {
-      return new URLSearchParams(location.search).get(name);
-    }
+        <div id="storySections"></div>
 
-    function setText(id, value, fallback = '尚未提供') {
-      const el = document.getElementById(id);
-      if (el) el.textContent = value || fallback;
-    }
+        <section class="route-map-section" id="route-map">
+          <div class="route-map-head">
+            <div>
+              <div class="kicker">ROUTE MAP</div>
+              <h2>本次路線地圖</h2>
+            </div>
+            <p>
+              依照後台設定的行程地圖顯示路線；可使用 Google 我的地圖（My
+              Maps）分享網址。
+            </p>
+          </div>
+          <iframe
+            id="mapEmbed"
+            class="map-embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+          <div style="margin-top: 18px">
+            <a id="mapButton" class="button outline" href="#" target="_blank"
+              >開啟 Google Maps</a
+            >
+          </div>
+        </section>
 
-    function normalizeText(text) {
-      return String(text || '')
-        .replace(/\r/g, '\n')
-        .replace(/\s+(?=\d{1,2}:\d{2}｜)/g, '\n')
-        .replace(/\s+(?=\d{1,2}:\d{2}\s*\|)/g, '\n')
-        .trim();
-    }
+        <section class="route-related-panel">
+          <div class="kicker">CONNECTED CONTENT</div>
+          <h2>這趟旅程會經過</h2>
+          <div class="route-related-grid">
+            <div class="route-related-box">
+              <div class="meta">SPOTS</div>
+              <h3>景點</h3>
+              <div id="relatedSpots"></div>
+            </div>
+            <div class="route-related-box food">
+              <div class="meta">FOOD</div>
+              <h3>美食</h3>
+              <div id="relatedFoods"></div>
+            </div>
+            <div class="route-related-box offer">
+              <div class="meta">OFFERS</div>
+              <h3>優惠</h3>
+              <div id="relatedCoupons"></div>
+            </div>
+          </div>
+        </section>
+      </article>
 
-    function formatImageCaptionText(text){
-      const raw = (text || '').trim();
-      if(!raw) return '';
-      return raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`;
-    }
+      <aside class="sidebar">
+        <div class="sticky-panel">
+          <section
+            class="sidebox compact metro-transit compact-transit"
+            aria-labelledby="transitTitle"
+          >
+            <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
+            <div class="compact-transit-head">
+              <h2 id="transitTitle">大眾運輸交通指南</h2>
+              <span
+                id="transitTotal"
+                class="compact-transit-total"
+                hidden
+              ></span>
+            </div>
+            <ol id="transitSteps" class="compact-transit-steps">
+              <li class="transit-empty">
+                交通路線整理中，請使用下方即時導航。
+              </li>
+            </ol>
+            <p class="compact-transit-note">
+              路線、時間及距離請以現場與運輸業者資訊為準。
+            </p>
+            <a
+              id="travelMapLink"
+              class="compact-transit-map"
+              href="https://www.google.com/maps"
+              target="_blank"
+              rel="noopener noreferrer"
+              >在 Google Maps 查看即時路線 ↗</a
+            >
+          </section>
 
-    function extractImageUrl(text){
-      const raw = String(text || '');
-      const match = raw.match(/https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s<>"']*)?/i)
-        || raw.match(/https?:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath\/[^\s<>"']+/i)
-        || raw.match(/https?:\/\/upload\.wikimedia\.org\/[^\s<>"']+/i)
-        || raw.match(/https?:\/\/images\.unsplash\.com\/[^\s<>"']+/i);
-      return match ? match[0] : '';
-    }
+          <div class="sidebox compact dark">
+            <div class="kicker" style="color: white">STAY NEARBY</div>
+            <h3>如果還想再慢一點</h3>
+            <p>把一晚留給北投，讓散步、泡湯與晚風都不用趕著結束。</p>
+            <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank"
+              >立即訂房 ↗</a
+            >
+          </div>
+        </div>
+      </aside>
+    </main>
 
-    function cleanTextImageUrl(text, imageUrl){
-      if(!text) return '';
-      let output = String(text);
-      if(imageUrl) output = output.replace(imageUrl, '');
-      return output.replace(/\s*\|\s*$/g, '').replace(/\n{3,}/g, '\n\n').trim();
-    }
+    <section id="relatedReading" class="section related" hidden></section>
 
-    function parseSteps(content) {
-      const text = normalizeText(content);
-      const rawLines = text.includes('\n') ? text.split('\n') : text.split(/(?=\d{1,2}:\d{2}[｜|])/g);
+    <section class="cta">
+      <div class="container">
+        <div class="kicker">PLAN YOUR STAY</div>
+        <h2>下一次出發，就從一晚舒服的停留開始</h2>
+        <p style="color: var(--muted)">
+          把步調交給城市，把休息留給自己。從北捷行旅出發，重新認識你以為熟悉的台北。
+        </p>
+        <a
+          class="button"
+          href="https://rwd.ezhotel.cloud/btresort/1"
+          target="_blank"
+          >立即訂房</a
+        >
+      </div>
+    </section>
 
-      return rawLines
-        .map(line => line.trim())
-        .filter(Boolean)
-        .map((line,index) => {
-          const parts = line.split(/[｜|]/).map(p => p.trim());
-          const time = parts[0] || '';
-          const title = parts[1] || `第 ${index + 1} 段`;
-          let body = parts[2] || parts.slice(0, 3).join(' ');
-          let image = parts[3] || extractImageUrl(body) || fallbackImage;
-          let image_source = parts[4] || '';
-          body = cleanTextImageUrl(body, image);
-          return { time, title, text: body, image, image_source };
-        });
-    }
+    <div id="footer"></div>
 
-    function normalizeTripSection(section, index){
-      const item = section || {};
-      let text = item.text || item.content || item.description || '';
-      let image = item.image || item.image_url || item.cover_image || extractImageUrl(text) || fallbackImage;
-      let image_source = item.image_source || item.cover_image_source || item.source || item.photo_source || item.caption || '';
-      text = cleanTextImageUrl(text, image);
+    <script>
+      document.getElementById("header").innerHTML = header();
+      document.getElementById("footer").innerHTML = footer();
 
-      return {
-        time: item.time || '',
-        title: item.title || `第 ${index + 1} 段`,
-        text,
-        image,
-        image_source,
-        show_image: item.show_image !== false
-      };
-    }
+      const fallbackImage =
+        "https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg";
 
-    function getTripSteps(trip){
-      if(Array.isArray(trip.trip_sections) && trip.trip_sections.length){
-        return trip.trip_sections
-          .slice()
-          .sort((a,b)=>(a.order || a.sort_order || 0) - (b.order || b.sort_order || 0))
-          .map(normalizeTripSection);
+      function getParam(name) {
+        return new URLSearchParams(location.search).get(name);
       }
-      return parseSteps(trip.content);
-    }
 
-    function getRouteQuery(trip, steps) {
-      if (trip.google_route) {
+      function setText(id, value, fallback = "尚未提供") {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value || fallback;
+      }
+
+      function normalizeText(text) {
+        return String(text || "")
+          .replace(/\r/g, "\n")
+          .replace(/\s+(?=\d{1,2}:\d{2}｜)/g, "\n")
+          .replace(/\s+(?=\d{1,2}:\d{2}\s*\|)/g, "\n")
+          .trim();
+      }
+
+      function formatImageCaptionText(text) {
+        const raw = (text || "").trim();
+        if (!raw) return "";
+        return raw.startsWith("圖片來源") ? raw : `圖片來源：${raw}`;
+      }
+
+      function extractImageUrl(text) {
+        const raw = String(text || "");
+        const match =
+          raw.match(
+            /https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s<>"']*)?/i,
+          ) ||
+          raw.match(
+            /https?:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath\/[^\s<>"']+/i,
+          ) ||
+          raw.match(/https?:\/\/upload\.wikimedia\.org\/[^\s<>"']+/i) ||
+          raw.match(/https?:\/\/images\.unsplash\.com\/[^\s<>"']+/i);
+        return match ? match[0] : "";
+      }
+
+      function cleanTextImageUrl(text, imageUrl) {
+        if (!text) return "";
+        let output = String(text);
+        if (imageUrl) output = output.replace(imageUrl, "");
+        return output
+          .replace(/\s*\|\s*$/g, "")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+      }
+
+      function parseSteps(content) {
+        const text = normalizeText(content);
+        const rawLines = text.includes("\n")
+          ? text.split("\n")
+          : text.split(/(?=\d{1,2}:\d{2}[｜|])/g);
+
+        return rawLines
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line, index) => {
+            const parts = line.split(/[｜|]/).map((p) => p.trim());
+            const time = parts[0] || "";
+            const title = parts[1] || `第 ${index + 1} 段`;
+            let body = parts[2] || parts.slice(0, 3).join(" ");
+            let image = parts[3] || extractImageUrl(body) || fallbackImage;
+            let image_source = parts[4] || "";
+            body = cleanTextImageUrl(body, image);
+            return { time, title, text: body, image, image_source };
+          });
+      }
+
+      function normalizeTripSection(section, index) {
+        const item = section || {};
+        let text = item.text || item.content || item.description || "";
+        let image =
+          item.image ||
+          item.image_url ||
+          item.cover_image ||
+          extractImageUrl(text) ||
+          fallbackImage;
+        let image_source =
+          item.image_source ||
+          item.cover_image_source ||
+          item.source ||
+          item.photo_source ||
+          item.caption ||
+          "";
+        text = cleanTextImageUrl(text, image);
+
+        return {
+          time: item.time || "",
+          title: item.title || `第 ${index + 1} 段`,
+          text,
+          image,
+          image_source,
+          show_image: item.show_image !== false,
+        };
+      }
+
+      function getTripSteps(trip) {
+        if (Array.isArray(trip.trip_sections) && trip.trip_sections.length) {
+          return trip.trip_sections
+            .slice()
+            .sort(
+              (a, b) =>
+                (a.order || a.sort_order || 0) - (b.order || b.sort_order || 0),
+            )
+            .map(normalizeTripSection);
+        }
+        return parseSteps(trip.content);
+      }
+
+      function getRouteQuery(trip, steps) {
+        if (trip.google_route) {
+          try {
+            const url = new URL(trip.google_route);
+            const q =
+              url.searchParams.get("query") || url.searchParams.get("q");
+            if (q) return q;
+          } catch (e) {}
+        }
+
+        const stepNames = steps
+          .map((s) => s.title)
+          .filter(Boolean)
+          .join(" ");
+        return stepNames || trip.title || "";
+      }
+
+      // Google My Maps 編輯／檢視／嵌入網址共用同一個 mid；不能用一般 Maps 搜尋嵌入取代。
+      function getMyMapsId(value) {
+        if (typeof value !== "string" || !value.trim()) return "";
         try {
-          const url = new URL(trip.google_route);
-          const q = url.searchParams.get('query') || url.searchParams.get('q');
-          if (q) return q;
-        } catch (e) {}
-      }
-
-      const stepNames = steps.map(s => s.title).filter(Boolean).join(' ');
-      return stepNames || trip.title || '';
-    }
-
-    // Google My Maps 編輯／檢視／嵌入網址共用同一個 mid；不能用一般 Maps 搜尋嵌入取代。
-    function getMyMapsId(value) {
-      if (typeof value !== 'string' || !value.trim()) return '';
-      try {
-        // The admin may paste either the URL itself or Google's iframe snippet.
-        const raw = value.trim();
-        const iframeSrc = raw.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
-        const url = new URL((iframeSrc || raw).replaceAll('&amp;', '&'));
-        if (!['google.com', 'www.google.com'].includes(url.hostname.toLowerCase())) return '';
-        // Signed-in My Maps links can contain /u/0/ before edit/viewer/embed.
-        if (!/^\/maps\/d\/(?:u\/\d+\/)?(?:edit|viewer|embed)(?:\/|$)/.test(url.pathname)) return '';
-        const mid = url.searchParams.get('mid') || '';
-        return /^[a-zA-Z0-9_-]+$/.test(mid) ? mid : '';
-      } catch (e) { return ''; }
-    }
-
-    function getGoogleMapsUrl(trip, steps) {
-      const raw = typeof trip.google_route === 'string' ? trip.google_route.trim() : '';
-      const mid = getMyMapsId(raw);
-      if (mid) return `https://www.google.com/maps/d/viewer?mid=${encodeURIComponent(mid)}`;
-      if (/^https:\/\//i.test(raw)) {
-        try {
-          const url = new URL(raw);
-          if (['google.com', 'www.google.com', 'maps.google.com'].includes(url.hostname.toLowerCase())) return url.href;
-        } catch (e) {}
-      }
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getRouteQuery(trip, steps))}`;
-    }
-
-    function getMapEmbedUrl(trip, steps) {
-      const mid = getMyMapsId(trip.google_route);
-      if (mid) return `https://www.google.com/maps/d/embed?mid=${encodeURIComponent(mid)}`;
-      return `https://www.google.com/maps?q=${encodeURIComponent(getRouteQuery(trip, steps))}&output=embed`;
-    }
-
-    function getTripKeyword(trip) {
-      const text = `${trip.title || ''} ${trip.summary || ''} ${trip.content || ''}`;
-      if (text.includes('陽明山')) return '陽明山';
-      if (text.includes('淡水')) return '淡水';
-      if (text.includes('士林')) return '士林';
-      if (text.includes('北投') || text.includes('新北投')) return '北投';
-      return '';
-    }
-
-    async function fetchTable(table) {
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/${table}?is_published=eq.true&select=*&order=id.asc`,
-        {
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        }
-      );
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || `${table} 讀取失敗`);
-      return result;
-    }
-
-    function renderRelatedList(targetId, rows, type, keyword, maxCount) {
-      const target = document.getElementById(targetId);
-      if (!target) return;
-
-      const filtered = rows.filter(item => {
-        const text = `${item.title || ''} ${item.area || ''} ${item.category || ''} ${item.summary || ''} ${item.content || ''} ${item.tags || ''}`;
-        return !keyword || text.includes(keyword);
-      }).slice(0, maxCount);
-
-      const list = filtered.length ? filtered : rows.slice(0, maxCount);
-
-      if (!list.length) {
-        target.innerHTML = `<a class="route-related-item" href="${type}s.html"><strong>查看全部</strong>目前尚未建立相關內容</a>`;
-        return;
-      }
-
-      target.innerHTML = list.map(item => {
-        const href = type === 'spot'
-          ? `spot.html?id=${encodeURIComponent(item.id)}`
-          : type === 'food'
-            ? `food.html?id=${encodeURIComponent(item.id)}`
-            : `coupon.html?id=${encodeURIComponent(item.id)}`;
-
-        return `<a class="route-related-item" href="${href}"><strong>${item.title || '未命名'}</strong>${item.summary || '更多介紹即將補上。'}</a>`;
-      }).join('');
-    }
-
-    async function renderRelatedContent(trip) {
-      const keyword = getTripKeyword(trip);
-
-      try {
-        const [spots, foods, coupons] = await Promise.all([
-          fetchTable('spots'),
-          fetchTable('foods'),
-          fetchTable('coupons')
-        ]);
-
-        // 後台有指定景點／美食時，優先依手動排序呈現；未指定則維持原有自動推薦。
-        const selected = Array.isArray(trip.related_items) ? trip.related_items : [];
-        const chosen = type => selected.filter(ref => ref && ref.type === type)
-          .map(ref => (type === 'spots' ? spots : foods).find(row => String(row.id) === String(ref.id)))
-          .filter(Boolean);
-        const chosenSpots = chosen('spots');
-        const chosenFoods = chosen('foods');
-        renderRelatedList('relatedSpots', chosenSpots.length ? chosenSpots : spots, 'spot', chosenSpots.length ? '' : keyword, 4);
-        renderRelatedList('relatedFoods', chosenFoods.length ? chosenFoods : foods, 'food', chosenFoods.length ? '' : keyword, 3);
-        renderRelatedList('relatedCoupons', coupons, 'coupon', keyword, 3);
-      } catch (error) {
-        console.error(error);
-        document.getElementById('relatedSpots').innerHTML = '<a class="route-related-item" href="spots.html"><strong>景點探索</strong>查看景點列表</a>';
-        document.getElementById('relatedFoods').innerHTML = '<a class="route-related-item" href="foods.html"><strong>美食目錄</strong>查看美食列表</a>';
-        document.getElementById('relatedCoupons').innerHTML = '<a class="route-related-item" href="coupons.html"><strong>優惠目錄</strong>查看優惠列表</a>';
-      }
-    }
-
-    // 交通欄位可在 Supabase 補充；尚未查核的路線不顯示虛構站數與時間。
-    const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
-    function setupHotelRoutes(item) {
-      const destination = [item.title, item.address].filter(Boolean).join(' ');
-      const url = new URL('https://www.google.com/maps/dir/');
-      url.searchParams.set('api', '1');
-      url.searchParams.set('origin', HOTEL_MAP_ORIGIN);
-      url.searchParams.set('destination', destination || item.title || '北投');
-      url.searchParams.set('travelmode', 'transit');
-      document.getElementById('travelMapLink').href = url.toString();
-      const root = document.getElementById('transitSteps');
-      const total = document.getElementById('transitTotal');
-      root.replaceChildren();
-      total.hidden = true;
-      let raw = item.transport_routes;
-      if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (_) { raw = null; } }
-      const routes = Array.isArray(raw) ? raw : raw && Array.isArray(raw.routes) ? raw.routes : [];
-      const route = routes.find(item => item && item.enabled !== false && Array.isArray(item.steps) && item.steps.length);
-      const steps = [];
-      if (route) {
-        for (let index = 0; index < route.steps.length; index++) {
-          const step = route.steps[index];
-          if (!step) continue;
-          const mode = step.type || step.mode || '';
-          const name = step.name || step.station || '';
-          if (name && (mode === '站點' || mode === '抵達' || !mode)) steps.push({station:name});
-          else {
-            const next = route.steps[index + 1];
-            if (mode === '轉乘' && next && (next.type === '捷運' || next.mode === '捷運')) {
-              const stations = String(next.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
-              const duration = next.duration ? `約${String(next.duration).replace(/\s*分鐘$/, '')}分` : '';
-              const directionName = String(next.direction || '').replace(/^往/, '').replace(/方向$/, '');
-              const direction = directionName ? `${directionName}方向` : '';
-              steps.push({leg:`站內轉乘${next.line || '捷運'}${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`});
-              index += 1;
-              continue;
-            }
-            const duration = step.duration ? `約${String(step.duration).replace(/\s*分鐘$/, '')}分` : '';
-            const stations = String(step.detail || '').match(/\d+\s*站/)?.[0]?.replace(/\s+/g, '') || '';
-            const directionName = String(step.direction || '').replace(/^往/, '').replace(/方向$/, '');
-            const direction = directionName ? `${directionName}方向` : '';
-            const description = mode === '步行'
-              ? `步行｜${[step.distance, duration].filter(Boolean).join('・')}`
-              : mode === '捷運'
-                ? `${step.line || '捷運'}${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`
-                : mode === '公車'
-                  ? `${step.line || ''}公車${direction ? `（${direction}）` : ''}｜${[stations, duration].filter(Boolean).join('・')}`
-                  : `${mode}｜${[stations, duration].filter(Boolean).join('・')}`;
-            if (description) steps.push({leg:description});
-          }
+          // The admin may paste either the URL itself or Google's iframe snippet.
+          const raw = value.trim();
+          const iframeSrc = raw.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
+          const url = new URL((iframeSrc || raw).replaceAll("&amp;", "&"));
+          if (
+            !["google.com", "www.google.com"].includes(
+              url.hostname.toLowerCase(),
+            )
+          )
+            return "";
+          // Signed-in My Maps links can contain /u/0/ before edit/viewer/embed.
+          if (
+            !/^\/maps\/d\/(?:u\/\d+\/)?(?:edit|viewer|embed)(?:\/|$)/.test(
+              url.pathname,
+            )
+          )
+            return "";
+          const mid = url.searchParams.get("mid") || "";
+          return /^[a-zA-Z0-9_-]+$/.test(mid) ? mid : "";
+        } catch (e) {
+          return "";
         }
       }
-      // 舊資料可沿用一格交通文字；不自行猜測站點、車程或距離。
-      if (!steps.length) {
-        const rawText = String(item.transport_text || item.transport_guide || item.transport_metro || '').trim();
-        const lines = rawText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-        for (const line of lines) {
-          if (/^(全程|總時間|參考總時間)/.test(line)) {
-            total.textContent = line.replace(/^(參考)?總時間[：:]?/, '全程');
-            total.hidden = false;
-          } else if (/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line)) steps.push({leg:line.replace(/\s*[｜|]\s*/g, ' · ')});
-          else steps.push({station:line});
+
+      function getGoogleMapsUrl(trip, steps) {
+        const raw =
+          typeof trip.google_route === "string" ? trip.google_route.trim() : "";
+        const mid = getMyMapsId(raw);
+        if (mid)
+          return `https://www.google.com/maps/d/viewer?mid=${encodeURIComponent(mid)}`;
+        if (/^https:\/\//i.test(raw)) {
+          try {
+            const url = new URL(raw);
+            if (
+              ["google.com", "www.google.com", "maps.google.com"].includes(
+                url.hostname.toLowerCase(),
+              )
+            )
+              return url.href;
+          } catch (e) {}
         }
-      }
-      // 有結構化路線時，也可從原有交通文字的「全程約 N 分鐘」讀取總時間。
-      // 僅顯示後台提供的數字，不根據路段自行推算或寫死 30 分鐘。
-      if (total.hidden) {
-        const source = String(item.transport_text || item.transport_guide || item.transport_metro || '');
-        const match = source.match(/(?:^|\n)\s*(?:全程|總時間|參考總時間)\s*[：:]?\s*(?:約\s*)?(\d+(?:\.\d+)?\s*(?:小時|分鐘)(?:\s*\d+\s*分鐘)?)/);
-        if (match) { total.textContent = `全程約 ${match[1].replace(/\s+/g, ' ').trim()}`; total.hidden = false; }
-      }
-      if (route && (route.total_duration || route.total_time || route.duration)) {
-        const duration = String(route.total_duration || route.total_time || route.duration);
-        total.textContent = /全程/.test(duration) ? duration : `全程約 ${duration}${/分鐘|小時/.test(duration) ? '' : ' 分鐘'}`;
-        total.hidden = false;
-      }
-      if (route && window.MetroTransitDuration) {
-        const result = MetroTransitDuration.calculate(route);
-        total.textContent = MetroTransitDuration.label(result);
-        total.hidden = !result.count;
-      }
-      if (!steps.length) {
-        const item = document.createElement('li'); item.className = 'transit-empty';
-        item.textContent = '交通路線尚待補充，請使用下方即時導航。'; root.append(item); return;
-      }
-      for (const step of steps) {
-        const item = document.createElement('li'); item.className = step.station ? 'transit-station' : 'transit-leg';
-        const label = document.createElement(step.station ? 'strong' : 'span');
-        label.textContent = step.station || step.leg; item.append(label); root.append(item);
-      }
-    }
-
-
-    async function loadTrip() {
-      const id = getParam('id');
-
-      if (!id) {
-        setText('heroSubtitle', '找不到行程代碼，請回行程列表重新進入。');
-        return;
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getRouteQuery(trip, steps))}`;
       }
 
-      try {
+      function getMapEmbedUrl(trip, steps) {
+        const mid = getMyMapsId(trip.google_route);
+        if (mid)
+          return `https://www.google.com/maps/d/embed?mid=${encodeURIComponent(mid)}`;
+        return `https://www.google.com/maps?q=${encodeURIComponent(getRouteQuery(trip, steps))}&output=embed`;
+      }
+
+      function getTripKeyword(trip) {
+        const text = `${trip.title || ""} ${trip.summary || ""} ${trip.content || ""}`;
+        if (text.includes("陽明山")) return "陽明山";
+        if (text.includes("淡水")) return "淡水";
+        if (text.includes("士林")) return "士林";
+        if (text.includes("北投") || text.includes("新北投")) return "北投";
+        return "";
+      }
+
+      async function fetchTable(table) {
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/trips?id=eq.${encodeURIComponent(id)}&select=*`,
+          `${SUPABASE_URL}/rest/v1/${table}?is_published=eq.true&select=*&order=id.asc`,
           {
             headers: {
               apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
-          }
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+          },
         );
 
         const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'Supabase 讀取失敗');
+        if (!response.ok)
+          throw new Error(result.message || `${table} 讀取失敗`);
+        return result;
+      }
 
-        const trip = result[0];
-        if (!trip) {
-          setText('heroSubtitle', '找不到這筆行程資料。');
+      function renderRelatedList(targetId, rows, type, keyword, maxCount) {
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        const filtered = rows
+          .filter((item) => {
+            const text = `${item.title || ""} ${item.area || ""} ${item.category || ""} ${item.summary || ""} ${item.content || ""} ${item.tags || ""}`;
+            return !keyword || text.includes(keyword);
+          })
+          .slice(0, maxCount);
+
+        const list = filtered.length ? filtered : rows.slice(0, maxCount);
+
+        if (!list.length) {
+          target.innerHTML = `<a class="route-related-item" href="${type}s.html"><strong>查看全部</strong>目前尚未建立相關內容</a>`;
           return;
         }
 
-        const image = trip.cover_image || fallbackImage;
-        const steps = getTripSteps(trip);
-        const mainImageWrap = document.getElementById('tripMainImageWrap');
-        const mainImage = document.getElementById('tripMainImage');
-        const mainImageUrl = typeof trip.trip_main_image === 'string' ? trip.trip_main_image.trim() : '';
-        mainImageWrap.hidden = !mainImageUrl || trip.show_trip_main_image !== true;
-        if (!mainImageWrap.hidden) {
-          mainImage.src = mainImageUrl;
-          mainImage.alt = `${trip.title || '行程'}主圖`;
-          mainImage.onerror = () => { mainImageWrap.hidden = true; };
-        } else {
-          mainImage.removeAttribute('src');
+        target.innerHTML = list
+          .map((item) => {
+            const href =
+              type === "spot"
+                ? `spot.html?id=${encodeURIComponent(item.id)}`
+                : type === "food"
+                  ? `food.html?id=${encodeURIComponent(item.id)}`
+                  : `coupon.html?id=${encodeURIComponent(item.id)}`;
+
+            return `<a class="route-related-item" href="${href}"><strong>${item.title || "未命名"}</strong>${item.summary || "更多介紹即將補上。"}</a>`;
+          })
+          .join("");
+      }
+
+      async function renderRelatedContent(trip) {
+        const keyword = getTripKeyword(trip);
+
+        try {
+          const [spots, foods, coupons] = await Promise.all([
+            fetchTable("spots"),
+            fetchTable("foods"),
+            fetchTable("coupons"),
+          ]);
+
+          // 完全依後台「這趟旅程會經過」的設定呈現，不再自動補入未選取內容。
+          const selected = Array.isArray(trip.related_items)
+            ? trip.related_items
+            : [];
+          const chosen = (type) =>
+            selected
+              .filter((ref) => ref && ref.type === type)
+              .map((ref) =>
+                (({ spots, foods, coupons })[type] || []).find(
+                  (row) => String(row.id) === String(ref.id),
+                ),
+              )
+              .filter(Boolean);
+          const chosenSpots = chosen("spots");
+          const chosenFoods = chosen("foods");
+          const chosenCoupons = chosen("coupons");
+          renderRelatedList("relatedSpots", chosenSpots, "spot", "", 4);
+          renderRelatedList("relatedFoods", chosenFoods, "food", "", 3);
+          renderRelatedList("relatedCoupons", chosenCoupons, "coupon", "", 3);
+        } catch (error) {
+          console.error(error);
+          document.getElementById("relatedSpots").innerHTML =
+            '<a class="route-related-item" href="spots.html"><strong>景點探索</strong>查看景點列表</a>';
+          document.getElementById("relatedFoods").innerHTML =
+            '<a class="route-related-item" href="foods.html"><strong>美食目錄</strong>查看美食列表</a>';
+          document.getElementById("relatedCoupons").innerHTML =
+            '<a class="route-related-item" href="coupons.html"><strong>優惠目錄</strong>查看優惠列表</a>';
+        }
+      }
+
+      // 交通欄位可在 Supabase 補充；尚未查核的路線不顯示虛構站數與時間。
+      const HOTEL_MAP_ORIGIN = "北捷行旅 北投會館 台北市北投區大業路527巷88號";
+      function setupHotelRoutes(item) {
+        const destination = [item.title, item.address]
+          .filter(Boolean)
+          .join(" ");
+        const url = new URL("https://www.google.com/maps/dir/");
+        url.searchParams.set("api", "1");
+        url.searchParams.set("origin", HOTEL_MAP_ORIGIN);
+        url.searchParams.set(
+          "destination",
+          destination || item.title || "北投",
+        );
+        url.searchParams.set("travelmode", "transit");
+        document.getElementById("travelMapLink").href = url.toString();
+        const root = document.getElementById("transitSteps");
+        const total = document.getElementById("transitTotal");
+        root.replaceChildren();
+        total.hidden = true;
+        let raw = item.transport_routes;
+        if (typeof raw === "string") {
+          try {
+            raw = JSON.parse(raw);
+          } catch (_) {
+            raw = null;
+          }
+        }
+        const routes = Array.isArray(raw)
+          ? raw
+          : raw && Array.isArray(raw.routes)
+            ? raw.routes
+            : [];
+        const route = routes.find(
+          (item) =>
+            item &&
+            item.enabled !== false &&
+            Array.isArray(item.steps) &&
+            item.steps.length,
+        );
+        const steps = [];
+        if (route) {
+          for (let index = 0; index < route.steps.length; index++) {
+            const step = route.steps[index];
+            if (!step) continue;
+            const mode = step.type || step.mode || "";
+            const name = step.name || step.station || "";
+            if (name && (mode === "站點" || mode === "抵達" || !mode))
+              steps.push({ station: name });
+            else {
+              const next = route.steps[index + 1];
+              if (
+                mode === "轉乘" &&
+                next &&
+                (next.type === "捷運" || next.mode === "捷運")
+              ) {
+                const stations =
+                  String(next.detail || "")
+                    .match(/\d+\s*站/)?.[0]
+                    ?.replace(/\s+/g, "") || "";
+                const duration = next.duration
+                  ? `約${String(next.duration).replace(/\s*分鐘$/, "")}分`
+                  : "";
+                const directionName = String(next.direction || "")
+                  .replace(/^往/, "")
+                  .replace(/方向$/, "");
+                const direction = directionName ? `${directionName}方向` : "";
+                steps.push({
+                  leg: `站內轉乘${next.line || "捷運"}${direction ? `（${direction}）` : ""}｜${[stations, duration].filter(Boolean).join("・")}`,
+                });
+                index += 1;
+                continue;
+              }
+              const duration = step.duration
+                ? `約${String(step.duration).replace(/\s*分鐘$/, "")}分`
+                : "";
+              const stations =
+                String(step.detail || "")
+                  .match(/\d+\s*站/)?.[0]
+                  ?.replace(/\s+/g, "") || "";
+              const directionName = String(step.direction || "")
+                .replace(/^往/, "")
+                .replace(/方向$/, "");
+              const direction = directionName ? `${directionName}方向` : "";
+              const description =
+                mode === "步行"
+                  ? `步行｜${[step.distance, duration].filter(Boolean).join("・")}`
+                  : mode === "捷運"
+                    ? `${step.line || "捷運"}${direction ? `（${direction}）` : ""}｜${[stations, duration].filter(Boolean).join("・")}`
+                    : mode === "公車"
+                      ? `${step.line || ""}公車${direction ? `（${direction}）` : ""}｜${[stations, duration].filter(Boolean).join("・")}`
+                      : `${mode}｜${[stations, duration].filter(Boolean).join("・")}`;
+              if (description) steps.push({ leg: description });
+            }
+          }
+        }
+        // 舊資料可沿用一格交通文字；不自行猜測站點、車程或距離。
+        if (!steps.length) {
+          const rawText = String(
+            item.transport_text ||
+              item.transport_guide ||
+              item.transport_metro ||
+              "",
+          ).trim();
+          const lines = rawText
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+          for (const line of lines) {
+            if (/^(全程|總時間|參考總時間)/.test(line)) {
+              total.textContent = line.replace(/^(參考)?總時間[：:]?/, "全程");
+              total.hidden = false;
+            } else if (/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line))
+              steps.push({ leg: line.replace(/\s*[｜|]\s*/g, " · ") });
+            else steps.push({ station: line });
+          }
+        }
+        // 有結構化路線時，也可從原有交通文字的「全程約 N 分鐘」讀取總時間。
+        // 僅顯示後台提供的數字，不根據路段自行推算或寫死 30 分鐘。
+        if (total.hidden) {
+          const source = String(
+            item.transport_text ||
+              item.transport_guide ||
+              item.transport_metro ||
+              "",
+          );
+          const match = source.match(
+            /(?:^|\n)\s*(?:全程|總時間|參考總時間)\s*[：:]?\s*(?:約\s*)?(\d+(?:\.\d+)?\s*(?:小時|分鐘)(?:\s*\d+\s*分鐘)?)/,
+          );
+          if (match) {
+            total.textContent = `全程約 ${match[1].replace(/\s+/g, " ").trim()}`;
+            total.hidden = false;
+          }
+        }
+        if (
+          route &&
+          (route.total_duration || route.total_time || route.duration)
+        ) {
+          const duration = String(
+            route.total_duration || route.total_time || route.duration,
+          );
+          total.textContent = /全程/.test(duration)
+            ? duration
+            : `全程約 ${duration}${/分鐘|小時/.test(duration) ? "" : " 分鐘"}`;
+          total.hidden = false;
+        }
+        if (route && window.MetroTransitDuration) {
+          const result = MetroTransitDuration.calculate(route);
+          total.textContent = MetroTransitDuration.label(result);
+          total.hidden = !result.count;
+        }
+        if (!steps.length) {
+          const item = document.createElement("li");
+          item.className = "transit-empty";
+          item.textContent = "交通路線尚待補充，請使用下方即時導航。";
+          root.append(item);
+          return;
+        }
+        for (const step of steps) {
+          const item = document.createElement("li");
+          item.className = step.station ? "transit-station" : "transit-leg";
+          const label = document.createElement(
+            step.station ? "strong" : "span",
+          );
+          label.textContent = step.station || step.leg;
+          item.append(label);
+          root.append(item);
+        }
+      }
+
+      async function loadTrip() {
+        const id = getParam("id");
+
+        if (!id) {
+          setText("heroSubtitle", "找不到行程代碼，請回行程列表重新進入。");
+          return;
         }
 
-        document.title = `${trip.title || '行程介紹'}｜Metro Inn Guide 北投旅圖`;
-        document.getElementById('heroImage').src = image;
-        setText('heroKicker', (trip.slug || 'route').replaceAll('-', ' ').toUpperCase());
-        setText('heroTitle', trip.title);
-        setText('articleTitle', trip.title);
-        setText('articleKicker', (trip.slug || 'TRIP').replaceAll('-', ' ').toUpperCase());
-        setText('heroSubtitle', trip.summary);
-        setText('heroDuration', trip.duration);
-        renderBreadcrumb('行程', 'trips.html', trip.title);
-        setText('leadText', trip.summary);
-        setText('sideTitle', trip.title);
-        setText('sideDuration', `◷　建議停留 ${trip.duration || '依行程安排'}`);
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/trips?id=eq.${encodeURIComponent(id)}&select=*`,
+            {
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+            },
+          );
 
-        document.getElementById('routeGrid').innerHTML = steps.slice(0, 4).map(step => `
+          const result = await response.json();
+          if (!response.ok)
+            throw new Error(result.message || "Supabase 讀取失敗");
+
+          const trip = result[0];
+          if (!trip) {
+            setText("heroSubtitle", "找不到這筆行程資料。");
+            return;
+          }
+
+          const image = trip.cover_image || fallbackImage;
+          const steps = getTripSteps(trip);
+          const mainImageWrap = document.getElementById("tripMainImageWrap");
+          const mainImage = document.getElementById("tripMainImage");
+          const mainImageUrl =
+            typeof trip.trip_main_image === "string"
+              ? trip.trip_main_image.trim()
+              : "";
+          mainImageWrap.hidden =
+            !mainImageUrl || trip.show_trip_main_image !== true;
+          if (!mainImageWrap.hidden) {
+            mainImage.src = mainImageUrl;
+            mainImage.alt = `${trip.title || "行程"}主圖`;
+            mainImage.onerror = () => {
+              mainImageWrap.hidden = true;
+            };
+          } else {
+            mainImage.removeAttribute("src");
+          }
+
+          document.title = `${trip.title || "行程介紹"}｜Metro Inn Guide 北投旅圖`;
+          document.getElementById("heroImage").src = image;
+          setText(
+            "heroKicker",
+            (trip.slug || "route").replaceAll("-", " ").toUpperCase(),
+          );
+          setText("heroTitle", trip.title);
+          setText("articleTitle", trip.title);
+          setText(
+            "articleKicker",
+            (trip.slug || "TRIP").replaceAll("-", " ").toUpperCase(),
+          );
+          setText("heroSubtitle", trip.summary);
+          setText("heroDuration", trip.duration);
+          renderBreadcrumb("行程", "trips.html", trip.title);
+          setText("leadText", trip.summary);
+          setText("sideTitle", trip.title);
+          setText(
+            "sideDuration",
+            `◷　建議停留 ${trip.duration || "依行程安排"}`,
+          );
+
+          document.getElementById("routeGrid").innerHTML = steps
+            .slice(0, 4)
+            .map(
+              (step) => `
           <div>
             <small>${step.time}</small>
             <strong>${step.title}</strong>
             <p>${step.text}</p>
           </div>
-        `).join('');
+        `,
+            )
+            .join("");
 
-        document.getElementById('storySections').innerHTML = steps.map((step, index) => `
+          document.getElementById("storySections").innerHTML = steps
+            .map(
+              (step, index) => `
           <section class="story numbered-story" id="s${index + 1}">
-            <h2><span class="step-no">${String(index + 1).padStart(2, '0')}</span><span>${step.title}</span></h2>
-            <p>${step.time ? step.time + '｜' : ''}${step.text}</p>
-            ${step.show_image !== false ? `<div class="story-img">
+            <h2><span class="step-no">${String(index + 1).padStart(2, "0")}</span><span>${step.title}</span></h2>
+            <p>${step.time ? step.time + "｜" : ""}${step.text}</p>
+            ${
+              step.show_image !== false
+                ? `<div class="story-img">
               <img src="${step.image}" alt="${step.title}">
             </div>
-            <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>` : ''}
+            <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>`
+                : ""
+            }
           </section>
-        `).join('');
+        `,
+            )
+            .join("");
 
-        document.getElementById('mapButton').href = getGoogleMapsUrl(trip, steps);
-        document.getElementById('mapEmbed').src = getMapEmbedUrl(trip, steps);
+          document.getElementById("mapButton").href = getGoogleMapsUrl(
+            trip,
+            steps,
+          );
+          document.getElementById("mapEmbed").src = getMapEmbedUrl(trip, steps);
 
-        setupHotelRoutes(trip);
-        renderRelatedReading(trip,document.getElementById('relatedReading'));
-        renderRelatedContent(trip);
-
-      } catch (error) {
-        console.error(error);
-        setText('heroSubtitle', '行程資料暫時無法載入，請稍後再試。');
-        setText('leadText', '行程資料暫時無法載入，請稍後再試。');
+          setupHotelRoutes(trip);
+          // 行程關聯內容統一由上方「這趟旅程會經過」呈現，避免與延伸閱讀重複或數量不一致。
+          document.getElementById("relatedReading").hidden = true;
+          renderRelatedContent(trip);
+        } catch (error) {
+          console.error(error);
+          setText("heroSubtitle", "行程資料暫時無法載入，請稍後再試。");
+          setText("leadText", "行程資料暫時無法載入，請稍後再試。");
+        }
       }
-    }
 
-    loadTrip();
-  </script>
-</body>
+      loadTrip();
+    </script>
+  </body>
 </html>

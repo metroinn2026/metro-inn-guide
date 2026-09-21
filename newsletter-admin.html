@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>電子報管理｜北投旅圖</title>
+    <link rel="stylesheet" href="admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+      body {
+        padding: 16px;
+        max-width: none;
+        margin: auto;
+        color: #24364b;
+      }
+      body.embedded .standalone-back {
+        display: none;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 40%);
+        gap: 18px;
+      }
+      .card {
+        border: 1px solid #d6e2f2;
+        padding: 20px;
+        background: #fff;
+        margin-bottom: 18px;
+      }
+      .form-row {
+        margin: 0 0 15px;
+      }
+      .form-row label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .form-row input,
+      .form-row select,
+      .form-row textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #b8c6d9;
+      }
+      .form-row textarea {
+        min-height: 96px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .primary {
+        background: #245a91;
+        color: #fff;
+        border-color: #245a91;
+      }
+      .danger {
+        background: #a33;
+        color: #fff;
+      }
+      .stats {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        padding: 12px 16px;
+        background: #f3f7fb;
+        border: 1px solid #d6e2f2;
+      }
+      .preview {
+        border: 1px solid #ddd;
+        background: #f4f2eb;
+        padding: 18px;
+      }
+      .preview-inner {
+        background: #fff;
+        border-top: 6px solid #526b4e;
+      }
+      .preview-copy {
+        padding: 22px;
+      }
+      .preview img {
+        width: 100%;
+        max-height: 260px;
+        object-fit: cover;
+        display: block;
+      }
+      .subscribers {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .subscribers th,
+      .subscribers td {
+        padding: 9px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        font-size: 13px;
+      }
+      .muted {
+        color: #68788b;
+        font-size: 13px;
+      }
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="standalone-back" href="admin.html">← 返回管理後台</a>
+    <h1>電子報管理</h1>
+    <p>
+      選擇已發布文章，自動帶入標題、摘要、圖片及連結；確認預覽後可寄測試信或寄送給全部有效訂閱者。
+    </p>
+    <div id="notice" role="status">確認登入中…</div>
+    <div id="app" hidden>
+      <div class="stats">
+        <div class="stat">有效訂閱者：<strong id="activeCount">—</strong></div>
+        <div class="stat">已取消：<strong id="inactiveCount">—</strong></div>
+        <button type="button" id="exportBtn">匯出有效訂閱者 CSV</button>
+      </div>
+      <div class="grid" style="margin-top: 18px">
+        <div>
+          <section class="card">
+            <h2>建立電子報</h2>
+            <div class="form-row">
+              <label for="contentType">文章類型</label
+              ><select id="contentType">
+                <option value="trips">行程</option>
+                <option value="coupons">優惠</option>
+                <option value="news">最新消息</option>
+                <option value="spots">景點</option>
+                <option value="foods">美食</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="articleSearch">搜尋文章</label
+              ><input
+                id="articleSearch"
+                type="search"
+                placeholder="輸入文章名稱"
+              />
+            </div>
+            <div class="form-row">
+              <label for="articleSelect">選擇已發布文章</label
+              ><select id="articleSelect">
+                <option value="">載入中…</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="subject">信件主旨</label
+              ><input id="subject" maxlength="180" />
+            </div>
+            <div class="form-row">
+              <label for="intro">電子報前言（選填）</label
+              ><textarea
+                id="intro"
+                maxlength="2000"
+                placeholder="例如：本月精選行程出爐，邀請你一起慢慢走讀北投。"
+              ></textarea>
+            </div>
+            <div class="form-row">
+              <label for="buttonText">連結按鈕文字</label
+              ><input id="buttonText" value="查看完整內容" maxlength="30" />
+            </div>
+            <div class="form-row">
+              <label for="testEmail">測試收件 Email</label
+              ><input
+                id="testEmail"
+                type="email"
+                placeholder="先寄給自己確認"
+              />
+            </div>
+            <div class="actions">
+              <button type="button" id="testBtn">寄送測試信</button
+              ><button type="button" id="sendBtn" class="primary">
+                寄給全部有效訂閱者
+              </button>
+            </div>
+            <p id="sendMsg" role="status"></p>
+          </section>
+        </div>
+        <aside>
+          <section class="card">
+            <h2>信件預覽</h2>
+            <div class="preview">
+              <div class="preview-inner">
+                <div class="preview-copy">
+                  <div class="muted">METRO INN GUIDE</div>
+                  <h2 id="previewSubject">請選擇文章</h2>
+                  <p id="previewIntro"></p>
+                </div>
+                <img id="previewImage" hidden alt="" />
+                <div class="preview-copy">
+                  <h3 id="previewTitle"></h3>
+                  <p id="previewSummary"></p>
+                  <span
+                    class="primary"
+                    style="display: inline-block; padding: 10px 16px"
+                    id="previewButton"
+                    >查看完整內容</span
+                  >
+                </div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+      <section class="card">
+        <h2>訂閱者名單</h2>
+        <p class="muted">僅後台可查看；前台不會公開 Email。</p>
+        <div style="overflow: auto">
+          <table class="subscribers">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>狀態</th>
+                <th>訂閱時間</th>
+                <th>來源</th>
+              </tr>
+            </thead>
+            <tbody id="subscriberRows"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card">
+        <h2>最近寄送紀錄</h2>
+        <div style="overflow: auto">
+          <table class="subscribers">
+            <thead>
+              <tr>
+                <th>主旨</th>
+                <th>狀態</th>
+                <th>成功／失敗</th>
+                <th>寄送時間</th>
+              </tr>
+            </thead>
+            <tbody id="campaignRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <script>
+      if (new URLSearchParams(location.search).has("embedded"))
+        document.body.classList.add("embedded");
+      const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const maps = {
+        trips: { page: "trip.html", label: "行程" },
+        coupons: { page: "coupon.html", label: "優惠" },
+        news: { page: "news-detail.html", label: "最新消息" },
+        spots: { page: "spot.html", label: "景點" },
+        foods: { page: "food.html", label: "美食" },
+      };
+      let articles = [],
+        selected = null,
+        subscribers = [];
+      async function init() {
+        const {
+          data: { user },
+        } = await db.auth.getUser();
+        if (!user) {
+          location.href = "admin-login.html";
+          return;
+        }
+        const { data: profile } = await db
+          .from("admin_profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!["admin", "super_admin"].includes(profile?.role)) {
+          document.getElementById("notice").textContent =
+            "沒有電子報管理權限。";
+          return;
+        }
+        document.getElementById("notice").hidden = true;
+        document.getElementById("app").hidden = false;
+        await Promise.all([loadArticles(), loadSubscribers(), loadCampaigns()]);
+        resize();
+      }
+      async function loadArticles() {
+        const table = document.getElementById("contentType").value;
+        const { data, error } = await db
+          .from(table)
+          .select("id,title,summary,cover_image")
+          .eq("is_published", true)
+          .order("sort_order", { ascending: true })
+          .limit(1000);
+        if (error) {
+          document.getElementById("articleSelect").innerHTML =
+            "<option>讀取失敗</option>";
+          return;
+        }
+        articles = data || [];
+        renderArticleOptions();
+      }
+      function renderArticleOptions() {
+        const q = document
+            .getElementById("articleSearch")
+            .value.trim()
+            .toLowerCase(),
+          select = document.getElementById("articleSelect"),
+          list = articles.filter(
+            (x) => !q || String(x.title).toLowerCase().includes(q),
+          );
+        select.innerHTML =
+          '<option value="">請選擇文章</option>' +
+          list
+            .map(
+              (x) =>
+                `<option value="${escapeHtml(x.id)}">${escapeHtml(x.title)}</option>`,
+            )
+            .join("");
+        selected = null;
+        updatePreview();
+      }
+      function escapeHtml(v) {
+        return String(v || "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+      function selectArticle() {
+        selected =
+          articles.find(
+            (x) =>
+              String(x.id) === document.getElementById("articleSelect").value,
+          ) || null;
+        if (selected && !document.getElementById("subject").value.trim())
+          document.getElementById("subject").value = selected.title;
+        updatePreview();
+      }
+      function updatePreview() {
+        const subject =
+          document.getElementById("subject").value.trim() ||
+          selected?.title ||
+          "請選擇文章";
+        document.getElementById("previewSubject").textContent = subject;
+        document.getElementById("previewIntro").textContent =
+          document.getElementById("intro").value;
+        document.getElementById("previewTitle").textContent =
+          selected?.title || "";
+        document.getElementById("previewSummary").textContent =
+          selected?.summary || "";
+        document.getElementById("previewButton").textContent =
+          document.getElementById("buttonText").value || "查看完整內容";
+        const img = document.getElementById("previewImage");
+        img.hidden = !selected?.cover_image;
+        if (selected?.cover_image) img.src = selected.cover_image;
+      }
+      function articlePayload() {
+        if (!selected) throw Error("請先選擇文章。");
+        const table = document.getElementById("contentType").value;
+        return {
+          type: table,
+          id: selected.id,
+          title: selected.title,
+          summary: selected.summary || "",
+          image: selected.cover_image || "",
+          url: `${location.origin}/${maps[table].page}?id=${encodeURIComponent(selected.id)}`,
+          buttonText:
+            document.getElementById("buttonText").value.trim() ||
+            "查看完整內容",
+        };
+      }
+      async function send(mode) {
+        const msg = document.getElementById("sendMsg"),
+          subject = document.getElementById("subject").value.trim();
+        try {
+          if (!subject) throw Error("請填寫信件主旨。");
+          const article = articlePayload();
+          if (
+            mode === "all" &&
+            !confirm(
+              `確定寄送給 ${document.getElementById("activeCount").textContent} 位有效訂閱者？寄出後無法收回。`,
+            )
+          )
+            return;
+          const {
+            data: { session },
+          } = await db.auth.getSession();
+          msg.textContent =
+            mode === "test" ? "測試信寄送中…" : "電子報寄送中，請勿關閉頁面…";
+          toggleBusy(true);
+          const response = await fetch("/api/send-newsletter", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              mode,
+              testEmail: document.getElementById("testEmail").value.trim(),
+              subject,
+              intro: document.getElementById("intro").value.trim(),
+              article,
+            }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw Error(result.error || "寄送失敗");
+          msg.textContent = `寄送完成：成功 ${result.success_count} 封，失敗 ${result.failure_count} 封。`;
+          await loadCampaigns();
+        } catch (error) {
+          msg.textContent = "寄送失敗：" + error.message;
+        } finally {
+          toggleBusy(false);
+          resize();
+        }
+      }
+      function toggleBusy(busy) {
+        document.getElementById("testBtn").disabled = busy;
+        document.getElementById("sendBtn").disabled = busy;
+      }
+      async function loadSubscribers() {
+        const { data, error } = await db
+          .from("newsletter_subscribers")
+          .select("email,status,consent_at,source_page")
+          .order("created_at", { ascending: false })
+          .limit(1000);
+        if (error) {
+          document.getElementById("subscriberRows").innerHTML =
+            `<tr><td colspan="4">${escapeHtml(error.message)}，請先執行 newsletter.sql。</td></tr>`;
+          return;
+        }
+        subscribers = data || [];
+        document.getElementById("activeCount").textContent = subscribers.filter(
+          (x) => x.status === "active",
+        ).length;
+        document.getElementById("inactiveCount").textContent =
+          subscribers.filter((x) => x.status !== "active").length;
+        document.getElementById("subscriberRows").innerHTML =
+          subscribers
+            .map(
+              (x) =>
+                `<tr><td>${escapeHtml(x.email)}</td><td>${x.status === "active" ? "有效" : "已取消"}</td><td>${new Date(x.consent_at).toLocaleString("zh-TW")}</td><td>${escapeHtml(x.source_page || "")}</td></tr>`,
+            )
+            .join("") || '<tr><td colspan="4">尚無訂閱者</td></tr>';
+      }
+      async function loadCampaigns() {
+        const { data } = await db
+          .from("newsletter_campaigns")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(30);
+        document.getElementById("campaignRows").innerHTML =
+          (data || [])
+            .map(
+              (x) =>
+                `<tr><td>${escapeHtml(x.subject)}</td><td>${escapeHtml(x.status)}</td><td>${x.success_count}／${x.failure_count}</td><td>${x.sent_at ? new Date(x.sent_at).toLocaleString("zh-TW") : "—"}</td></tr>`,
+            )
+            .join("") || '<tr><td colspan="4">尚無寄送紀錄</td></tr>';
+      }
+      function exportCsv() {
+        const rows = [
+            ["Email", "狀態", "訂閱時間", "來源"],
+            ...subscribers
+              .filter((x) => x.status === "active")
+              .map((x) => [
+                x.email,
+                x.status,
+                x.consent_at,
+                x.source_page || "",
+              ]),
+          ],
+          csv =
+            "\ufeff" +
+            rows
+              .map((row) =>
+                row
+                  .map((v) => `"${String(v).replaceAll('"', '""')}"`)
+                  .join(","),
+              )
+              .join("\r\n"),
+          a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([csv], { type: "text/csv;charset=utf-8" }),
+        );
+        a.download = `北投旅圖電子報訂閱者_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      function resize() {
+        if (window.parent !== window)
+          parent.postMessage(
+            {
+              type: "metro-workspace-height",
+              height: document.documentElement.scrollHeight + 40,
+            },
+            location.origin,
+          );
+      }
+      document.getElementById("contentType").onchange = loadArticles;
+      document.getElementById("articleSearch").oninput = renderArticleOptions;
+      document.getElementById("articleSelect").onchange = selectArticle;
+      ["subject", "intro", "buttonText"].forEach(
+        (id) => (document.getElementById(id).oninput = updatePreview),
+      );
+      document.getElementById("testBtn").onclick = () => send("test");
+      document.getElementById("sendBtn").onclick = () => send("all");
+      document.getElementById("exportBtn").onclick = exportCsv;
+      window.addEventListener("load", init);
+      new ResizeObserver(resize).observe(document.body);
+    </script>
+  </body>
+</html>

@@ -152,7 +152,14 @@
 
     // A single-pin OpenStreetMap embed is used when a precise coordinate exists.
     // Google Maps place embeds are the fallback: Google controls surrounding POI labels.
+    const verifiedSpotCoordinates = {
+      // 地熱谷入口／泉池位置；避免「中山路、溫泉路交會附近」被判讀成路口。
+      spot_26001: [25.13809, 121.51192]
+    };
+
     function mapCoordinates(item) {
+      const verified = verifiedSpotCoordinates[String(item.id || '')];
+      if (verified) return verified;
       const lat = Number(item.latitude ?? item.lat);
       const lon = Number(item.longitude ?? item.lng ?? item.lon);
       if (Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && (lat !== 0 || lon !== 0)) return [lat, lon];

@@ -7,40 +7,79 @@
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
+  <style>
+    .search-results-main{padding:56px 0 88px}
+    .search-results-head{padding-bottom:36px;border-bottom:1px solid #ddd}
+    .search-results-head h1{margin:12px 0 10px;font-size:clamp(34px,4vw,52px);line-height:1.18}
+    .search-results-head>p{margin:0;color:#666}
+    .search-form{display:flex;gap:12px;margin-top:28px;max-width:980px}
+    .search-form input{min-width:0;flex:1;height:58px;padding:0 20px;border:1px solid #ccc;border-radius:0;background:#fff;font:inherit}
+    .search-form .button{min-width:104px;border-radius:0}
+    .search-results-section{padding-top:38px}
+    .search-results-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px}
+    .search-results-toolbar h2{margin:0 0 8px;font-size:30px}
+    .search-results-toolbar p{margin:0;color:#666}
+    .search-type-filters{display:flex;flex-wrap:wrap;gap:8px}
+    .search-type-filter{padding:9px 15px;border:1px solid #ccc;border-radius:0;background:#fff;color:#444;font:inherit;font-weight:700;cursor:pointer}
+    .search-type-filter:hover,.search-type-filter.is-active{border-color:#f15d3a;background:#f15d3a;color:#fff}
+    .search-empty{padding:46px 0 18px;border-top:1px solid #ddd}
+    .search-empty h3{margin:0 0 10px;font-size:26px}
+    .search-empty p{margin:0 0 22px;color:#666}
+    .search-directory-links{display:flex;flex-wrap:wrap;gap:18px}
+    .search-directory-links a{color:#e95736;font-weight:700;border-bottom:1px solid currentColor}
+    .search-results-page .directory-grid{margin-top:0}
+    .search-results-page [hidden]{display:none!important}
+    @media(max-width:720px){
+      .search-results-main{padding:36px 0 60px}
+      .search-results-head{padding-bottom:28px}
+      .search-form{flex-direction:column}
+      .search-form .button{width:100%}
+      .search-results-toolbar{align-items:flex-start;flex-direction:column}
+    }
+  </style>
 </head>
-<body id="top">
+<body id="top" class="search-results-page">
   <div id="header"></div>
-  <section class="directory-hero">
+  <main class="search-results-main">
     <div class="container">
-      <div class="eyebrow">SEARCH</div>
-      <h1 id="resultTitle">搜尋結果</h1>
-      <p>搜尋目前已上架的景點、美食、行程與優惠。</p>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container">
-      <div class="search-box search-box-simple" style="margin-bottom:44px">
-        <div class="field keyword-only">
-          <label for="kw2">KEYWORD SEARCH</label>
-          <div class="keyword-row">
-            <input id="kw2" placeholder="搜尋景點、美食、行程，例如：地熱谷、泡湯、親子景點、拉麵">
-            <button class="button" id="searchBtn" type="button">搜尋</button>
+      <section class="search-results-head">
+        <div class="eyebrow">SEARCH</div>
+        <h1 id="resultTitle">搜尋結果</h1>
+        <p>搜尋目前已上架的景點、美食、行程與優惠。</p>
+        <div class="search-form" role="search">
+          <input id="kw2" aria-label="搜尋關鍵字" placeholder="例如：地熱谷、泡湯、親子景點、拉麵">
+          <button class="button" id="searchBtn" type="button">搜尋</button>
+        </div>
+      </section>
+
+      <section class="search-results-section" aria-labelledby="resultsHeading">
+        <div class="search-results-toolbar">
+          <div>
+            <h2 id="resultsHeading">搜尋結果</h2>
+            <p id="searchStatus" aria-live="polite">搜尋資料載入中…</p>
+          </div>
+          <div class="search-type-filters" aria-label="內容類型篩選">
+            <button class="search-type-filter is-active" type="button" data-filter="全部" aria-pressed="true">全部</button>
+            <button class="search-type-filter" type="button" data-filter="景點" aria-pressed="false">景點</button>
+            <button class="search-type-filter" type="button" data-filter="美食" aria-pressed="false">美食</button>
+            <button class="search-type-filter" type="button" data-filter="行程" aria-pressed="false">行程</button>
+            <button class="search-type-filter" type="button" data-filter="優惠" aria-pressed="false">優惠</button>
           </div>
         </div>
-      </div>
-      <div class="filter-row">
-        <h2 class="quick-search-title">依類型快速查看</h2>
-        <div class="filter-pills">
-          <a class="pill" href="spots.html">景點</a>
-          <a class="pill" href="trips.html">行程</a>
-          <a class="pill" href="foods.html">美食</a>
-          <a class="pill" href="coupons.html">優惠</a>
+        <div class="directory-grid" id="results"></div>
+        <div class="search-empty" id="emptyState" hidden>
+          <h3 id="emptyTitle">找不到符合條件的內容</h3>
+          <p id="emptyDescription">可以換一個關鍵字，或直接查看以下分類。</p>
+          <div class="search-directory-links">
+            <a href="spots.html">查看景點</a>
+            <a href="foods.html">查看美食</a>
+            <a href="trips.html">查看行程</a>
+            <a href="coupons.html">查看優惠</a>
+          </div>
         </div>
-      </div>
-      <p id="searchStatus" aria-live="polite">搜尋資料載入中…</p>
-      <div class="directory-grid" id="results"></div>
+      </section>
     </div>
-  </section>
+  </main>
   <div id="footer"></div>
   <script>
     document.getElementById('header').innerHTML=header();
@@ -51,6 +90,12 @@
     const input=document.getElementById('kw2');
     const results=document.getElementById('results');
     const status=document.getElementById('searchStatus');
+    const emptyState=document.getElementById('emptyState');
+    const emptyTitle=document.getElementById('emptyTitle');
+    const emptyDescription=document.getElementById('emptyDescription');
+    const filterButtons=[...document.querySelectorAll('.search-type-filter')];
+    let allItems=[];
+    let activeType='全部';
     input.value=query;
     document.getElementById('resultTitle').textContent=query?`「${query}」的搜尋結果`:'搜尋景點、美食、行程與優惠';
 
@@ -68,6 +113,16 @@
     document.getElementById('searchBtn').addEventListener('click',startSearch);
     input.addEventListener('keydown',event=>{if(event.key==='Enter')startSearch();});
 
+    filterButtons.forEach(button=>button.addEventListener('click',()=>{
+      activeType=button.dataset.filter;
+      filterButtons.forEach(item=>{
+        const selected=item===button;
+        item.classList.toggle('is-active',selected);
+        item.setAttribute('aria-pressed',String(selected));
+      });
+      renderResults();
+    }));
+
     function searchableText(item){
       return [item.title,item.summary,item.content,item.area,item.station,item.category,item.tags,item.notes,item.address,item.duration]
         .map(value=>typeof value==='string'?value:JSON.stringify(value||''))
@@ -77,7 +132,7 @@
     function validImage(url){
       return /^https?:\/\//i.test(String(url||'').trim());
     }
-    function appendCard(item){
+    function createCard(item){
       const card=document.createElement('a');
       card.className='directory-card';
       card.href=`${item.page}?id=${encodeURIComponent(item.id)}`;
@@ -102,16 +157,34 @@
       more.textContent='查看內容';
       body.append(meta,title,summary,more);
       card.append(imageWrap,body);
-      results.append(card);
+      return card;
+    }
+
+    function renderResults(){
+      const visibleItems=activeType==='全部'?allItems:allItems.filter(item=>item.type===activeType);
+      results.replaceChildren(...visibleItems.map(createCard));
+      if(visibleItems.length){
+        status.textContent=activeType==='全部'?`共找到 ${visibleItems.length} 筆內容。`:`${activeType}共 ${visibleItems.length} 筆。`;
+        emptyState.hidden=true;
+      }else{
+        status.textContent='沒有符合條件的內容。';
+        emptyTitle.textContent=query?`找不到符合「${query}」的${activeType==='全部'?'內容':activeType}`:'輸入關鍵字開始搜尋';
+        emptyDescription.textContent=query?'可以換一個關鍵字，或直接查看以下分類。':'輸入地點、主題或店名，即可搜尋網站內容。';
+        emptyState.hidden=false;
+      }
     }
 
     async function loadSearchResults(){
       if(!query){
-        status.textContent='請輸入關鍵字開始搜尋。';
+        allItems=[];
+        renderResults();
         return;
       }
       if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined'){
         status.textContent='搜尋服務目前無法使用，請稍後再試。';
+        emptyTitle.textContent='搜尋服務暫時無法使用';
+        emptyDescription.textContent='請稍後重新整理頁面，或直接查看以下分類。';
+        emptyState.hidden=false;
         return;
       }
       const settled=await Promise.allSettled(sources.map(async source=>{
@@ -124,20 +197,18 @@
         return (rows||[]).map(row=>({...row,...source}));
       }));
       const keyword=query.toLowerCase();
-      const items=settled
+      allItems=settled
         .filter(result=>result.status==='fulfilled')
         .flatMap(result=>result.value)
         .filter(item=>item.id&&item.title&&validImage(item.cover_image)&&searchableText(item).includes(keyword));
-      results.replaceChildren();
-      items.forEach(appendCard);
-      if(items.length){
-        status.textContent=`共找到 ${items.length} 筆已上架內容。`;
-      }else{
-        status.textContent=`目前沒有符合「${query}」且具備封面圖片的已上架內容。`;
-      }
       if(settled.every(result=>result.status==='rejected')){
         status.textContent='搜尋資料暫時無法載入，請稍後再試。';
+        emptyTitle.textContent='搜尋資料暫時無法載入';
+        emptyDescription.textContent='請稍後重新整理頁面，或直接查看以下分類。';
+        emptyState.hidden=false;
+        return;
       }
+      renderResults();
     }
     loadSearchResults();
   </script>

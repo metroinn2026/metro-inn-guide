@@ -1605,8 +1605,8 @@
             ["cover_image", "封面圖片網址", "image"],
             [
               "topics",
-              "分類代碼（至「分類標籤」查詢，多個以逗號分隔）",
-              "text",
+              "顯示分類（可複選）",
+              "featuredTopics",
             ],
             ["is_active", "狀態", "booleanActive"],
           ],
@@ -1938,6 +1938,8 @@
 
       let featuredContentCatalog = [];
       let featuredContentRequest = 0;
+      let featuredTopicCatalog = [];
+      let featuredTopicRequest = 0;
       const featuredTypeLabel = { spot: "景點", food: "美食", trip: "行程" };
       function featuredContentTemplate(name, label) {
         return `<div class="form-row"><label>${label}</label>
@@ -2037,6 +2039,74 @@
           .map((x) => x.reason.message);
         if (status && errors.length)
           status.textContent = "部分內容無法讀取：" + errors.join("；");
+      }
+      function featuredTopicsTemplate(name, label) {
+        return `<div class="form-row"><label>${label}</label>
+          <input id="f_${name}" type="hidden">
+          <div id="featuredTopicOptions" style="display:flex;flex-wrap:wrap;gap:10px 18px;padding:14px 16px;border:1px solid #c9d9ee;background:#fff">正在讀取分類…</div>
+          <div id="featuredTopicStatus" class="help">直接勾選要顯示的分類；「人氣精選」會自動包含所有啟用內容，不需勾選。</div>
+        </div>`;
+      }
+      function renderFeaturedTopicOptions() {
+        const wrap = document.getElementById("featuredTopicOptions");
+        const hidden = document.getElementById("f_topics");
+        if (!wrap || !hidden) return;
+        const selected = String(hidden.value || "")
+          .split(",")
+          .map((x) => x.trim())
+          .filter((x) => x && x !== "all");
+        const known = new Set(featuredTopicCatalog.map((x) => String(x.id)));
+        const options = [
+          ...featuredTopicCatalog,
+          ...selected
+            .filter((id) => !known.has(id))
+            .map((id) => ({ id, title: id + "（既有分類）" })),
+        ];
+        wrap.innerHTML = options.length
+          ? options
+              .map(
+                (topic) =>
+                  `<label style="display:inline-flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" data-featured-topic="${relatedEsc(topic.id)}" ${selected.includes(String(topic.id)) ? "checked" : ""} onchange="syncFeaturedTopicSelection()"><span>${relatedEsc(topic.title || topic.id)}</span></label>`,
+              )
+              .join("")
+          : "尚未建立可用分類，請先到「分類標籤」新增。";
+      }
+      function syncFeaturedTopicSelection() {
+        const hidden = document.getElementById("f_topics");
+        if (!hidden) return;
+        hidden.value = Array.from(
+          document.querySelectorAll("[data-featured-topic]:checked"),
+        )
+          .map((input) => input.dataset.featuredTopic)
+          .filter(Boolean)
+          .join(",");
+        scheduleAdminDraftPreview();
+      }
+      async function loadFeaturedTopicsPicker() {
+        if (currentTable !== "featured_picks") return;
+        const token = ++featuredTopicRequest;
+        const status = document.getElementById("featuredTopicStatus");
+        if (status) status.textContent = "正在讀取分類標籤…";
+        const { data, error } = await db
+          .from("featured_topics")
+          .select("id,title,is_active,sort_order")
+          .eq("is_active", true)
+          .neq("id", "all")
+          .order("sort_order", { ascending: true });
+        if (token !== featuredTopicRequest || currentTable !== "featured_picks")
+          return;
+        if (error) {
+          featuredTopicCatalog = [];
+          renderFeaturedTopicOptions();
+          if (status)
+            status.textContent = "分類讀取失敗：" + error.message;
+          return;
+        }
+        featuredTopicCatalog = data || [];
+        renderFeaturedTopicOptions();
+        if (status)
+          status.textContent =
+            "直接勾選要顯示的分類；「人氣精選」會自動包含所有啟用內容，不需勾選。";
       }
       const relatedEsc = (text) =>
         String(text ?? "").replace(
@@ -3108,6 +3178,8 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               return `<input id="f_${name}" type="hidden">`;
             if (type === "featuredContent")
               return featuredContentTemplate(name, label);
+            if (type === "featuredTopics")
+              return featuredTopicsTemplate(name, label);
             if (type === "image") return imageFieldTemplate(name, label);
             if (type === "textarea")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
@@ -3317,6 +3389,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         relatedSelection = [];
         loadRelatedPicker();
         loadFeaturedContentPicker();
+        loadFeaturedTopicsPicker();
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
@@ -3663,6 +3736,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           : [];
         loadRelatedPicker();
         loadFeaturedContentPicker();
+        loadFeaturedTopicsPicker();
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 

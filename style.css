@@ -660,3 +660,23 @@ body.trip-detail-page .trip-main-image img{display:block;width:100%;height:auto;
 /* 目錄摘要使用完整內容寬度；後台手動換行才保留斷行。 */
 .directory-hero p{max-width:none;white-space:pre-line}
 .filter-pills button.pill{font:inherit;background:transparent;border-top:0;border-left:0;border-right:0;cursor:pointer}
+
+/* 共用手機導覽：原本 980px 以下隱藏導覽，改成可展開的完整選單。 */
+.mobile-nav-toggle{display:none;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 11px;min-height:40px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+#breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
+#breadcrumb a{color:inherit;text-decoration:none}
+#breadcrumb a:hover,#breadcrumb a:focus-visible{color:var(--orange);text-decoration:underline;text-underline-offset:3px}
+#breadcrumb [aria-current="page"]{overflow-wrap:anywhere}
+.breadcrumb-separator{color:#999}
+@media(max-width:980px){
+ .topbar .nav{position:relative;gap:8px}
+ .topbar .mobile-nav-toggle{display:inline-flex;order:2;margin-left:auto;flex:none}
+ .topbar .menu,.topbar body:has(.editor-picks) .menu,body:has(.editor-picks) .topbar .menu{display:none}
+ .topbar .menu.is-open,body:has(.editor-picks) .topbar .menu.is-open{display:flex;position:absolute;top:calc(100% + 12px);left:0;right:0;z-index:100;flex-direction:column;align-items:stretch;gap:0;background:#fff;border:1px solid var(--line);box-shadow:0 8px 18px #00000012;max-height:calc(100vh - 100px);overflow-y:auto;padding:6px 0}
+ .topbar .menu.is-open a{display:block;padding:13px 18px;font-size:15px;white-space:normal;border-bottom:1px solid #eee}
+ .topbar .menu.is-open a:last-child{border-bottom:0}
+ .topbar .nav-book{display:none}
+ .topbar .brand{min-width:0}
+ .topbar .brand-guide-name{white-space:nowrap}
+}
+@media(max-width:480px){.topbar .mobile-nav-toggle{padding:8px}.topbar .mobile-nav-label{display:none}.topbar .brand-logo-img{max-width:145px!important}.topbar .brand-guide-name{font-size:13px!important}}

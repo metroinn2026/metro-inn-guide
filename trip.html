@@ -487,7 +487,7 @@
         setText('articleKicker', (trip.slug || 'TRIP').replaceAll('-', ' ').toUpperCase());
         setText('heroSubtitle', trip.summary);
         setText('heroDuration', trip.duration);
-        setText('breadcrumb', `首頁　›　行程　›　${trip.title}`);
+        renderBreadcrumb('行程', 'trips.html', trip.title);
         setText('leadText', trip.summary);
         setText('sideTitle', trip.title);
         setText('sideDuration', `◷　建議停留 ${trip.duration || '依行程安排'}`);

@@ -134,7 +134,7 @@
         setText('publishDate', news.publish_date || '日期未設定');
         const dateEl=document.getElementById('publishDate');
         if(news.publish_date)dateEl.dateTime=news.publish_date;
-        setText('breadcrumb', `首頁　›　最新消息　›　${news.title}`);
+        renderBreadcrumb('最新消息', 'news.html', news.title);
         setText('leadText', news.summary, '');
         document.getElementById('leadText').hidden=!String(news.summary||'').trim();
         renderContentBlocks(news);

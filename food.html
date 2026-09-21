@@ -349,7 +349,7 @@
         setText('heroCost', cost);
         setText('heroTags', tags[0] || '美食');
 
-        setText('breadcrumb', `首頁 〉 美食介紹 〉 ${title}`);
+        renderBreadcrumb('美食介紹', 'foods.html', title);
         setText('leadText', summary);
         setText('storyMeta', (food.slug || 'food').replaceAll('-', ' ').toUpperCase());
         setText('storyContent', content);

@@ -349,7 +349,7 @@
         setText('heroTags', tags[0] || '景點');
         setText('heroStayTime', spot.stay_time || '建議停留依行程安排');
 
-        setText('breadcrumb', `首頁 〉 景點介紹 〉 ${title}`);
+        renderBreadcrumb('景點介紹', 'spots.html', title);
         setText('leadText', summary);
         setText('storyMeta', (spot.slug || areaText).replaceAll('-', ' ').toUpperCase());
         setText('storyContent', content);

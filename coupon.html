@@ -183,7 +183,7 @@
         setText('heroTitle', title);
         setText('heroSubtitle', summary);
         setText('heroDate', `活動期間：${range}`);
-        setText('breadcrumb', `首頁 〉 優惠介紹 〉 ${title}`);
+        renderBreadcrumb('優惠介紹', 'coupons.html', title);
         setText('articleTitle', title);
         setText('leadText', summary);
         setText('storyMeta', (coupon.slug || 'offer').replaceAll('-', ' ').toUpperCase());

@@ -1069,10 +1069,6 @@
             <div class="nav-group-title">投稿管理</div>
             <a href="#submissions" data-workspace="submissions">民眾投稿審核</a>
           </div>
-          <div class="nav-group">
-            <div class="nav-group-title">電子報管理</div>
-            <a href="#newsletter" data-workspace="newsletter">訂閱者與寄送</a>
-          </div>
           <div class="nav-group nav-group-last">
             <div class="nav-group-title">系統管理</div>
             <a href="#audit" data-workspace="audit">操作紀錄</a>
@@ -2366,9 +2362,7 @@
             ? initialWorkspace.slice(1)
             : "banners",
         );
-        if (
-          ["#submissions", "#newsletter", "#audit"].includes(initialWorkspace)
-        )
+        if (["#submissions", "#audit"].includes(initialWorkspace))
           openWorkspace(initialWorkspace.slice(1));
       }
 
@@ -2652,15 +2646,11 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         document.getElementById("workspaceTitle").textContent =
           kind === "audit"
             ? "操作紀錄"
-            : kind === "newsletter"
-              ? "電子報管理"
-              : "民眾投稿審核";
+            : "民眾投稿審核";
         const target =
           (kind === "audit"
             ? "operation-audit.html"
-            : kind === "newsletter"
-              ? "newsletter-admin.html"
-              : "submissions-review.html") + "?embedded=1";
+            : "submissions-review.html") + "?embedded=1";
         const frame = document.getElementById("workspaceFrame");
         if (frame.getAttribute("src") !== target) frame.src = target;
         document

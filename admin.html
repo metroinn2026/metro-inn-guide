@@ -614,6 +614,15 @@
           ['facebook_url','Facebook 連結','text'],
           ['instagram_url','Instagram 連結','text'],
           ['line_url','LINE 連結','text'],
+          ['spots_directory_title','景點目錄標題','text'],
+          ['spots_directory_summary','景點目錄摘要','textarea'],
+          ['spots_directory_tags','景點分類標籤（以逗號分隔）','textarea'],
+          ['foods_directory_title','美食目錄標題','text'],
+          ['foods_directory_summary','美食目錄摘要','textarea'],
+          ['foods_directory_tags','美食分類標籤（以逗號分隔）','textarea'],
+          ['trips_directory_title','行程目錄標題','text'],
+          ['trips_directory_summary','行程目錄摘要','textarea'],
+          ['trips_directory_tags','行程分類標籤（以逗號分隔）','textarea'],
           ['map_iframe','Google Map iframe','textarea'],
           ['copyright_text','版權文字','text']
         ],
@@ -626,6 +635,8 @@
         tips:`<ul class="tip-list">
           <li><b>Logo</b>：建議 SVG 或透明 PNG，高度約 80px。</li>
           <li><b>頁首</b>：訂房按鈕文字建議 4～6 字，例如「立即訂房」。</li>
+          <li><b>目錄文字</b>：可管理景點、美食、行程頁的標題、摘要及分類標籤；標籤請用逗號分隔。</li>
+          <li><b>摘要換行</b>：只有在文字框中手動換行時，前台才會依該位置換行；其餘由瀏覽器依畫面寬度排列。</li>
           <li><b>頁尾</b>：地址、電話、Email 建議完整填寫，避免旅客找不到聯絡資訊。</li>
           <li><b>Google Map</b>：可貼 iframe，但若不熟悉可先留空。</li>
           <li><b>社群圖示</b>：若未來使用圖片，建議 64 × 64 px PNG。</li>
@@ -2234,9 +2245,14 @@ ${warnings.length?'略過欄位：'+warnings.slice(0,6).join('；')+(warnings.le
       }
 
       const url = publicImageUrl(path);
-      document.getElementById('f_' + fieldName).value = url;
-      updateFieldThumb(fieldName);
-      updateImagePreview();
+      // 行程段落圖片由共用編輯器寫回 trip_sections，並沒有 f_trip_section_N 欄位。
+      // 僅一般圖片欄位需要同步舊表單，避免對 null 設定 value 而中斷上傳。
+      const legacyField = document.getElementById('f_' + fieldName);
+      if(legacyField){
+        legacyField.value = url;
+        updateFieldThumb(fieldName);
+        updateImagePreview();
+      }
       msg.textContent = '圖片已上傳並帶入網址。';
       return url;
     }

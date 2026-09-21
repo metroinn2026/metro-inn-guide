@@ -15,22 +15,15 @@
   <section class="directory-hero">
     <div class="container">
       <div class="kicker">FOOD DIRECTORY</div>
-      <h1>美食目錄</h1>
-      <p>美食與店家獨立成資料庫，服務只想找餐廳、小吃、咖啡或伴手禮的旅客。</p>
+      <h1 id="directoryTitle">美食目錄</h1>
+      <p id="directorySummary">美食與店家獨立成資料庫，服務只想找餐廳、小吃、咖啡或伴手禮的旅客。</p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
       <div class="filter-row">
-        <div class="filter-pills">
-          <a class="pill active" data-area="all">全部</a>
-          <a class="pill" data-area="北投">北投</a>
-          <a class="pill" data-area="新北投">新北投</a>
-          <a class="pill" data-area="陽明山">陽明山</a>
-          <a class="pill" data-area="士林">士林</a>
-          <a class="pill" data-area="淡水">淡水</a>
-        </div>
+        <div id="directoryFilters" class="filter-pills"></div>
         <a class="section-link" href="index.html">回首頁搜尋 →</a>
       </div>
 
@@ -51,6 +44,7 @@
     const statusEl = document.getElementById('foodsStatus');
     const gridEl = document.getElementById('foodsGrid');
     let allFoods = [];
+    const defaultFilters = ['全部','北投','新北投','陽明山','士林','淡水'];
 
     const fallbackImage = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85';
 
@@ -79,6 +73,16 @@
       if (text.includes('北投')) return '北投';
       return food.category || 'FOOD';
     }
+
+    function escapeHtml(value) { return String(value || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+    function parseDirectoryFilters(value) { const labels=String(value||'').split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean); return labels.length?labels:defaultFilters; }
+    function renderDirectoryFilters(labels) {
+      const root=document.getElementById('directoryFilters');
+      const normalized=labels[0]==='全部'?labels:['全部',...labels.filter(x=>x!=='全部')];
+      root.innerHTML=normalized.map((label,index)=>`<button type="button" class="pill${index===0?' active':''}" data-filter="${escapeHtml(index===0?'all':label)}">${escapeHtml(label)}</button>`).join('');
+      root.querySelectorAll('.pill').forEach(pill=>pill.addEventListener('click',()=>{root.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));pill.classList.add('active');const keyword=pill.dataset.filter;renderFoods(keyword==='all'?allFoods:allFoods.filter(food=>[food.category,food.address,food.summary,food.content,food.tags].filter(Boolean).join(' ').includes(keyword)));}));
+    }
+    async function loadDirectorySettings(){renderDirectoryFilters(defaultFilters);try{const response=await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=foods_directory_title,foods_directory_summary,foods_directory_tags`,{cache:'no-store',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!response.ok)return;const settings=(await response.json())?.[0];if(!settings)return;if(settings.foods_directory_title)document.getElementById('directoryTitle').textContent=settings.foods_directory_title;if(settings.foods_directory_summary)document.getElementById('directorySummary').textContent=settings.foods_directory_summary;renderDirectoryFilters(parseDirectoryFilters(settings.foods_directory_tags));}catch(error){console.warn('美食目錄設定載入失敗，使用預設值。',error);}}
 
     function renderFoodsPage(foods) {
       gridEl.innerHTML = '';
@@ -149,21 +153,7 @@
       }
     }
 
-    document.querySelectorAll('.pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
-        pill.classList.add('active');
-
-        const area = pill.dataset.area;
-
-        if (area === 'all') {
-          renderFoods(allFoods);
-        } else {
-          renderFoods(allFoods.filter(food => getArea(food).includes(area)));
-        }
-      });
-    });
-
+    loadDirectorySettings();
     loadFoods();
   </script>
 </body>

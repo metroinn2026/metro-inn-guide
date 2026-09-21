@@ -656,3 +656,7 @@ body.trip-detail-page .route-grid {
 body.trip-detail-page .trip-main-image{margin:32px 0 0;width:100%;}
 body.trip-detail-page .trip-main-image[hidden]{display:none;}
 body.trip-detail-page .trip-main-image img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;}
+
+/* 目錄摘要使用完整內容寬度；後台手動換行才保留斷行。 */
+.directory-hero p{max-width:none;white-space:pre-line}
+.filter-pills button.pill{font:inherit;background:transparent;border-top:0;border-left:0;border-right:0;cursor:pointer}

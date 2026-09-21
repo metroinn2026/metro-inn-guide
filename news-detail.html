@@ -9,24 +9,8 @@
   <script src="supabase-config.js"></script>
 </head>
 
-<body id="top">
+<body id="top" class="news-detail-page">
   <div id="header"></div>
-
-  <section class="hero">
-    <img id="heroImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
-    <div class="container">
-      <div class="hero-content">
-        <div class="kicker">NEWS DETAIL</div>
-        <h1 id="heroTitle">最新消息</h1>
-        <p id="heroSubtitle">消息資料載入中...</p>
-        <div class="hero-icons">
-          <span id="publishDate">發布日期</span>
-          <span>活動資訊</span>
-          <span>北捷行旅</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <div class="crumb">
     <div class="container">
@@ -37,23 +21,13 @@
 
   <main class="container article-wrap">
     <article>
+      <div class="meta detail-eyebrow">NEWS</div>
+      <h1 id="articleTitle" class="news-article-title">最新消息</h1>
+      <time id="publishDate" class="news-publish-date">發布日期</time>
       <p id="leadText" class="lead">消息資料載入中...</p>
+      <div id="newsContentBlocks" class="news-content-blocks" aria-live="polite"></div>
 
-      <section class="story numbered-story">
-        <h2><span class="step-no">01</span><span id="storyTitle">活動亮點</span></h2>
-        <p id="storyContent">消息資料載入中...</p>
-        <div class="story-img">
-          <img id="storyImage" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg">
-        </div>
-        <p id="storyImageSource" class="image-source-caption"></p>
-      </section>
-
-      <section class="story numbered-story">
-        <h2><span class="step-no">02</span><span>推薦玩法</span></h2>
-        <p>活動前後可搭配北投景點、美食與優惠資訊，安排半日或一日輕旅行。</p>
-      </section>
-
-      <section class="info-card point-info">
+      <section id="eventInfo" class="info-card point-info" hidden>
         <div class="info-head-row">
           <div>
             <div class="kicker">INFORMATION</div>
@@ -102,8 +76,6 @@
     document.getElementById('header').innerHTML = header();
     document.getElementById('footer').innerHTML = footer();
 
-    const fallbackImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Thermal%20Valley%20beitou%20Taiwan.jpg';
-
     function getParam(name) {
       return new URLSearchParams(location.search).get(name);
     }
@@ -113,26 +85,58 @@
       if (el) el.textContent = value || fallback;
     }
 
-    function renderImageCaption(text){
-      const el = document.getElementById('storyImageSource');
-      if(!el) return;
-      const raw = (text || '').trim();
-      if(!raw){
-        el.textContent = '';
-        el.style.display = 'none';
-        return;
-      }
-      el.textContent = raw.startsWith('圖片來源') ? raw : `圖片來源：${raw}`;
-      el.style.display = 'block';
+    function parseContentBlocks(value){
+      const raw=String(value||'').trim();
+      if(!raw)return [];
+      try{
+        const blocks=JSON.parse(raw);
+        if(Array.isArray(blocks))return blocks;
+      }catch{}
+      return [{type:'text',text:raw,legacy:true}];
     }
 
+    function renderContentBlocks(news){
+      const root=document.getElementById('newsContentBlocks');
+      const blocks=parseContentBlocks(news.content);
+      root.replaceChildren();
+      blocks.forEach(block=>{
+        if(block?.type==='image'&&block.image){
+          const figure=document.createElement('figure');
+          figure.className='news-content-image';
+          const img=document.createElement('img');
+          img.src=block.image;
+          img.alt=block.alt||news.title||'';
+          figure.append(img);
+          if(block.image_source){
+            const caption=document.createElement('figcaption');
+            caption.textContent=String(block.image_source).startsWith('圖片來源')?block.image_source:`圖片來源：${block.image_source}`;
+            figure.append(caption);
+          }
+          root.append(figure);
+        }else if(block?.text){
+          const paragraph=document.createElement('div');
+          paragraph.className='news-content-text';
+          paragraph.textContent=block.text;
+          root.append(paragraph);
+        }
+      });
+      // 舊消息仍沿用原本的「純文字＋封面」呈現；新圖文段落不會強制插入封面。
+      if(blocks.some(block=>block?.legacy)&&news.cover_image){
+        const figure=document.createElement('figure');
+        figure.className='news-content-image';
+        const img=document.createElement('img');img.src=news.cover_image;img.alt=news.title||'';figure.append(img);
+        const source=news.cover_image_source||news.image_source||'';
+        if(source){const caption=document.createElement('figcaption');caption.textContent=String(source).startsWith('圖片來源')?source:`圖片來源：${source}`;figure.append(caption);}
+        root.append(figure);
+      }
+    }
 
 
     async function loadNews() {
       const id = getParam('id');
 
       if (!id) {
-        setText('heroSubtitle', '找不到消息代碼，請回最新消息列表重新進入。');
+        setText('leadText', '找不到消息代碼，請回最新消息列表重新進入。');
         return;
       }
 
@@ -153,25 +157,19 @@
         const news = result[0];
 
         if (!news) {
-          setText('heroSubtitle', '找不到這筆最新消息。');
+          setText('leadText', '找不到這筆最新消息。');
           return;
         }
 
-        const image = news.cover_image || fallbackImage;
-        const imageSourceText = news.cover_image_source || news.image_source || '';
-
         document.title = `${news.title || '最新消息'}｜Metro Inn Guide 北投旅圖`;
-        document.getElementById('heroImage').src = image;
-        document.getElementById('storyImage').src = image;
-        renderImageCaption(imageSourceText);
-
-        setText('heroTitle', news.title);
-        setText('heroSubtitle', news.summary);
-        setText('publishDate', news.publish_date ? `發布日期：${news.publish_date}` : '發布日期');
+        setText('articleTitle', news.title);
+        setText('publishDate', news.publish_date || '日期未設定');
+        const dateEl=document.getElementById('publishDate');
+        if(news.publish_date)dateEl.dateTime=news.publish_date;
         setText('breadcrumb', `首頁　›　最新消息　›　${news.title}`);
-        setText('leadText', news.summary);
-        setText('storyTitle', news.title);
-        setText('storyContent', news.content);
+        setText('leadText', news.summary, '');
+        document.getElementById('leadText').hidden=!String(news.summary||'').trim();
+        renderContentBlocks(news);
 
         setText('eventName', news.event_name);
         setText('eventDate', news.event_date);
@@ -179,10 +177,10 @@
         setText('phone', news.phone);
         setText('eventContent', news.event_content);
         setText('remark', news.remark);
+        document.getElementById('eventInfo').hidden=![news.event_name,news.event_date,news.event_address,news.phone,news.event_content,news.remark].some(value=>String(value||'').trim());
 
       } catch (error) {
         console.error(error);
-        setText('heroSubtitle', '最新消息資料暫時無法載入，請稍後再試。');
         setText('leadText', '最新消息資料暫時無法載入，請稍後再試。');
       }
     }

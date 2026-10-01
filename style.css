@@ -385,6 +385,64 @@ body:not(:has(.editor-picks)) .footer a:hover{color:#E5F2F7}
  body:not(:has(.editor-picks)) .directory-hero h1{font-size:32px}
 }
 
+/* 首頁視覺整理：收緊搜尋區，先呈現精選探索，再接最新消息。 */
+body:has(.editor-picks) .search-panel{padding:8px 0 14px}
+body:has(.editor-picks) .search-box{padding:10px 0 5px;border-top:0}
+body:has(.editor-picks) .quick-search-title{font-size:clamp(23px,2vw,29px);margin:0 0 10px;color:#4D4D4D}
+body:has(.editor-picks) .keyword-row input{height:50px}
+body:has(.editor-picks) .search-tags{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:12px 0 0}
+body:has(.editor-picks) .search-tags span{color:#73777a;font-size:13px;margin-right:2px}
+body:has(.editor-picks) .search-tags a{display:inline-flex;align-items:center;min-height:32px;padding:4px 10px;border:1px solid #e3e3e3;color:#555;font-size:13px;white-space:nowrap}
+body:has(.editor-picks) .search-tags a:hover{border-color:#F3653B;color:#F3653B}
+.home-quick-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:15px;border-top:1px solid #e7e7e7;border-bottom:1px solid #e7e7e7}
+.home-quick-links a{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#4D4D4D;font-size:14px;font-weight:700;border-right:1px solid #e7e7e7}
+.home-quick-links a:last-child{border-right:0}
+.home-quick-links a span{font-size:10px;color:#999;font-variant-numeric:tabular-nums}
+.home-quick-links a b{margin-left:auto;color:#F3653B;font-size:17px;font-weight:500}
+.home-quick-links a:hover{color:#F3653B}
+.editor-picks{padding:42px 0 48px}
+.picks-heading{margin-bottom:20px}
+.picks-topics{padding-bottom:16px}
+.picks-topics button{border-radius:0;padding:9px 15px;background:#fff}
+.picks-card{flex-basis:29%;}
+.picks-card:first-child{flex-basis:42%}
+.picks-card:nth-child(3n + 2) .picks-photo{aspect-ratio:1.05}
+.picks-card:nth-child(3n) .picks-photo{aspect-ratio:1.32}
+.picks-card:first-child .picks-photo{aspect-ratio:1.38}
+.picks-photo{border-radius:0}
+.picks-caption{padding:58px 20px 20px}
+.home-news{padding:34px 0 42px!important}
+@media(max-width:760px){
+ body:has(.editor-picks) .home-banner-carousel{height:clamp(285px,38vh,360px);min-height:285px;max-height:360px}
+ body:has(.editor-picks) .home-banner-overlay{padding-bottom:30px}
+ body:has(.editor-picks) .home-banner-copy h1{font-size:30px;margin:8px 0}
+ body:has(.editor-picks) .search-panel{padding:7px 0 12px}
+ body:has(.editor-picks) .search-box{padding:7px 0 0}
+ body:has(.editor-picks) .quick-search-title{font-size:22px;margin-bottom:8px}
+ body:has(.editor-picks) .keyword-row{display:flex;gap:8px}
+ body:has(.editor-picks) .keyword-row input{width:auto;min-width:0;flex:1;height:46px;margin:0;padding:0 12px;font-size:14px}
+ body:has(.editor-picks) .keyword-row .button{width:auto;flex:0 0 72px;height:46px;padding:0 10px}
+ body:has(.editor-picks) .search-tags{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:2px 0 5px;margin-top:9px;gap:7px}
+ body:has(.editor-picks) .search-tags::-webkit-scrollbar{display:none}
+ body:has(.editor-picks) .search-tags span{flex:none;margin-right:3px;font-size:12px}
+ body:has(.editor-picks) .search-tags a{flex:none;min-height:30px;padding:3px 9px;font-size:12px}
+ .home-quick-links{margin-top:9px}
+ .home-quick-links a{flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:9px 7px;font-size:13px}
+ .home-quick-links a b{display:none}
+ .home-quick-links a span{font-size:9px}
+ .editor-picks{padding:32px 0 34px}
+ .picks-heading{margin-bottom:14px}
+ .picks-topics{padding-bottom:13px}
+ .picks-card,.picks-card:first-child{flex-basis:78%}
+ .picks-card:first-child .picks-photo{aspect-ratio:1.2}
+ .picks-card:nth-child(even) .picks-photo{aspect-ratio:1.05}
+ .picks-card:nth-child(3n) .picks-photo{aspect-ratio:1.28}
+ .home-news{padding:28px 0 34px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body:has(.editor-picks) .home-banner-slide,.picks-track,.picks-photo img{scroll-behavior:auto;transition:none}
+}
+
 /* 2026-09 全站視覺規範：橘色主按鈕，灰階輔助色；首頁及內頁一致 */
 :root{--brand-dark:#4D4D4D;--aux-gray:#BDBDBD;--aux-light:#D7D7D7;--aux-ice:#E5F2F7;--brand-cta:#F3653B;--ink:#4D4D4D;--orange:#F3653B;--line:#D7D7D7}
 body,body:has(.editor-picks),body:not(:has(.editor-picks)){--ink:#4D4D4D;--orange:#F3653B;--line:#D7D7D7;color:#4D4D4D}

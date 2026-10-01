@@ -1,42 +1,117 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>活動資訊｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head>
-<body class="activity-detail-page"><div id="header"></div>
-<main><section class="activity-detail-hero"><div class="container"><a class="activity-back" href="activities.html">← 返回近期活動</a><div id="activityHeroContent"><p class="activity-message">活動資料載入中…</p></div></div></section>
-<section class="section activity-detail-section"><div class="container activity-detail-layout"><article id="activityDetails" class="activity-detail-main"></article><aside id="activityDirections" class="activity-detail-aside"></aside></div><div class="container activity-map-wrap" id="activityMapWrap" hidden><h2>活動地圖</h2><iframe id="activityMap" class="activity-map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="活動地點 Google 地圖" allowfullscreen></iframe><a id="activityMapLink" class="activity-map-link" target="_blank" rel="noopener noreferrer">在 Google Maps 查看路線 ↗</a></div></section></main>
-<div id="footer"></div>
-<script>
-document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();
-const hero=document.getElementById('activityHeroContent'),details=document.getElementById('activityDetails'),directions=document.getElementById('activityDirections');
-function todayTaipei(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
-function safeUrl(raw){if(!raw)return '';try{const u=new URL(raw,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch{return '';}}
-function state(x){const d=todayTaipei();return x.end_date<d?'活動已結束':x.start_date>d?'即將開始':'活動中';}
-function dateText(v){if(!v)return '日期未提供';const [y,m,d]=v.slice(0,10).split('-');return `${y}.${m}.${d}`;}
-function addRow(root,label,value,{link='',linkText=''}={}){if(!value&&!link)return;const row=document.createElement('div');row.className='activity-info-row';const key=document.createElement('strong');key.textContent=label;row.append(key);const val=document.createElement('div');val.className='activity-info-value';if(value){const text=document.createElement('p');text.textContent=value;val.append(text);}if(link){const a=document.createElement('a');a.href=safeUrl(link);a.target='_blank';a.rel='noopener noreferrer';a.textContent=linkText||'開啟連結 ↗';val.append(a);}row.append(val);root.append(row);}
-function googleQueryUrl(query,embed=false){const u=new URL('https://www.google.com/maps');u.searchParams.set('q',query);if(embed)u.searchParams.set('output','embed');return u.href;}
-function renderSide(item){
-  directions.replaceChildren();
-  const info=document.createElement('section');info.className='activity-side-panel activity-info-panel';
-  const kicker=document.createElement('p');kicker.className='compact-transit-kicker';kicker.textContent='EVENT INFORMATION';
-  const infoTitle=document.createElement('h2');infoTitle.textContent='活動資訊';info.append(kicker,infoTitle);
-  addRow(info,'活動日期',`${dateText(item.start_date)} – ${dateText(item.end_date)}`);
-  addRow(info,'活動時間',item.hours);
-  addRow(info,'活動地點',item.venue_name);
-  addRow(info,'地址',item.address,{link:item.address?googleQueryUrl(item.address):'',linkText:'Google 地圖 ↗'});
-  addRow(info,'費用／入場',item.admission);
-  addRow(info,'主辦單位資訊','',{link:item.official_url,linkText:'查看主辦單位公告 ↗'});
-  directions.append(info);
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>活動資訊｜北投旅圖</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body id="top" class="activity-detail-page">
+  <div id="header"></div>
+  <section class="activity-detail-hero">
+    <div class="container">
+      <a class="activity-back" href="activities.html">← 返回近期活動</a>
+      <div id="activityHeroContent"><p class="activity-message">活動資料載入中…</p></div>
+    </div>
+  </section>
+  <section class="crumb">
+    <div class="container">
+      <div id="activityBreadcrumb">首頁 〉 近期活動</div>
+      <button class="share-icon" id="activityShare" type="button" aria-label="分享此活動">⇪</button>
+    </div>
+  </section>
+  <main class="container article-wrap single-point activity-article-wrap">
+    <article id="activityDetails" class="activity-detail-main">
+      <p class="lead" id="activityLead"></p>
+      <section class="story" id="activityStory"></section>
+      <section id="activityInfo" class="info-card point-info activity-info-card">
+        <div class="info-head-row">
+          <div><div class="kicker">INFORMATION</div><h3>活動資訊</h3></div>
+        </div>
+        <div class="info-row"><span class="info-label">活動日期</span><span id="infoDates">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">活動時間</span><span id="infoHours">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">活動地點</span><span id="infoVenue">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">地址</span><span id="infoAddress">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">費用／入場</span><span id="infoAdmission">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">活動類型</span><span id="infoCategory">尚未提供</span></div>
+        <div class="info-row"><span class="info-label">備註</span><span>活動日期、時間及內容可能異動，請以主辦單位最新公告為準。</span></div>
+        <div class="info-actions multi">
+          <a id="activityMapButton" class="button" target="_blank" rel="noopener noreferrer">Google Map</a>
+          <a id="activityOfficialButton" class="button outline" target="_blank" rel="noopener noreferrer" hidden>主辦單位公告</a>
+        </div>
+        <div class="detail-map-frame" id="activityMapFrame" hidden>
+          <h2>活動地圖</h2>
+          <iframe id="activityMap" class="map-embed small" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="活動地點 Google 地圖" allowfullscreen></iframe>
+        </div>
+      </section>
+    </article>
+    <aside class="sticky-panel activity-sticky-panel">
+      <section class="sidebox compact metro-transit compact-transit" aria-labelledby="activityTransitTitle">
+        <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
+        <div class="compact-transit-head"><h2 id="activityTransitTitle">大眾運輸交通指南</h2></div>
+        <p id="activityTransport" class="activity-transit-text">交通資訊載入中…</p>
+        <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
+        <a id="activityDirectionsLink" class="compact-transit-map" target="_blank" rel="noopener noreferrer">從北捷行旅規劃大眾運輸路線 ↗</a>
+      </section>
+      <div class="sidebox compact dark">
+        <div class="kicker" style="color:white">STAY NEARBY</div>
+        <h3>入住北捷行旅</h3>
+        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
+        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener noreferrer">立即訂房 ↗</a>
+      </div>
+    </aside>
+  </main>
+  <div id="footer"></div>
+  <script>
+    document.getElementById('header').innerHTML = header();
+    document.getElementById('footer').innerHTML = footer();
 
-  const transit=document.createElement('section');transit.className='activity-side-panel compact-transit activity-transit-panel';
-  const transitKicker=document.createElement('div');transitKicker.className='compact-transit-kicker';transitKicker.textContent='TRANSPORT GUIDE';
-  const transitHead=document.createElement('div');transitHead.className='compact-transit-head';const transitTitle=document.createElement('h2');transitTitle.textContent='大眾運輸交通指南';transitHead.append(transitTitle);
-  const text=document.createElement('p');text.className='activity-transit-text';text.textContent=item.transport||'活動交通資訊尚未補充，出發前請查看主辦單位公告。';
-  transit.append(transitKicker,transitHead,text);
-  const destination=[item.venue_name,item.address].filter(Boolean).join(' ');
-  if(destination){const route=new URL('https://www.google.com/maps/dir/');route.searchParams.set('api','1');route.searchParams.set('origin','北捷行旅 北投會館 台北市北投區大業路527巷88號');route.searchParams.set('destination',destination);route.searchParams.set('travelmode','transit');const a=document.createElement('a');a.className='compact-transit-map';a.href=route.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent='從北捷行旅規劃大眾運輸路線 ↗';transit.append(a);}
-  directions.append(transit);
-}
-function renderMap(item){const query=[item.venue_name,item.address].filter(Boolean).join(' ')||item.title||'';if(!query)return;const wrap=document.getElementById('activityMapWrap');document.getElementById('activityMap').src=googleQueryUrl(query,true);const link=document.getElementById('activityMapLink');link.href=safeUrl(item.google_map)||googleQueryUrl(query);wrap.hidden=false;}
-async function load(){const id=new URLSearchParams(location.search).get('id');if(!id){hero.textContent='找不到活動編號。';return;}try{const q=new URLSearchParams({select:'*',id:`eq.${id}`,is_published:'eq.true',limit:'1'});const r=await fetch(`${SUPABASE_URL}/rest/v1/events?${q}`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw Error(`讀取失敗 ${r.status}`);const rows=await r.json(),item=rows[0];if(!item||item.end_date<todayTaipei()&&item.end_behavior!=='show_ended'){hero.textContent='這筆活動目前沒有公開，或已結束。';return;}document.title=`${item.title}｜北投近期活動｜北投旅圖`;const badge=document.createElement('span');badge.className='event-status '+(state(item)==='活動中'?'ongoing':state(item)==='活動已結束'?'ended':'upcoming');badge.textContent=state(item);const meta=document.createElement('div');meta.className='activity-detail-meta';meta.append(badge,document.createTextNode(`${dateText(item.start_date)} – ${dateText(item.end_date)}${item.hours?'｜'+item.hours:''}`));const title=document.createElement('h1');title.textContent=item.title||'在地活動';const category=document.createElement('p');category.className='activity-category';category.textContent=item.category||'在地活動';hero.replaceChildren(category,title,meta);const image=safeUrl(item.cover_image);if(image){const img=document.createElement('img');img.className='activity-detail-image';img.src=image;img.alt=item.title||'活動圖片';details.append(img);if(item.cover_image_source){const source=document.createElement('p');source.className='image-source-caption';source.textContent='圖片來源：'+item.cover_image_source;details.append(source);}}if(item.summary){const summary=document.createElement('p');summary.className='activity-detail-lead';summary.textContent=item.summary;details.append(summary);}if(item.content){const content=document.createElement('div');content.className='activity-detail-content';content.textContent=item.content;details.append(content);}renderSide(item);renderMap(item);const note=document.createElement('p');note.className='activity-detail-note';note.textContent='活動日期、時間及內容可能異動，出發前請以主辦單位最新公告為準。';details.append(note);}catch(error){console.error(error);hero.textContent='目前無法載入活動資料，請稍後再試。';}}
-load();
-</script></body></html>
+    const hero = document.getElementById('activityHeroContent');
+    const story = document.getElementById('activityStory');
+    const $ = id => document.getElementById(id);
+    const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
+    function todayTaipei(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+    function safeUrl(raw){if(!raw)return '';try{const u=new URL(raw,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch{return '';}}
+    function state(item){const d=todayTaipei();return item.end_date<d?'活動已結束':item.start_date>d?'即將開始':'活動中';}
+    function dateText(value){if(!value)return '尚未提供';const [y,m,d]=value.slice(0,10).split('-');return `${y}.${m}.${d}`;}
+    function mapsUrl(query){const u=new URL('https://www.google.com/maps');u.searchParams.set('q',query);return u.href;}
+    function mapsEmbedUrl(query){const u=new URL('https://www.google.com/maps');u.searchParams.set('q',query);u.searchParams.set('z','17');u.searchParams.set('output','embed');return u.href;}
+    function setInfo(id,value){$(id).textContent=value||'尚未提供';}
+    function addStory(item){
+      if(item.cover_image){const figure=document.createElement('figure');figure.className='story-img activity-story-img';const img=document.createElement('img');img.src=safeUrl(item.cover_image);img.alt=item.title||'活動圖片';img.loading='lazy';figure.append(img);story.append(figure);if(item.cover_image_source){const cap=document.createElement('p');cap.className='image-source-caption';cap.textContent='圖片來源：'+item.cover_image_source;story.append(cap);}}
+      if(item.content){const content=document.createElement('div');content.className='detail-prose activity-detail-content';content.textContent=item.content;story.append(content);}
+      if(!item.cover_image&&!item.content)story.hidden=true;
+    }
+    function render(item){
+      document.title=`${item.title}｜北投近期活動｜北投旅圖`;
+      const category=document.createElement('p');category.className='activity-category';category.textContent=item.category||'在地活動';
+      const title=document.createElement('h1');title.textContent=item.title||'在地活動';
+      const badge=document.createElement('span');const label=state(item);badge.className='event-status '+(label==='活動中'?'ongoing':label==='活動已結束'?'ended':'upcoming');badge.textContent=label;
+      const meta=document.createElement('div');meta.className='activity-detail-meta';meta.append(badge,document.createTextNode(`${dateText(item.start_date)} – ${dateText(item.end_date)}${item.hours?'｜'+item.hours:''}`));
+      hero.replaceChildren(category,title,meta);
+      $('activityBreadcrumb').textContent=`首頁 〉 近期活動 〉 ${item.title||'活動資訊'}`;
+      if(item.summary){$('activityLead').textContent=item.summary;}else $('activityLead').hidden=true;
+      addStory(item);
+      setInfo('infoDates',`${dateText(item.start_date)} – ${dateText(item.end_date)}`);
+      setInfo('infoHours',item.hours);setInfo('infoVenue',item.venue_name);setInfo('infoAddress',item.address);setInfo('infoAdmission',item.admission);setInfo('infoCategory',item.category);
+      const query=[item.venue_name,item.address].filter(Boolean).join(' ')||item.title||'';
+      const mapUrl=safeUrl(item.google_map)||mapsUrl(query);
+      $('activityMapButton').href=mapUrl;
+      $('activityMapButton').hidden=!query;
+      if(query){$('activityMap').src=mapsEmbedUrl(query);$('activityMapFrame').hidden=false;}
+      const official=safeUrl(item.official_url);if(official){$('activityOfficialButton').href=official;$('activityOfficialButton').hidden=false;}
+      $('activityTransport').textContent=item.transport||'交通方式尚未補充，出發前請先確認主辦單位公告。';
+      const destination=[item.venue_name,item.address].filter(Boolean).join(' ')||item.title||'';
+      const directions=new URL('https://www.google.com/maps/dir/');directions.searchParams.set('api','1');directions.searchParams.set('origin',HOTEL_MAP_ORIGIN);directions.searchParams.set('destination',destination);directions.searchParams.set('travelmode','transit');$('activityDirectionsLink').href=directions.href;
+      $('activityShare').addEventListener('click',async()=>{const payload={title:item.title||'北投近期活動',url:location.href};try{if(navigator.share)await navigator.share(payload);else{await navigator.clipboard.writeText(location.href);alert('活動連結已複製');}}catch(_){}});
+    }
+    async function load(){
+      const id=new URLSearchParams(location.search).get('id');if(!id){hero.textContent='找不到活動編號。';return;}
+      try{const q=new URLSearchParams({select:'*',id:`eq.${id}`,is_published:'eq.true',limit:'1'});const r=await fetch(`${SUPABASE_URL}/rest/v1/events?${q}`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw Error(`讀取失敗 ${r.status}`);const rows=await r.json(),item=rows[0];if(!item||item.end_date<todayTaipei()&&item.end_behavior!=='show_ended'){hero.textContent='這筆活動目前沒有公開，或已結束。';return;}render(item);}catch(error){console.error(error);hero.textContent='目前無法載入活動資料，請稍後再試。';}
+    }
+    load();
+  </script>
+</body>
+</html>

@@ -58,7 +58,7 @@
     box.id = 'metro-font-controls';
     box.setAttribute('role', 'group');
     box.setAttribute('aria-label', '調整網站字級');
-    var frontend = !document.querySelector('.main > .topbar .top-actions') && !document.querySelector('header .top-actions');
+    var frontend = !!document.querySelector('#header .topbar') || (!document.querySelector('.main > .topbar .top-actions') && !document.querySelector('header .top-actions'));
     if (frontend) {
       box.classList.add('metro-font-dropdown');
       box.innerHTML = '<button type="button" class="metro-font-trigger" aria-label="調整字級" aria-haspopup="true" aria-expanded="false" aria-controls="metro-font-menu" title="調整字級">A</button>' +
@@ -67,9 +67,9 @@
     } else {
       box.innerHTML = '<button type="button" data-level="0" aria-label="標準字級" title="標準字級">A</button><button type="button" data-level="1" aria-label="放大字級" title="放大字級">A+</button><button type="button" data-level="2" aria-label="特大字級" title="特大字級">A++</button>';
     }
-    var target = document.querySelector('.main > .topbar .top-actions') || document.querySelector('#header .topbar .nav') || document.querySelector('header.topbar .nav') || document.querySelector('header .top-actions');
-    if (frontend) target = document.querySelector('#hotelLink');
-    if (target && frontend) target.insertAdjacentElement('afterend', box);
+    var target = document.querySelector('.main > .topbar .top-actions') || document.querySelector('#siteHeaderActions') || document.querySelector('#header .topbar .nav') || document.querySelector('header.topbar .nav') || document.querySelector('header .top-actions');
+    if (frontend) target = document.querySelector('#siteHeaderActions') || document.querySelector('#hotelLink');
+    if (target && frontend) target.appendChild(box);
     else if (target) target.appendChild(box);
     else document.body.appendChild(box);
     register(document.body);
@@ -106,10 +106,10 @@
     observer.observe(document.body, {childList:true,subtree:true});
     // 前台頁首由 data.js 非同步建立，出現後才將控制器移入頁首。
     var headerObserver = new MutationObserver(function(){
-      var target = document.querySelector('.main > .topbar .top-actions') || document.querySelector('#header .topbar .nav') || document.querySelector('header.topbar .nav');
+      var target = document.querySelector('.main > .topbar .top-actions') || document.querySelector('#siteHeaderActions') || document.querySelector('#header .topbar .nav') || document.querySelector('header.topbar .nav');
       if (frontend) {
-        target = document.querySelector('#hotelLink');
-        if (target && box.previousElementSibling !== target) target.insertAdjacentElement('afterend', box);
+        target = document.querySelector('#siteHeaderActions') || document.querySelector('#hotelLink');
+        if (target && box.parentElement !== target) target.appendChild(box);
       } else if (target && box.parentElement !== target) target.appendChild(box);
       if (target) headerObserver.disconnect();
     });

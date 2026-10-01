@@ -17,7 +17,7 @@ coffee:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format
 river:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85',
 shop:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85'
 };
-function header(active='') {return `<header class="topbar"><div class="container nav"><a class="brand brand-ci" href="index.html" aria-label="Metro Inn 北投旅圖首頁"><img class="brand-logo-img" id="siteLogoImage" src="metro-inn-logo.svg" alt="METRO INN"><span class="brand-divider"></span><span id="siteLogoText" class="brand-guide-name">北投旅圖</span></a><button class="mobile-nav-toggle" type="button" aria-label="開啟網站選單" aria-expanded="false" aria-controls="mobile-site-menu"><span aria-hidden="true">☰</span><span class="mobile-nav-label">選單</span></button><nav class="menu" id="mobile-site-menu"><a href="news.html">最新消息</a><a href="activities.html">近期活動</a><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a><a href="stories.html">旅人遊記</a><a href="submit.html">投稿分享</a><a id="hotelLink" href="https://btresort.metro.taipei/" target="_blank">北投會館</a></nav><a id="bookingLink" class="nav-book" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div></header>`}
+function header(active='') {return `<header class="topbar"><div class="container nav"><a class="brand brand-ci" href="index.html" aria-label="Metro Inn 北投旅圖首頁"><img class="brand-logo-img" id="siteLogoImage" src="metro-inn-logo.svg" alt="METRO INN"><span class="brand-divider"></span><span id="siteLogoText" class="brand-guide-name">北投旅圖</span></a><button class="mobile-nav-toggle" type="button" aria-label="開啟網站選單" aria-expanded="false" aria-controls="mobile-site-menu"><span aria-hidden="true">☰</span><span class="mobile-nav-label">選單</span></button><nav class="menu" id="mobile-site-menu"><a href="news.html">最新消息</a><a href="activities.html">近期活動</a><div class="nav-dropdown"><button type="button" class="nav-dropdown-toggle" aria-expanded="false">探索 <span aria-hidden="true">⌄</span></button><div class="nav-dropdown-menu"><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a></div></div><a href="stories.html">旅人遊記</a><a href="submit.html">投稿分享</a><a id="hotelLink" href="https://btresort.metro.taipei/" target="_blank" rel="noopener">北投會館</a></nav><a id="bookingLink" class="nav-book" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank">立即訂房 ↗</a></div></header>`}
 // 手機選單：共用頁首，點擊連結、外側或 Esc 後自動關閉。
 document.addEventListener('click', event => {
   const toggle = event.target.closest('.mobile-nav-toggle');
@@ -29,10 +29,17 @@ document.addEventListener('click', event => {
     button.setAttribute('aria-expanded', String(opened));
     button.setAttribute('aria-label', opened ? '關閉網站選單' : '開啟網站選單');
     nav.classList.toggle('is-open', opened);
+  } else if (event.target.closest('.nav-dropdown-toggle')) {
+    const dropdown = event.target.closest('.nav-dropdown');
+    const dropdownButton = dropdown.querySelector('.nav-dropdown-toggle');
+    const opened = dropdownButton.getAttribute('aria-expanded') !== 'true';
+    dropdownButton.setAttribute('aria-expanded', String(opened));
+    dropdown.classList.toggle('is-open', opened);
   } else if (!event.target.closest('#mobile-site-menu') || event.target.closest('#mobile-site-menu a')) {
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-label', '開啟網站選單');
     nav.classList.remove('is-open');
+    nav.querySelectorAll('.nav-dropdown.is-open').forEach(item => {item.classList.remove('is-open');item.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded','false');});
   }
 });
 document.addEventListener('keydown', event => {

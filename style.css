@@ -230,12 +230,14 @@ body:has(.editor-picks) .search-panel{background:#fff}
 .picks-topics button{flex:none;white-space:nowrap;border:1px solid #dddfe2;background:#f7f7f8;color:#4D4D4D;border-radius:12px;padding:12px 19px;font-size:15px;cursor:pointer}
 .picks-topics button.active{border-color:#F3653B;background:#fff;color:#4D4D4D;font-weight:700}
 .picks-carousel{position:relative}
-.picks-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;padding-bottom:3px}
+.picks-track{display:flex;align-items:stretch;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;padding:12px 8px 18px}
 .picks-track::-webkit-scrollbar{display:none}
-.picks-card{flex:0 0 calc((100% - 40px)/3);min-width:0;text-decoration:none;color:inherit;scroll-snap-align:start}
-.picks-photo{position:relative;aspect-ratio:1.28;overflow:hidden;border-radius:12px;background:#ededed}
+.picks-card{flex:0 0 calc((100% - 40px)/3);min-width:0;text-decoration:none;color:inherit;scroll-snap-align:center;transition:flex-basis .32s ease,transform .32s ease}
+.picks-card.is-featured{flex-basis:42%;transform:translateY(-4px)}
+.picks-photo{position:relative;aspect-ratio:1.28;overflow:hidden;border-radius:18px;background:#ededed}
 .picks-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
-.picks-card:hover img{transform:scale(1.025)}
+.picks-card:hover img{transform:scale(1.015)}
+.picks-photo img{border-radius:inherit}
 .picks-caption{position:absolute;inset:auto 0 0;padding:48px 22px 22px;background:linear-gradient(transparent,rgba(0,0,0,.76));color:#fff}
 .picks-caption span{font-size:13px;opacity:.9}.picks-caption h3{font-size:clamp(19px,1.7vw,27px);margin:7px 0 5px;color:#fff}.picks-caption p{font-size:13px;margin:0;line-height:1.5;color:#fff}
 .picks-arrow{position:absolute;z-index:2;top:43%;transform:translateY(-50%);border:0;border-radius:50%;background:#fff;box-shadow:0 2px 18px #0002;width:48px;height:48px;font-size:32px;cursor:pointer;color:#4D4D4D}.picks-arrow.prev{left:-23px}.picks-arrow.next{right:-23px}
@@ -246,13 +248,16 @@ body:has(.editor-picks) .search-panel{background:#fff}
 /* 2026-09 首頁首屏微調：縮小 CI、清楚導覽、讓搜尋在首屏露出。僅作用於首頁。 */
 body:has(.editor-picks) .topbar{height:72px;background:#fff}
 body:has(.editor-picks) .topbar .container{width:min(1180px,calc(100% - 56px))}
-body:has(.editor-picks) .topbar .nav{gap:24px;flex-wrap:nowrap}
+body:has(.editor-picks) .topbar .nav{gap:18px;flex-wrap:nowrap}
 body:has(.editor-picks) .topbar .brand-ci{display:flex;align-items:center;gap:10px;min-width:0;flex:0 1 auto;font-size:16px;white-space:nowrap}
 body:has(.editor-picks) .topbar .brand-logo-img{display:block;width:auto!important;height:34px!important;max-width:215px!important;object-fit:contain!important;flex:none}
 body:has(.editor-picks) .topbar .brand-divider{display:block;width:1px;height:25px;background:#d6d6d6;flex:none}
 body:has(.editor-picks) .topbar .brand-guide-name{font-size:16px;letter-spacing:.02em;font-weight:800;white-space:nowrap}
-body:has(.editor-picks) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.55vw,24px);font-size:15px;font-weight:700;line-height:1.4;flex:1;min-width:0}
+body:has(.editor-picks) .topbar .menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(10px,1.15vw,17px);font-size:14px;font-weight:700;line-height:1.4;flex:1;min-width:0}
 body:has(.editor-picks) .topbar .menu a{white-space:nowrap;word-break:keep-all;flex:none}
+body:has(.editor-picks) .nav-dropdown-menu{display:none;position:absolute;top:100%;left:-14px;z-index:90;min-width:150px;padding:7px 0;background:#fff;border:1px solid #e8e8e8;box-shadow:0 8px 20px #00000012}
+body:has(.editor-picks) .nav-dropdown:hover .nav-dropdown-menu,body:has(.editor-picks) .nav-dropdown:focus-within .nav-dropdown-menu,body:has(.editor-picks) .nav-dropdown.is-open .nav-dropdown-menu{display:block}
+body:has(.editor-picks) .nav-dropdown-menu a{display:block;padding:10px 15px;font-size:14px}
 body:has(.editor-picks) .topbar .nav-book{flex:none;font-size:14px;padding:11px 15px}
 body:has(.editor-picks) .home-banner-carousel{height:clamp(350px,48vh,490px);min-height:0;max-height:490px}
 body:has(.editor-picks) .home-banner-copy h1{font-size:clamp(32px,3.5vw,48px);margin:12px 0}
@@ -269,10 +274,23 @@ body:has(.editor-picks) .search-tags{margin-top:10px;gap:8px 16px}
  body:has(.editor-picks) .topbar .brand-guide-name{font-size:14px}
  body:has(.editor-picks) .topbar .nav{gap:14px}
 }
+@media(min-width:981px){.topbar .nav-dropdown-toggle{padding:8px 0}.topbar .menu>.nav-dropdown{display:flex;align-items:center}}
+/* 共用頁首的「探索」將景點、行程、美食、優惠收在同一個選單。 */
+.nav-dropdown{position:relative;flex:none}
+.nav-dropdown-toggle{border:0;background:transparent;color:inherit;padding:8px 0;font:inherit;font-weight:700;white-space:nowrap;cursor:pointer}
+.nav-dropdown-toggle span{margin-left:3px;color:#F3653B}
+.nav-dropdown-menu{display:none;position:absolute;top:100%;left:-14px;z-index:90;min-width:150px;padding:7px 0;background:#fff;border:1px solid #e8e8e8;box-shadow:0 8px 20px #00000012}
+.nav-dropdown:hover .nav-dropdown-menu,.nav-dropdown:focus-within .nav-dropdown-menu,.nav-dropdown.is-open .nav-dropdown-menu{display:block}
+.nav-dropdown-menu a{display:block!important;padding:10px 15px!important;font-size:14px}
+.nav-dropdown-menu a:hover{background:#f7f7f5}
 @media(max-width:980px){
  body:has(.editor-picks) .topbar .menu,body:has(.editor-picks) .topbar .nav-book{display:none}
  body:has(.editor-picks) .topbar .brand-logo-img{height:30px!important;max-width:190px!important}
 }
+/* 近期活動卡片數量不足三筆時，沿用簡單等寬卡片，避免空格比例失衡。 */
+.home-event-grid:not(:has(.home-event-card:nth-child(3))) {grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.home-event-grid:not(:has(.home-event-card:nth-child(3))) .home-event-card:nth-child(3n + 1){grid-column:auto;display:flex;min-height:0}
+.home-event-grid:not(:has(.home-event-card:nth-child(3))) .home-event-card:nth-child(3n + 1) .home-event-photo{height:218px;min-height:0}
 @media(max-width:760px){
  body:has(.editor-picks) .topbar{height:64px}
  body:has(.editor-picks) .topbar .container{width:calc(100% - 32px)}
@@ -399,8 +417,8 @@ body:has(.editor-picks) .search-tags a:hover{border-color:#F3653B;color:#F3653B}
 .picks-topics{padding-bottom:16px}
 .picks-topics button{border-radius:0;padding:9px 15px;background:#fff}
 .picks-card{flex-basis:29%;}
-.picks-card:first-child{flex-basis:42%}
-.picks-photo{height:300px;aspect-ratio:auto;border-radius:0}
+.picks-card.is-featured{flex-basis:42%}
+.picks-photo{height:300px;aspect-ratio:auto;border-radius:18px}
 .picks-caption{padding:58px 20px 20px}
 .home-news{padding:34px 0 42px!important}
 .home-events{padding:34px 0 36px!important;background:#f7f7f5!important}
@@ -475,7 +493,7 @@ body:has(.editor-picks) .search-tags a:hover{border-color:#F3653B;color:#F3653B}
  .editor-picks{padding:32px 0 34px}
  .picks-heading{margin-bottom:14px}
  .picks-topics{padding-bottom:13px}
- .picks-card,.picks-card:first-child{flex-basis:78%}
+ .picks-card,.picks-card.is-featured{flex-basis:78%}
  .picks-photo{height:260px}
  .home-news{padding:28px 0 34px!important}
  .home-events{padding:26px 0 28px!important}

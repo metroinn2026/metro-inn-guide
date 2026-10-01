@@ -162,7 +162,7 @@ function renderHomeBanners(banners){
     return;
   }
 
-  const bannerItems = valid.slice(0,4);
+  const bannerItems = valid.slice(0,10);
   const slides = bannerItems.map((b,i)=>{
     const pc = b.image_url || b.image_pc;
     const mobile = b.mobile_image_url || b.image_mobile || pc;
@@ -203,7 +203,8 @@ async function loadHomeBanners(){
   }
 
   try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?select=*&order=sort_order.asc&limit=4`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?select=*&order=sort_order.asc&limit=10`, {
+      cache: 'no-store',
       headers:{
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`

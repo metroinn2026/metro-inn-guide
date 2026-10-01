@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
+  <script src="transit-duration.js"></script>
+  <script src="transport-guide.js"></script>
 </head>
 <body id="top" class="activity-detail-page">
   <div id="header"></div>
@@ -48,13 +50,7 @@
       </section>
     </article>
     <aside class="sticky-panel activity-sticky-panel">
-      <section class="sidebox compact metro-transit compact-transit" aria-labelledby="activityTransitTitle">
-        <div class="compact-transit-kicker">TRANSPORT GUIDE</div>
-        <div class="compact-transit-head"><h2 id="activityTransitTitle">大眾運輸交通指南</h2></div>
-        <p id="activityTransport" class="activity-transit-text">交通資訊載入中…</p>
-        <p class="compact-transit-note">路線、時間及距離請以現場與運輸業者資訊為準。</p>
-        <a id="activityDirectionsLink" class="compact-transit-map" target="_blank" rel="noopener noreferrer">從北捷行旅規劃大眾運輸路線 ↗</a>
-      </section>
+<div id="activityTransportGuide"></div>
       <div class="sidebox compact dark">
         <div class="kicker" style="color:white">STAY NEARBY</div>
         <h3>入住北捷行旅</h3>
@@ -71,7 +67,6 @@
     const hero = document.getElementById('activityHeroContent');
     const story = document.getElementById('activityStory');
     const $ = id => document.getElementById(id);
-    const HOTEL_MAP_ORIGIN = '北捷行旅 北投會館 台北市北投區大業路527巷88號';
     function todayTaipei(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
     function safeUrl(raw){if(!raw)return '';try{const u=new URL(raw,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch{return '';}}
     function state(item){const d=todayTaipei();return item.end_date<d?'活動已結束':item.start_date>d?'即將開始':'活動中';}
@@ -102,9 +97,7 @@
       $('activityMapButton').hidden=!query;
       if(query){$('activityMap').src=mapsEmbedUrl(query);$('activityMapFrame').hidden=false;}
       const official=safeUrl(item.official_url);if(official){$('activityOfficialButton').href=official;$('activityOfficialButton').hidden=false;}
-      $('activityTransport').textContent=item.transport||'交通方式尚未補充，出發前請先確認主辦單位公告。';
-      const destination=[item.venue_name,item.address].filter(Boolean).join(' ')||item.title||'';
-      const directions=new URL('https://www.google.com/maps/dir/');directions.searchParams.set('api','1');directions.searchParams.set('origin',HOTEL_MAP_ORIGIN);directions.searchParams.set('destination',destination);directions.searchParams.set('travelmode','transit');$('activityDirectionsLink').href=directions.href;
+      MetroTransportGuide.render($('activityTransportGuide'),item,{destination:[item.title,item.venue_name,item.address].filter(Boolean).join(' ')});
       $('activityShare').addEventListener('click',async()=>{const payload={title:item.title||'北投近期活動',url:location.href};try{if(navigator.share)await navigator.share(payload);else{await navigator.clipboard.writeText(location.href);alert('活動連結已複製');}}catch(_){}});
     }
     async function load(){

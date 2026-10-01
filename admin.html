@@ -1091,6 +1091,7 @@
           <div class="nav-group">
             <div class="nav-group-title">內容管理</div>
             <a data-table="news">最新消息</a>
+            <a data-table="events">活動情報管理</a>
             <a data-table="spots">景點管理</a>
 
             <a data-table="foods">美食管理</a>
@@ -1780,6 +1781,42 @@
           tips: `<ul class="tip-list"><li><b>超級管理員</b>：可新增管理員帳號、調整權限、管理所有內容。</li><li><b>管理員</b>：可管理 Banner、消息、景點、美食、行程、優惠，但不可建立其他管理員。</li><li>建立帳號會透過 Vercel API 寫入 Supabase Auth，因此 Vercel 需設定 SERVICE ROLE KEY。</li></ul>`,
         },
 
+        events: {
+          label: "活動情報管理",
+          kicker: "EVENTS",
+          table: "events",
+          preview: "activity.html?id=",
+          hint: "管理北投及周邊展覽、節慶、市集等活動。活動狀態依起訖日期自動判斷；可選擇結束後顯示「已結束」或自動隱藏。首頁精選勾選後最多顯示 6 筆，請選有封面圖的活動。",
+          fields: [
+            ["id", "活動編號", "text", "auto"],
+            ["sort_order", "排序數字", "number"],
+            ["title", "活動名稱", "text", "required"],
+            ["category", "活動類型", "eventCategory"],
+            ["summary", "活動簡介", "textarea"],
+            ["content", "活動補充說明", "textarea"],
+            ["cover_image", "活動封面圖（建議 1200×800）", "image"],
+            ["cover_image_source", "圖片來源", "text"],
+            ["start_date", "活動開始日期", "date"],
+            ["end_date", "活動結束日期", "date"],
+            ["hours", "活動時間／開放時間", "text"],
+            ["venue_name", "活動地點", "text"],
+            ["address", "地址", "text"],
+            ["transport", "交通方式／怎麼去", "textarea"],
+            ["admission", "費用／入場方式", "text"],
+            ["google_map", "Google 地圖連結", "text"],
+            ["official_url", "主辦單位活動資訊連結", "text"],
+            ["is_home_featured", "加入首頁精選活動", "eventFeatured"],
+            ["end_behavior", "活動結束後", "eventEndBehavior"],
+            ["is_published", "上架狀態", "boolean"],
+          ],
+          columns: ["title", "start_date", "is_published"],
+          subtitle: (x) => `${x.start_date || "未設定"} ～ ${x.end_date || "未設定"}`,
+          statusKey: "is_published",
+          typeOptions: [["all", "全部類型"], ["展覽", "展覽"], ["節慶", "節慶"], ["市集", "市集"], ["親子", "親子"], ["表演", "表演"], ["其他", "其他"]],
+          order: "sort_order",
+          idPrefix: "event",
+          tips: `<ul class="tip-list"><li>請填寫活動起訖日期、地點與交通方式，前台會自動顯示「即將開始／活動中／活動已結束」。</li><li>活動結束後可選擇保留「已結束」標籤，或自動從前台隱藏；資料仍會保留在後台。</li><li>勾選「加入首頁精選活動」會在首頁最多顯示 6 筆，依排序數字排列。</li><li>上架前請確認日期、交通、主辦單位連結及圖片來源。</li></ul>`,
+        },
         news: {
           label: "最新消息",
           kicker: "NEWS",
@@ -3117,6 +3154,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           : "none";
         document.getElementById("contentCountCard").hidden = ![
           "news",
+          "events",
           "spots",
           "foods",
           "trips",
@@ -3363,6 +3401,12 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               return featuredContentTemplate(name, label);
             if (type === "featuredTopics")
               return featuredTopicsTemplate(name, label);
+            if (type === "eventCategory")
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="其他">其他</option><option value="展覽">展覽</option><option value="節慶">節慶</option><option value="市集">市集</option><option value="親子">親子</option><option value="表演">表演</option></select></div>`;
+            if (type === "eventEndBehavior")
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="hide_after_end">結束後自動隱藏</option><option value="show_ended">保留並顯示「活動已結束」</option></select><div class="help">隱藏只影響前台，活動資料仍保留在後台。</div></div>`;
+            if (type === "eventFeatured")
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="false">否，僅顯示於活動列表</option><option value="true">是，推薦在首頁</option></select><div class="help">首頁最多顯示 6 筆精選活動，依排序數字排列。</div></div>`;
             if (type === "image") return imageFieldTemplate(name, label);
             if (type === "textarea")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
@@ -3385,6 +3429,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         "trips",
         "coupons",
         "news",
+        "events",
       ]);
       let adminChecked = new Set(),
         adminBusy = false;
@@ -3519,9 +3564,9 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             String(item.id || "")
           : label + "管理 / 新增資料";
         const status = document.getElementById("editorStatus");
-        status.hidden = !["spots", "foods", "trips"].includes(currentTable);
+        status.hidden = !["spots", "foods", "trips", "events"].includes(currentTable);
         status.textContent = item?.is_published
-          ? "已上架"
+          ? currentTable === "events" ? "已上架／依日期顯示" : "已上架"
           : item
             ? "未上架"
             : "新草稿";
@@ -3546,15 +3591,19 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
                 .reduce((a, b) => Math.max(a, b), 0) || cache.length) + 1,
             );
           else if (name === "is_published")
-            el.value = ["spots", "foods", "trips"].includes(currentTable)
+            el.value = ["spots", "foods", "trips", "events"].includes(currentTable)
               ? "false"
               : "true";
+          else if (name === "is_home_featured") el.value = "false";
+          else if (name === "end_behavior") el.value = "hide_after_end";
           else if (name === "is_active") el.value = "true";
           else if (
             type === "date" &&
             (name === "publish_date" || name === "start_date")
           )
-            el.value = new Date().toISOString().slice(0, 10);
+            el.value = new Intl.DateTimeFormat("en-CA", {
+              timeZone: "Asia/Taipei", year: "numeric", month: "2-digit", day: "2-digit",
+            }).format(new Date());
           else el.value = "";
         });
         if (currentTable === "trips") renderTripSections([]);
@@ -3620,7 +3669,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           return false;
         }
         cache = data || [];
-        if (["news", "spots", "foods", "trips", "coupons"].includes(table)) {
+        if (["news", "events", "spots", "foods", "trips", "coupons"].includes(table)) {
           document.getElementById("contentCountNumber").textContent =
             count == null ? "—" : count.toLocaleString("zh-TW");
           document.getElementById("contentCountDetail").textContent =
@@ -3646,6 +3695,20 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           return '<span class="role-pill super">超級管理員</span>';
         if (role === "admin") return '<span class="role-pill">管理員</span>';
         return '<span class="badge">未設定</span>';
+      }
+
+      function eventAdminStatus(item) {
+        if (!item.is_published) return '<span class="status draft">草稿</span>';
+        const today = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Taipei", year: "numeric", month: "2-digit", day: "2-digit",
+        }).format(new Date());
+        if (item.end_date < today)
+          return item.end_behavior === "show_ended"
+            ? '<span class="status draft">活動已結束</span>'
+            : '<span class="status draft">已結束／前台隱藏</span>';
+        if (item.start_date > today)
+          return '<span class="status on">即將開始</span>';
+        return '<span class="status on">活動中</span>';
       }
 
       function renderList() {
@@ -3711,7 +3774,9 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             const title =
               item.title || item.footer_title || item.booking_text || item.id;
             const statusHtml =
-              currentTable === "admin_profiles"
+              currentTable === "events"
+                ? eventAdminStatus(item)
+                : currentTable === "admin_profiles"
                 ? roleLabel(item.role)
                 : cfg.statusKey
                   ? `<span class="status ${item[cfg.statusKey] ? "on" : "draft"}">${item[cfg.statusKey] ? (currentTable === "banners" ? "啟用" : "已上架") : currentTable === "banners" ? "停用" : "草稿"}</span>`
@@ -3819,7 +3884,9 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             const title =
               item.title || item.footer_title || item.booking_text || item.id;
             const statusHtml =
-              currentTable === "admin_profiles"
+              currentTable === "events"
+                ? eventAdminStatus(item)
+                : currentTable === "admin_profiles"
                 ? roleLabel(item.role)
                 : cfg.statusKey
                   ? `<span class="status ${item[cfg.statusKey] ? "on" : "draft"}">${item[cfg.statusKey] ? (currentTable === "banners" ? "啟用" : "已上架") : currentTable === "banners" ? "停用" : "草稿"}</span>`
@@ -3886,7 +3953,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         configs[currentTable].fields.forEach(([name, label, type]) => {
           const el = document.getElementById("f_" + name);
           if (!el) return;
-          if (type === "boolean" || type === "booleanActive")
+          if (type === "boolean" || type === "booleanActive" || type === "eventFeatured")
             el.value = item[name] ? "true" : "false";
           else if (name === "password") el.value = "";
           else if (name === "transport_routes") {
@@ -3958,7 +4025,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               invalidTransportRoutes = true;
               return;
             }
-          } else if (type === "boolean" || type === "booleanActive")
+          } else if (type === "boolean" || type === "booleanActive" || type === "eventFeatured")
             payload[name] = el.value === "true";
           else if (type === "number")
             payload[name] = el.value === "" ? null : Number(el.value);
@@ -4146,6 +4213,27 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         ) {
           msg.textContent = "請輸入標題 / 名稱。";
           return;
+        }
+        if (currentTable === "events") {
+          if (!payload.start_date || !payload.end_date) {
+            msg.textContent = "請填寫活動開始及結束日期。";
+            return;
+          }
+          if (payload.end_date < payload.start_date) {
+            msg.textContent = "結束日期不可早於開始日期。";
+            return;
+          }
+          if (payload.is_home_featured && !payload.cover_image) {
+            msg.textContent = "加入首頁精選前，請先設定活動封面圖片。";
+            return;
+          }
+          if (
+            payload.is_home_featured &&
+            cache.filter((x) => x.is_home_featured && String(x.id) !== String(payload.id)).length >= 6
+          ) {
+            msg.textContent = "首頁精選活動最多 6 筆，請先取消其他活動的首頁精選。";
+            return;
+          }
         }
         // Existing records use UPDATE rather than UPSERT: UPDATE-only RLS does not imply INSERT permission.
         // Draft updates must not rewrite review/publish fields, even with stale cache values.

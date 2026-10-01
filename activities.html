@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>北投近期活動｜北投旅圖</title><link rel="stylesheet" href="style.css"><script src="data.js"></script><script src="supabase-config.js"></script></head>
+<body class="activities-page"><div id="header"></div>
+<main>
+  <section class="directory-hero"><div class="container"><div class="kicker">WHAT'S ON IN BEITOU</div><h1>北投近期活動</h1><p>展覽、節慶、市集與周邊活動資訊，出發前先看看最近有什麼值得順道安排。</p></div></section>
+  <section class="section activity-directory"><div class="container">
+    <div class="activity-filters" role="group" aria-label="活動狀態篩選"><button type="button" class="active" data-filter="all" aria-pressed="true">全部</button><button type="button" data-filter="ongoing" aria-pressed="false">活動中</button><button type="button" data-filter="upcoming" aria-pressed="false">即將開始</button><button type="button" data-filter="ended" aria-pressed="false">已結束</button></div>
+    <div id="activityList" class="activity-list-grid" aria-live="polite"><p class="activity-message">活動資料載入中…</p></div>
+  </div></section>
+</main><div id="footer"></div>
+<script>
+document.getElementById('header').innerHTML=header();document.getElementById('footer').innerHTML=footer();
+const list=document.getElementById('activityList');let allEvents=[];let currentFilter='all';
+function todayTaipei(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+function state(item){const t=todayTaipei();return item.end_date<t?'ended':item.start_date>t?'upcoming':'ongoing';}
+function label(item){return ({ended:'活動已結束',upcoming:'即將開始',ongoing:'活動中'})[state(item)];}
+function dateText(value){if(!value)return '';const [y,m,d]=value.slice(0,10).split('-');return `${y}.${m}.${d}`;}
+function safeUrl(raw){if(!raw)return '';try{const u=new URL(raw,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch{return '';}}
+function render(){let items=allEvents.filter(x=>!(state(x)==='ended'&&x.end_behavior!=='show_ended'));if(currentFilter!=='all')items=items.filter(x=>state(x)===currentFilter);const rank={ongoing:0,upcoming:1,ended:2};items.sort((a,b)=>rank[state(a)]-rank[state(b)]||String(a.start_date).localeCompare(String(b.start_date))||Number(a.sort_order||0)-Number(b.sort_order||0));list.replaceChildren();if(!items.length){const p=document.createElement('p');p.className='activity-message';p.textContent='目前沒有符合條件的活動，請稍後再查看。';list.append(p);return;}items.forEach(item=>{const a=document.createElement('a');a.className='activity-list-card';a.href='activity.html?id='+encodeURIComponent(item.id);const imgUrl=safeUrl(item.cover_image);if(imgUrl){const img=document.createElement('img');img.className='activity-list-photo';img.src=imgUrl;img.alt=item.title||'活動圖片';img.loading='lazy';a.append(img);}const body=document.createElement('div');body.className='activity-list-copy';const meta=document.createElement('div');meta.className='activity-list-meta';const badge=document.createElement('span');badge.className='event-status '+state(item);badge.textContent=label(item);const dates=document.createElement('time');dates.textContent=`${dateText(item.start_date)} – ${dateText(item.end_date)}`;dates.dateTime=item.start_date;meta.append(badge,dates);const category=document.createElement('span');category.className='activity-category';category.textContent=item.category||'在地活動';const title=document.createElement('h2');title.textContent=item.title||'活動';const summary=document.createElement('p');summary.textContent=item.summary||'';const venue=document.createElement('p');venue.className='activity-venue';venue.textContent=item.venue_name||item.address||'';const more=document.createElement('span');more.className='home-event-more';more.textContent='活動資訊與交通 ↗';body.append(meta,category,title,summary,venue,more);a.append(body);list.append(a);});}
+document.querySelectorAll('.activity-filters button').forEach(button=>button.addEventListener('click',()=>{currentFilter=button.dataset.filter;document.querySelectorAll('.activity-filters button').forEach(x=>{const selected=x===button;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected));});render();}));
+async function load(){if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined'){list.textContent='活動資料目前無法載入。';return;}try{const r=await fetch(`${SUPABASE_URL}/rest/v1/events?select=id,title,category,summary,cover_image,start_date,end_date,venue_name,address,sort_order,is_published,end_behavior&is_published=eq.true&order=start_date.asc`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw Error(`讀取失敗 ${r.status}`);allEvents=await r.json();render();}catch(error){console.error(error);list.textContent='活動資料目前無法載入，請稍後再試。';}}
+load();
+</script></body></html>

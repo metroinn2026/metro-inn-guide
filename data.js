@@ -94,7 +94,21 @@ async function loadSiteSettings(){
     const setText=(id,val)=>{const el=document.getElementById(id); if(el && val) el.textContent=val;};
     const setHref=(id,val)=>{const el=document.getElementById(id); if(el && val) el.href=val;};
     setText('siteLogoText', s.logo_text || '北投旅圖');
+    setText('homeDefaultBanner1Title', s.home_default_banner_1_title);
     setText('homeIntroText', s.home_intro_text);
+    setText('homeDefaultBanner2Title', s.home_default_banner_2_title);
+    setText('homeDefaultBanner2Subtitle', s.home_default_banner_2_subtitle);
+    setText('homeDefaultBanner3Title', s.home_default_banner_3_title);
+    setText('homeDefaultBanner3Subtitle', s.home_default_banner_3_subtitle);
+    const setButton=(id,text,url)=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(text) el.textContent=text;
+      if(url) el.href=url;
+    };
+    setButton('homeDefaultBanner1Button',s.home_default_banner_1_button_text,s.home_default_banner_1_button_url);
+    setButton('homeDefaultBanner2Button',s.home_default_banner_2_button_text,s.home_default_banner_2_button_url);
+    setButton('homeDefaultBanner3Button',s.home_default_banner_3_button_text,s.home_default_banner_3_button_url);
     const logo = document.getElementById('siteLogoImage');
     if(logo && typeof s.logo_url === 'string' && /^https:\/\//i.test(s.logo_url.trim())) logo.src = s.logo_url.trim();
     setText('footerTitle', s.footer_title || s.site_title);

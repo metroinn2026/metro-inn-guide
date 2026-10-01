@@ -46,7 +46,7 @@
 
 <section class="section home-events" id="homeEvents"><div class="container"><div class="section-head compact home-events-head"><div><h2>北投近期活動</h2><p>展覽、節慶與在地活動，安排旅程時順道走走。</p></div><a class="section-link" href="activities.html">查看全部活動 ↗</a></div><div class="home-event-grid" id="homeEventGrid" aria-live="polite"><p class="home-event-empty">目前沒有精選活動，敬請期待。</p></div></div></section>
 
-<section class="section home-news" id="news"><div class="container"><div class="section-head compact"><div><h2>最新消息</h2></div></div><div class="news-line-list" id="homeNewsList" aria-live="polite"><a class="news-line" href="news.html"><time>最新消息</time><strong>查看北投旅圖最新活動與旅遊資訊</strong><span class="news-chevron" aria-hidden="true">›</span></a></div><div class="home-news-bottom"><a href="news.html">查看更多消息 ↗</a></div></div></section>
+<section class="section home-news" id="news"><div class="container"><div class="home-news-layout"><figure class="home-news-art"><img src="images/home-news-beitou.png" alt="" aria-hidden="true"></figure><div class="home-news-main"><header class="home-news-heading"><span class="home-news-heading-rule" aria-hidden="true"></span><div><p class="home-news-kicker">INFORMATION</p><h2>最新消息</h2></div></header><div class="news-line-list" id="homeNewsList" aria-live="polite"><a class="news-line news-line-fallback" href="news.html"><time>北投旅圖</time><span class="news-kind">消息</span><strong>查看所有已發布消息</strong><span class="news-chevron" aria-hidden="true">→</span></a></div><div class="home-news-bottom"><a href="news.html">進一步瀏覽消息 <span aria-hidden="true">→</span></a></div></div></div></div></section>
 
 <section class="editor-picks section" id="picks"><div class="container">
   <div class="picks-heading"><div><h2>找到你的北投旅行方式</h2><p>從溫泉、散步到在地美食，探索適合自己的旅行體驗。</p></div></div>
@@ -244,16 +244,17 @@ async function loadHomeNews(){
   const items=await response.json();
   if(!Array.isArray(items)||!items.length) return;
   list.replaceChildren();
-  items.forEach(item=>{
-   const link=document.createElement('a');link.className='news-line';
+  items.forEach((item,index)=>{
+   const link=document.createElement('a');link.className='news-line'+(index===0?' news-line-featured':'');
    link.href='news-detail.html?id='+encodeURIComponent(item.id);
    const time=document.createElement('time');
    const date=item.publish_date?new Date(item.publish_date+'T00:00:00'):null;
    time.textContent=date&&!Number.isNaN(date.getTime())?`${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`:'最新消息';
    if(item.publish_date)time.dateTime=item.publish_date;
+   const kind=document.createElement('span');kind.className='news-kind';kind.textContent=index===0?'最新':'消息';
    const title=document.createElement('strong');title.textContent=item.title||'最新消息';
-   const arrow=document.createElement('span');arrow.className='news-chevron';arrow.setAttribute('aria-hidden','true');arrow.textContent='›';
-   link.append(time,title,arrow);list.append(link);
+   const arrow=document.createElement('span');arrow.className='news-chevron';arrow.setAttribute('aria-hidden','true');arrow.textContent='→';
+   link.append(time,kind,title,arrow);list.append(link);
   });
  }catch(error){console.warn('首頁最新消息讀取失敗，保留列表入口',error);}
 }

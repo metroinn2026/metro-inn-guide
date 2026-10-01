@@ -834,15 +834,17 @@ body.trip-detail-page .trip-main-image img{display:block;width:100%;height:auto;
 /* 頁首一致化：主選單採相同寬高且相鄰的橘色 hover 方塊。 */
 @media(min-width:1121px){
  .topbar .nav{gap:12px}
- .topbar .menu{gap:0!important;justify-content:flex-start!important;align-self:stretch}
- .topbar .menu>a,.topbar .menu>.nav-dropdown{flex:1 1 0;width:auto;min-width:0}
+ .topbar .menu{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:0!important;justify-content:stretch!important;align-self:stretch;align-items:stretch}
+ .topbar .menu>a,.topbar .menu>.nav-dropdown{flex:none;width:100%;min-width:0;max-width:100%}
  .topbar .menu>a,.topbar .menu>.nav-dropdown>.nav-dropdown-toggle{height:50px;min-height:50px;padding:0 7px!important;box-sizing:border-box}
  .topbar .menu>.nav-dropdown>.nav-dropdown-toggle{width:100%}
- .topbar .menu>.nav-dropdown{height:50px}
+ .topbar .menu>.nav-dropdown{height:50px;display:block;position:relative}
  .topbar .menu>a:hover,.topbar .menu>a:focus-visible,
  .topbar .menu>.nav-dropdown>.nav-dropdown-toggle:hover,.topbar .menu>.nav-dropdown>.nav-dropdown-toggle:focus-visible{background:#F3653B!important;color:#fff!important}
  .topbar .nav-book{height:50px;min-height:50px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;padding:0 18px!important}
 }
+/* Keep the complete site header visible and above page content while scrolling. */
+.topbar{position:sticky!important;top:0!important;z-index:1000!important;isolation:isolate}
 .topbar .nav #siteHeaderActions{display:inline-flex;align-items:center;gap:4px!important;flex:0 0 auto;margin:0 0 0 4px!important}
 .topbar .site-search-toggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;padding:0;border:1px solid #dedede;background:#fff;color:#4D4D4D;cursor:pointer}
 .topbar .site-search-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}

@@ -1661,7 +1661,7 @@
           kicker: "SETTING",
           table: "site_settings",
           preview: "index.html",
-          hint: "這裡管理全站共用資訊，例如 Logo、訂房按鈕、頁尾地址、電話、社群連結。此資料表固定只有 1 筆。",
+          hint: "這裡管理全站共用資訊，例如首頁主視覺介紹、Logo、訂房按鈕、頁尾地址、電話與社群連結。此資料表固定只有 1 筆。",
           fields: [
             ["id", "ID", "number", "fixed1"],
             [
@@ -1669,6 +1669,7 @@
               "網站 CI／Logo（支援 SVG、透明 PNG 或 WEBP）",
               "image",
             ],
+            ["home_intro_text", "首頁主視覺介紹文字（紅框文字）", "textarea"],
             ["booking_text", "訂房按鈕文字", "text"],
             ["booking_url", "訂房按鈕連結", "text"],
             ["footer_title", "頁尾標題", "text"],

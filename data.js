@@ -94,6 +94,7 @@ async function loadSiteSettings(){
     const setText=(id,val)=>{const el=document.getElementById(id); if(el && val) el.textContent=val;};
     const setHref=(id,val)=>{const el=document.getElementById(id); if(el && val) el.href=val;};
     setText('siteLogoText', s.logo_text || '北投旅圖');
+    setText('homeIntroText', s.home_intro_text);
     const logo = document.getElementById('siteLogoImage');
     if(logo && typeof s.logo_url === 'string' && /^https:\/\//i.test(s.logo_url.trim())) logo.src = s.logo_url.trim();
     setText('footerTitle', s.footer_title || s.site_title);

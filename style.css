@@ -1044,3 +1044,37 @@ body:has(.editor-picks) .home-journey .mag-feature-copy p{margin-bottom:18px!imp
  body:has(.editor-picks) .home-journey .mag-feature{grid-template-columns:1fr;gap:22px}
  body:has(.editor-picks) .home-journey .mag-feature-img{height:240px}
 }
+
+/* 活動內頁：活動資訊與大眾運輸指南採用景點頁的側欄資訊結構，地圖另以全寬呈現。 */
+.activity-detail-aside{display:flex;flex-direction:column;gap:24px;min-width:0}
+.activity-side-panel{min-width:0;border-top:4px solid #4D4D4D;padding:20px 0 0}
+.activity-side-panel h2{font-size:19px;line-height:1.4;margin:0 0 12px;color:#4D4D4D}
+.activity-info-panel .compact-transit-kicker{margin-bottom:7px}
+.activity-info-row{grid-template-columns:90px minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid #e5e5e5}
+.activity-info-value{min-width:0;color:#666;white-space:pre-line}
+.activity-info-value p{margin:0;white-space:pre-line;color:inherit}
+.activity-info-value a{display:inline-block;margin-top:5px;color:#F3653B;font-size:13px;font-weight:700}
+.activity-transit-panel{background:#f7f7f5;border:1px solid #e5e5e5;border-top:4px solid #4D4D4D;padding:18px}
+.activity-transit-panel .compact-transit-head{margin-bottom:10px}
+.activity-transit-panel .compact-transit-head h2{font-size:18px;white-space:normal}
+.activity-transit-text{margin:0 0 10px;color:#666;font-size:14px;line-height:1.8;white-space:pre-line}
+.activity-transit-panel .compact-transit-map{margin:0;padding:12px 0 0;border-top:1px solid #e1e1e1;color:#4D4D4D;line-height:1.6}
+.activity-map-wrap{margin-top:42px}
+.activity-map-wrap[hidden]{display:none}
+.activity-map-wrap h2{font-size:22px;line-height:1.4;color:#4D4D4D;margin:0 0 16px}
+.activity-map-embed{display:block;width:100%;height:380px;border:1px solid #e5e5e5;background:#f5f5f5}
+.activity-map-link{display:inline-block;margin-top:12px;color:#F3653B;font-size:14px;font-weight:700}
+@media(min-width:981px){.activity-detail-aside{position:sticky;top:96px}}
+@media(max-width:760px){
+ .activity-detail-layout{grid-template-columns:1fr;gap:28px}
+ .activity-detail-aside{gap:20px}
+ .activity-map-wrap{margin-top:30px}
+ .activity-map-embed{height:300px}
+ .activity-info-row{grid-template-columns:82px minmax(0,1fr);gap:8px;font-size:13px}
+}
+/* 頁首捲動時只收合上排，主導覽尺寸固定，避免多個元素同時縮放造成晃動感。 */
+.header-primary-row .container.nav{transition:none!important}
+#header.is-scrolled .header-primary-row .container.nav{height:72px!important}
+#header.is-scrolled .header-primary-row .brand-logo-img{height:34px!important;max-height:34px!important}
+#header.is-scrolled .header-primary-row .nav-book{height:50px;min-height:50px}
+.header-utility-row{transition:max-height .18s ease,opacity .16s ease}

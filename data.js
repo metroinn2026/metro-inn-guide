@@ -21,9 +21,18 @@ function header(active='') {return `<header class="topbar">
 <div class="header-utility-row"><div class="container utility-inner"><nav class="header-utility-links" aria-label="延伸服務"><a href="stories.html">旅人遊記</a><a href="submit.html">投稿分享</a><a href="https://btresort.metro.taipei/" target="_blank" rel="noopener">北投會館</a></nav></div></div>
 <div class="header-primary-row"><div class="container nav"><a class="brand brand-ci" href="index.html" aria-label="Metro Inn 北投旅圖首頁"><img class="brand-logo-img" id="siteLogoImage" src="metro-inn-logo.svg" alt="METRO INN"><span class="brand-divider"></span><span id="siteLogoText" class="brand-guide-name">北投旅圖</span></a><button class="mobile-nav-toggle" type="button" aria-label="開啟網站選單" aria-expanded="false" aria-controls="mobile-site-menu"><span aria-hidden="true">☰</span><span class="mobile-nav-label">選單</span></button><nav class="menu" id="mobile-site-menu"><a href="news.html">最新消息</a><a href="activities.html">近期活動</a><div class="nav-dropdown"><button type="button" class="nav-dropdown-toggle" aria-expanded="false">探索</button><div class="nav-dropdown-menu"><a href="spots.html">景點</a><a href="trips.html">行程</a><a href="foods.html">美食</a><a href="coupons.html">優惠</a></div></div><a class="mobile-utility-link" href="stories.html">旅人遊記</a><a class="mobile-utility-link" href="submit.html">投稿分享</a><a class="mobile-utility-link" href="https://btresort.metro.taipei/" target="_blank" rel="noopener">北投會館</a></nav><div class="top-actions" id="siteHeaderActions"><button type="button" class="site-search-toggle" id="siteSearchToggle" aria-label="搜尋網站" aria-expanded="false" title="搜尋網站"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg></button></div><a id="bookingLink" class="nav-book" href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a></div></div>
 </header>`}
-function updateHeaderScrollState(){document.getElementById('header')?.classList.toggle('is-scrolled',window.scrollY>40)}
+let headerIsScrolled = false;
+function updateHeaderScrollState(){
+  const header = document.getElementById('header');
+  if (!header) return;
+  const y = window.scrollY || document.documentElement.scrollTop || 0;
+  // Hysteresis keeps the 36px utility row from toggling repeatedly as it collapses.
+  if (!headerIsScrolled && y > 120) headerIsScrolled = true;
+  else if (headerIsScrolled && y < 32) headerIsScrolled = false;
+  header.classList.toggle('is-scrolled', headerIsScrolled);
+}
 window.addEventListener('scroll',updateHeaderScrollState,{passive:true});
-window.addEventListener('pageshow',updateHeaderScrollState);
+window.addEventListener('pageshow',()=>{headerIsScrolled=(window.scrollY||0)>120;updateHeaderScrollState();});
 requestAnimationFrame(updateHeaderScrollState);
 // 手機選單：共用頁首，點擊連結、外側或 Esc 後自動關閉。
 document.addEventListener('click', event => {

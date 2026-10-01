@@ -822,7 +822,7 @@
         gap: 8px;
         justify-content: flex-end;
       }
-      /* 景點／美食／行程：左側預覽，右側完整表單。其他管理模組維持原狀。 */
+      /* 景點／美食／行程／活動：左側預覽，右側完整表單。 */
       #editorView.content-split .editor-grid {
         display: grid !important;
         grid-template-columns: minmax(280px, 38%) minmax(0, 1fr) !important;
@@ -1602,14 +1602,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="secure-delete.js"></script>
-    <script src="cms-schema.js"></script>
+      <script src="cms-schema.js?v=20261001-unified-event-editor"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="bulk-data.js"></script>
     <script src="transit-duration.js"></script>
-    <script src="cms-editor.js"></script>
+      <script src="cms-editor.js?v=20261001-unified-event-editor"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
-    <script src="cms-preview.js"></script>
+      <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
     <script>
       const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -2015,9 +2015,19 @@
         },
       };
 
-      // 景點、美食、行程統一引用共用欄位定義；其餘模組保留原版。
+      // 景點、美食、行程、活動共用欄位定義；其餘模組保留原版。
       for (const type of MetroCmsSchema.types) {
         configs[type].fields = MetroCmsSchema.fields(type);
+      }
+      for (const type of ["spots", "foods", "trips", "events"]) {
+        configs[type].fields = configs[type].fields.map((field) => {
+          if (field[0] === "title") return [field[0], "名稱", ...field.slice(2)];
+          if (field[0] === "summary") return [field[0], "摘要", ...field.slice(2)];
+          if (field[0] === "content") return [field[0], "介紹內容", ...field.slice(2)];
+          if (field[0] === "cover_image_source") return [field[0], "圖片來源", ...field.slice(2)];
+          if (field[0] === "is_published") return [field[0], "發布狀態", ...field.slice(2)];
+          return field;
+        });
       }
 
       const relatedTypes = ["spots", "foods", "trips"];
@@ -3243,7 +3253,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         if (
           !card ||
           card.hidden ||
-          !["spots", "foods", "trips"].includes(currentTable)
+          !["spots", "foods", "trips", "events"].includes(currentTable)
         )
           return;
         const error = document.getElementById("adminPreviewError");
@@ -3259,21 +3269,26 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             values,
             true,
           );
-          let routePreview = document.getElementById("adminRouteTimeline");
-          if (!routePreview) {
-            routePreview = document.createElement("div");
-            routePreview.id = "adminRouteTimeline";
-            routePreview.className = "metro-transit";
-            document.getElementById("adminDraftPreview").after(routePreview);
+          if (currentTable === "events") {
+            const routePreview = document.getElementById("adminRouteTimeline");
+            routePreview?.remove();
+          } else {
+            let routePreview = document.getElementById("adminRouteTimeline");
+            if (!routePreview) {
+              routePreview = document.createElement("div");
+              routePreview.id = "adminRouteTimeline";
+              routePreview.className = "metro-transit";
+              document.getElementById("adminDraftPreview").after(routePreview);
+            }
+            MetroRouteTimeline.render(routePreview, values.transport_routes);
           }
-          MetroRouteTimeline.render(routePreview, values.transport_routes);
         } catch (e) {
           error.textContent = "請先修正欄位，預覽暫停更新：" + e.message;
           document.getElementById("adminPreviewState").textContent = "待修正";
         }
       }
       function syncAdminPreviewLayout() {
-        const enabled = ["spots", "foods", "trips"].includes(currentTable);
+        const enabled = ["spots", "foods", "trips", "events"].includes(currentTable);
         document
           .getElementById("editorView")
           .classList.toggle("content-split", enabled);
@@ -3284,7 +3299,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
       function mountAdminSharedEditor() {
         const root = document.getElementById("sharedAdminEditor");
         const legacy = document.getElementById("formFields");
-        const supported = ["spots", "foods", "trips"].includes(currentTable);
+        const supported = ["spots", "foods", "trips", "events"].includes(currentTable);
         adminSharedEditor = null;
         root.hidden = !supported;
         legacy.hidden = supported;
@@ -3346,6 +3361,14 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         };
         adminSharedEditor = MetroCmsEditor.mount(mount, currentTable, record, {
           layout: "all",
+          fieldValue: (key) => {
+            const el = document.getElementById("f_" + key);
+            if (!el) return record[key];
+            if (key === "transport" || key === "google_map" || key === "official_url") return el.value;
+            if (key === "is_home_featured" || key === "end_behavior") return el.value;
+            if (key === "sort_order") return el.value === "" ? null : Number(el.value);
+            return el.value;
+          },
           uploadImage: async (name, file) => {
             const url = await uploadImageForField(name, file);
             if (!url)
@@ -3359,6 +3382,16 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             const el = document.getElementById("f_" + name);
             if (!el) return;
             const value = record[name];
+            if (currentTable === "events") {
+              el.value = value ?? "";
+              scheduleAdminDraftPreview();
+              return;
+            }
+            if (name === "transport" || name === "google_map" || name === "official_url" || name === "is_home_featured" || name === "end_behavior" || name === "sort_order") {
+              el.value = value ?? "";
+              scheduleAdminDraftPreview();
+              return;
+            }
             if (name === "trip_sections") {
               if (Array.isArray(value)) renderTripSections(value);
             } else if (name === "transport_routes")

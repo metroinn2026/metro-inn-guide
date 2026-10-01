@@ -1,13 +1,18 @@
 <!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>CMS browser smoke</title><div id="root"></div><pre id="result">RUNNING</pre><script src="cms-schema.js"></script><script src="cms-editor.js"></script><script>
 const results=[];function check(name,condition){results.push((condition?'PASS ':'FAIL ')+name);if(!condition)throw Error(name)}
 try{
- for(const type of ['spots','foods','trips']){
-  const record={id:'test',title:'測試',transport_routes:{metro:'MRT'},trip_sections:[]};let changes=0,invalid=0;
+ for(const type of ['spots','foods','trips','events']){
+  const record={id:'test',title:'測試',transport_routes:[],transport:'步行｜約5分鐘\n新北投站',category:'展覽',start_date:'2026-10-01',end_date:'2026-10-03',is_home_featured:false,end_behavior:'hide_after_end',trip_sections:[]};let changes=0,invalid=0;
   const editor=MetroCmsEditor.mount(document.getElementById('root'),type,record,{onChange:()=>changes++,onInvalid:()=>invalid++});
   check(type+' initial title',editor.values().title==='測試');
   const tabs=[...document.querySelectorAll('#root button')];check(type+' has five tabs',tabs.length>=5);
   for(const tab of tabs.slice(0,5)){tab.click();check(type+' tab opens',tab.getAttribute('aria-pressed')==='true')}
-  if(type!=='trips'){
+  if(type==='events'){
+   check('event date input',document.querySelector('[data-field="start_date"]')?.type==='date');
+   check('event transport text retained',editor.values().transport==='步行｜約5分鐘\n新北投站');
+   const category=document.querySelector('[data-field="category"]');check('event category select',category?.tagName==='SELECT');
+   check('event featured value retained',editor.values().is_home_featured===false);
+  }else if(type!=='trips'){
    editor.showTab('transport');const json=document.querySelector('[data-field="transport_routes"]');check(type+' JSON field visible',!!json);
    json.value='{broken';json.dispatchEvent(new Event('input',{bubbles:true}));let rejected=false;try{editor.values()}catch{rejected=true}check(type+' rejects invalid JSON',rejected&&invalid>0);
    json.value='{"metro":"捷運"}';json.dispatchEvent(new Event('input',{bubbles:true}));check(type+' accepts valid JSON',editor.values().transport_routes.metro==='捷運');

@@ -3,6 +3,37 @@
 (function(global){
 'use strict';
 const definitions={
+  "events": {
+    "fields": [
+      ["id", "ID", "text", "auto"],
+      ["sort_order", "排序數字", "number"],
+      ["title", "名稱", "text", "required"],
+      ["category", "活動類型", "eventCategory"],
+      ["summary", "摘要", "textarea"],
+      ["content", "介紹內容", "textarea"],
+      ["start_date", "開始日期", "date"],
+      ["end_date", "結束日期", "date"],
+      ["hours", "營業／活動時間", "text"],
+      ["venue_name", "地點名稱", "text"],
+      ["address", "地址", "text"],
+      ["transport", "交通指南", "textarea"],
+      ["admission", "費用／入場方式", "text"],
+      ["google_map", "Google Maps 連結", "text"],
+      ["official_url", "官方網站／活動資訊連結", "text"],
+      ["cover_image", "封面圖片", "image"],
+      ["cover_image_source", "圖片來源", "text"],
+      ["is_home_featured", "加入首頁精選活動", "eventFeatured"],
+      ["end_behavior", "活動結束後", "eventEndBehavior"],
+      ["is_published", "發布狀態", "boolean"]
+    ],
+    "tabs": {
+      "basic": ["id", "title", "category", "summary", "start_date", "end_date", "hours", "venue_name", "address", "admission", "official_url"],
+      "detail": ["content"],
+      "transport": ["transport", "google_map"],
+      "images": ["cover_image", "cover_image_source"],
+      "settings": ["sort_order", "is_home_featured", "end_behavior", "is_published"]
+    }
+  },
   "spots": {
     "fields": [
       [

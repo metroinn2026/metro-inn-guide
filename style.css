@@ -1420,3 +1420,20 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
 .home-news .home-news-more a:hover,.home-news .home-news-more a:focus-visible,
 body:has(.editor-picks) .picks-destinations a:hover,body:has(.editor-picks) .picks-destinations a:focus-visible,
 .home-trip-more .home-journey-link:hover,.home-trip-more .home-journey-link:focus-visible{border-color:#82927f!important;background:#82927f!important;color:#fff!important}
+/* 強制 CTA 未 hover 時維持淺灰底與灰字，不被首頁舊版橘色文字規則覆蓋。 */
+body:has(.editor-picks) .home-events .home-section-more .home-events-more-link,
+body:has(.editor-picks) .home-news .home-section-more a,
+body:has(.editor-picks) .editor-picks .picks-destinations a,
+body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link{
+ border:1px solid #a9aaa5!important;background:#f5f5f3!important;color:#666963!important
+}
+body:has(.editor-picks) .home-events .home-section-more .home-events-more-link:hover,
+body:has(.editor-picks) .home-events .home-section-more .home-events-more-link:focus-visible,
+body:has(.editor-picks) .home-news .home-section-more a:hover,
+body:has(.editor-picks) .home-news .home-section-more a:focus-visible,
+body:has(.editor-picks) .editor-picks .picks-destinations a:hover,
+body:has(.editor-picks) .editor-picks .picks-destinations a:focus-visible,
+body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link:hover,
+body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link:focus-visible{
+ border-color:#82927f!important;background:#82927f!important;color:#fff!important
+}

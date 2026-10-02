@@ -1354,3 +1354,33 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
 .home-trip-empty{padding:26px 2px;color:#70777a}
 @media(max-width:900px){.home-trip-card{flex-basis:calc((100% - 20px)/2)}}
 @media(max-width:760px){.home-trip-grid{gap:12px}.home-trip-card{flex:0 0 84%}.home-trip-copy{padding:13px 14px 15px}.home-trip-copy h3{font-size:18px}.home-trip-arrow{width:36px;height:36px}.home-trip-arrow.prev{left:-10px}.home-trip-arrow.next{right:-10px}.home-trip-controls{margin-top:6px}}
+
+/* 活動卡片：桌機五張橫列、每六秒向右切換一張；小筆電三張、手機滑動瀏覽。 */
+.home-events .home-event-grid{gap:16px!important}
+.home-events:not(.is-static) .home-event-slide{flex:0 0 calc((100% - 64px)/5)!important;scroll-snap-align:start}
+.home-events.is-static .home-event-slide{flex:0 0 calc((100% - 16px)/2)!important;scroll-snap-align:start}
+.home-events.is-static .home-event-slide:only-child{flex-basis:min(100%,420px)!important}
+@media(max-width:1100px){.home-events:not(.is-static) .home-event-slide{flex-basis:calc((100% - 32px)/3)!important}}
+@media(max-width:760px){
+ .home-events .home-event-grid{gap:12px!important}
+ .home-events .home-event-slide,.home-events.is-static .home-event-slide,.home-events.is-static .home-event-slide:only-child{flex:0 0 82%!important;max-width:none}
+}
+
+/* 精選卡片：圖片與文字分層，上圖下文，卡片同寬顯示。 */
+.picks-track{align-items:stretch!important}
+.picks-card,.picks-card.is-featured{display:flex;flex:0 0 calc((100% - 20px)/2)!important;flex-direction:column;transform:none!important;scroll-snap-align:start}
+.picks-photo{width:100%;aspect-ratio:16/9!important;border-radius:12px!important;overflow:hidden}
+.picks-caption{position:static!important;inset:auto!important;display:flex;flex-direction:column;align-items:flex-start;flex:1;padding:14px 2px 4px!important;background:transparent!important;color:#4D4D4D!important}
+.picks-caption span{font-size:12px!important;opacity:1!important;color:#8a7656!important}
+.picks-caption h3{margin:6px 0 5px!important;font-size:clamp(17px,1.5vw,22px)!important;line-height:1.4!important;color:#4D4D4D!important}
+.picks-caption p{margin:0!important;color:#70777a!important;font-size:14px!important;line-height:1.65!important}
+.picks-card:hover .picks-caption h3{color:#F3653B!important}
+.home-trip-card{flex-basis:calc((100% - 20px)/2)!important}
+@media(max-width:760px){
+ .picks-track{gap:14px}
+ .picks-card,.picks-card.is-featured{flex-basis:84%!important}
+ .picks-photo{aspect-ratio:1.6!important}
+ .picks-caption{padding-top:12px!important}
+ .picks-caption h3{font-size:18px!important}
+ .home-trip-card{flex-basis:84%!important}
+}

@@ -1138,10 +1138,13 @@ body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px
 .home-events .home-event-carousel{overflow:visible;padding:0 8px}
 .home-events .home-event-grid{display:flex!important;align-items:stretch;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:10px 8px 14px}
 .home-events .home-event-grid::-webkit-scrollbar{display:none}
-.home-events .home-event-slide{position:relative;display:flex;flex-direction:column;flex:0 0 calc((100% - 40px)/3);min-width:0;min-height:0;grid-column:auto;scroll-snap-align:center;text-decoration:none;color:#4D4D4D;background:#fff;border:1px solid #e9e9e6;border-bottom:3px solid transparent;border-radius:12px;overflow:hidden;transform:none!important;transition:border-color .2s ease}
-.home-events .home-event-slide.is-featured{flex-basis:calc((100% - 40px)/3);transform:none!important;border-bottom-color:#F3653B}
+.home-events .home-event-slide{position:relative;display:flex;flex-direction:column;flex:0 0 calc((100% - 40px)/3);min-width:0;min-height:0;grid-column:auto;scroll-snap-align:center;text-decoration:none;color:#4D4D4D;background:#fff;border:1px solid #e9e9e6;border-radius:12px;overflow:hidden;transform:none!important;transition:border-color .2s ease,background-color .2s ease}
+.home-events .home-event-slide.is-featured{flex-basis:calc((100% - 40px)/3);transform:none!important;border-color:#e9e9e6}
 .home-events .home-event-photo{position:relative;width:100%;height:auto!important;min-height:0;aspect-ratio:1.55;overflow:hidden;background:#e9e9e7;border-radius:0;flex:none}
-.home-events .home-event-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.home-events .home-event-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .28s ease}
+.home-events .home-event-slide:hover,.home-events .home-event-slide:focus-visible{border-color:#d4d4cf;background:#fbfaf7}
+.home-events .home-event-slide:hover .home-event-photo img,.home-events .home-event-slide:focus-visible .home-event-photo img{transform:scale(1.035)}
+.home-events .home-event-slide:hover .home-event-copy h3,.home-events .home-event-slide:focus-visible .home-event-copy h3{color:#F3653B}
 .home-events .home-event-photo.is-placeholder{display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#E9EFE7,#F5EBDD 55%,#F4DDD3);color:#536657;font-size:15px;font-weight:700;letter-spacing:.08em;text-align:center}
 .home-events .home-event-copy{position:static!important;inset:auto!important;height:auto!important;display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:12px 15px 14px;color:#4D4D4D;background:#fff}
 .home-events .home-event-copy .home-event-category{font-size:11px;letter-spacing:.05em;color:#8a7656}
@@ -1202,8 +1205,11 @@ body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px
 
 /* 少於三筆活動時顯示實際卡片一次，不複製輪播；隱藏輪播箭頭與頁數，卡片置中呈現。 */
 .home-events.is-static .home-event-controls,.home-events.is-static .picks-arrow{display:none!important}
-.home-events.is-static .home-event-grid{justify-content:center;overflow-x:visible;scroll-snap-type:none}
+.home-events.is-static .home-event-grid{justify-content:flex-start;overflow-x:visible;scroll-snap-type:none}
 .home-events.is-static .home-event-slide{flex:0 1 calc((100% - 20px)/3)}
 .home-events.is-static .home-event-slide:only-child{flex-basis:min(100%,420px)}
 @media(max-width:900px){.home-events.is-static .home-event-slide{flex-basis:calc((100% - 20px)/2)}}
 @media(max-width:760px){.home-events.is-static .home-event-grid{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory}.home-events.is-static .home-event-slide,.home-events.is-static .home-event-slide:only-child{flex:0 0 84%;max-width:none}}
+
+/* 活動卡片不以底部色線標示 hover/焦點，圖片微幅放大並變更標題色即可。 */
+.home-events .home-event-slide,.home-events .home-event-slide.is-featured{border-bottom:1px solid #e9e9e6!important}

@@ -1386,54 +1386,36 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
 }
 @media(max-width:900px) and (min-width:761px){.picks-card,.picks-card.is-featured{flex-basis:calc((100% - 20px)/2)!important}}
 
-/* 首頁各區塊的延伸入口統一放在內容下方置中。 */
-.home-section-more{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:26px auto 0}
-.home-section-more a,
-.home-trip-more .home-journey-link{
- display:inline-flex!important;align-items:center;justify-content:center;min-width:230px;min-height:50px;padding:12px 24px;
- border:1px solid #a9aaa5!important;border-radius:3px;background:transparent!important;color:#666963!important;
- font-size:15px!important;font-weight:700!important;line-height:1.4;text-align:center;text-decoration:none!important;
+/* 首頁延伸按鈕：置中、雙頭圓長條，灰底灰字；hover 為鼠尾草綠底白字。 */
+.home-section-more{display:flex!important;align-items:center!important;justify-content:center!important;gap:14px!important;flex-wrap:wrap;margin:26px auto 0!important}
+.home-events .home-events-more,.home-news .home-news-more,.home-trip-more{width:100%;justify-content:center!important}
+body:has(.editor-picks) .editor-picks .picks-destinations{display:flex!important;position:static!important;top:auto!important;right:auto!important;transform:none!important;width:100%!important;justify-content:center!important;flex-direction:row!important;flex-wrap:wrap!important;gap:14px!important;margin:24px auto 0!important}
+#homeEventsMoreLink,#homeNewsMoreLink,#homeSpotsMoreLink,#homeFoodsMoreLink,#homeTripMoreLink,
+#homeEventsMoreLink:link,#homeEventsMoreLink:visited,#homeNewsMoreLink:link,#homeNewsMoreLink:visited,
+#homeSpotsMoreLink:link,#homeSpotsMoreLink:visited,#homeFoodsMoreLink:link,#homeFoodsMoreLink:visited,
+#homeTripMoreLink:link,#homeTripMoreLink:visited{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;
+ min-width:230px!important;min-height:50px!important;padding:12px 24px!important;
+ border:1px solid #a9aaa5!important;border-radius:999px!important;background:#f5f5f3!important;color:#666963!important;
+ font-size:15px!important;font-weight:700!important;line-height:1.4!important;text-align:center!important;
+ text-decoration:none!important;text-underline-offset:0!important;outline:none!important;box-shadow:none!important;
  transition:background-color .22s ease,color .22s ease,border-color .22s ease!important
 }
-.home-section-more a:hover,.home-section-more a:focus-visible,
-.home-trip-more .home-journey-link:hover,.home-trip-more .home-journey-link:focus-visible{
- border-color:#82927f!important;background:#82927f!important;color:#fff!important;outline:none
+#homeEventsMoreLink:hover,#homeEventsMoreLink:focus,#homeEventsMoreLink:focus-visible,#homeEventsMoreLink:active,
+#homeNewsMoreLink:hover,#homeNewsMoreLink:focus,#homeNewsMoreLink:focus-visible,#homeNewsMoreLink:active,
+#homeSpotsMoreLink:hover,#homeSpotsMoreLink:focus,#homeSpotsMoreLink:focus-visible,#homeSpotsMoreLink:active,
+#homeFoodsMoreLink:hover,#homeFoodsMoreLink:focus,#homeFoodsMoreLink:focus-visible,#homeFoodsMoreLink:active,
+#homeTripMoreLink:hover,#homeTripMoreLink:focus,#homeTripMoreLink:focus-visible,#homeTripMoreLink:active{
+ border-color:#82927f!important;background:#82927f!important;color:#fff!important;
+ text-decoration:none!important;outline:none!important;box-shadow:none!important
 }
-.home-news .home-news-more{margin-top:24px}
-.home-news .home-news-more a{margin:0 auto}
-.home-events .home-events-more{margin-top:24px}
-.picks-destinations{margin:24px auto 0!important;justify-content:center!important}
 .home-trip-controls{justify-content:center!important;margin-top:16px}
-.home-trip-more{display:flex;justify-content:center;margin:8px auto 0}
-.home-trip-more .home-journey-link{color:#666963!important}
 .picks-track{scroll-behavior:smooth}
 .picks-track.is-repositioning{scroll-behavior:auto!important;scroll-snap-type:none!important}
 @media(max-width:760px){
- .home-section-more{gap:10px;margin-top:20px}
- .home-section-more a,.home-trip-more .home-journey-link{width:min(100%,300px);min-width:0;min-height:46px;font-size:14px!important}
- .picks-destinations{width:100%!important;flex-direction:column;align-items:center}
+ .home-section-more{gap:10px!important;margin-top:20px!important}
+ #homeEventsMoreLink,#homeNewsMoreLink,#homeTripMoreLink{width:min(100%,300px)!important;min-width:0!important;min-height:46px!important;font-size:14px!important}
+ body:has(.editor-picks) .editor-picks .picks-destinations{width:100%!important;justify-content:center!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:10px!important}
+ #homeSpotsMoreLink,#homeFoodsMoreLink{flex:1 1 0!important;width:calc((100% - 10px)/2)!important;min-width:0!important;min-height:46px!important;padding:10px 8px!important;font-size:13px!important}
  .home-trip-controls{margin-top:12px}
-}
-/* 提高區塊 CTA 的覆寫優先度，確保灰色預設與鼠尾草綠 hover 不受舊樣式蓋回。 */
-.home-events .home-events-more-link,.home-news .home-news-more a,.picks-destinations a,.home-trip-more .home-journey-link{border:1px solid #a9aaa5!important;background:transparent!important;color:#666963!important}
-.home-events .home-events-more-link:hover,.home-events .home-events-more-link:focus-visible,
-.home-news .home-news-more a:hover,.home-news .home-news-more a:focus-visible,
-body:has(.editor-picks) .picks-destinations a:hover,body:has(.editor-picks) .picks-destinations a:focus-visible,
-.home-trip-more .home-journey-link:hover,.home-trip-more .home-journey-link:focus-visible{border-color:#82927f!important;background:#82927f!important;color:#fff!important}
-/* 強制 CTA 未 hover 時維持淺灰底與灰字，不被首頁舊版橘色文字規則覆蓋。 */
-body:has(.editor-picks) .home-events .home-section-more .home-events-more-link,
-body:has(.editor-picks) .home-news .home-section-more a,
-body:has(.editor-picks) .editor-picks .picks-destinations a,
-body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link{
- border:1px solid #a9aaa5!important;background:#f5f5f3!important;color:#666963!important
-}
-body:has(.editor-picks) .home-events .home-section-more .home-events-more-link:hover,
-body:has(.editor-picks) .home-events .home-section-more .home-events-more-link:focus-visible,
-body:has(.editor-picks) .home-news .home-section-more a:hover,
-body:has(.editor-picks) .home-news .home-section-more a:focus-visible,
-body:has(.editor-picks) .editor-picks .picks-destinations a:hover,
-body:has(.editor-picks) .editor-picks .picks-destinations a:focus-visible,
-body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link:hover,
-body:has(.editor-picks) .home-journey .home-trip-more .home-journey-link:focus-visible{
- border-color:#82927f!important;background:#82927f!important;color:#fff!important
 }

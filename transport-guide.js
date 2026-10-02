@@ -44,12 +44,40 @@
       }
     }
     const source=String(item.transport_text||item.transport_guide||item.transport_metro||item.transport||'').trim();
+    let legacyTotal=0,legacyTimed=0,legacyMissing=0;
     if(!steps.length){
-      for(const line of source.split(/\r?\n/).map(value=>value.trim()).filter(Boolean)){
-        if(/^(全程|總時間|參考總時間)/.test(line)){total.textContent=line.replace(/^(參考)?總時間[：:]?/,'全程');total.hidden=false;}
-        else if(/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁)/.test(line))steps.push({leg:line.replace(/\s*[｜|]\s*/g,' · ')});
-        else steps.push({station:line});
+      const lines=source.split(/\r?\n/).map(value=>value.trim()).filter(Boolean);let pendingTransfer='';
+      const durationOf=line=>{const h=line.match(/(\d+(?:\.\d+)?)\s*小時/),m=line.match(/(\d+(?:\.\d+)?)\s*(?:分鐘|分)(?!鐘)/);return h||m?(Number(h?.[1]||0)*60+Number(m?.[1]||0)):null;};
+      for(let index=0;index<lines.length;index++){
+        const line=lines[index];
+        if(/^(全程|總時間|參考總時間)/.test(line)){total.textContent=line.replace(/^(參考)?總時間[：:]?/,'全程');total.hidden=false;continue;}
+        const parts=line.split(/[｜|]/).map(value=>value.trim()).filter(Boolean);const mode=parts[0];
+        if(!/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁|候車)/.test(mode)){if(pendingTransfer){steps.push({leg:`站內轉乘${pendingTransfer?'｜'+pendingTransfer:''}`});pendingTransfer='';}steps.push({station:line});continue;}
+        const duration=durationOf(line);legacyTimed++;
+        if(duration===null)legacyMissing++;else legacyTotal+=duration;
+        const distance=parts.find(value=>/公尺|公里|km|m$/i.test(value))||'';
+        const stationCount=parts.find(value=>/\d+\s*站/.test(value))?.replace(/\s+/g,'')||'';
+        const routeParts=parts.slice(1).filter(value=>durationOf(value)===null&&!/\d+\s*站/.test(value)&&!/公尺|公里|km|m$/i.test(value));
+        const routeName=routeParts.shift()||'';const directionPart=routeParts.find(value=>/^(往|.*方向$)/.test(value))||'';
+        const direction=directionPart.replace(/^往/,'').replace(/方向$/,'').replace(/[（）()]/g,'').trim();
+        const durationText=duration===null?'':`約${duration}分`;
+        const detail=[stationCount,durationText].filter(Boolean).join('・');
+        if(mode==='步行'||mode==='騎乘'||mode==='候車'){
+          const partsText=[distance,durationText].filter(Boolean).join('・');steps.push({leg:`${mode==='騎乘'?'騎乘':mode}${partsText?'｜'+partsText:''}`});continue;
+        }
+        if(mode==='轉乘'&&!routeName){pendingTransfer=durationText;continue;}
+        if(pendingTransfer){
+          const name=routeName||mode;const dir=direction?`（${direction}方向）`:'';
+          steps.push({leg:`站內轉乘${name}${dir}${detail?'｜'+detail:''}`});pendingTransfer='';continue;
+        }
+        if(mode==='捷運'||mode==='公車'||mode==='轉乘'){
+          const name=routeName||mode;const dir=direction?`（${direction}方向）`:'';
+          steps.push({leg:`${mode==='公車'?'公車':''}${name}${dir}${detail?'｜'+detail:''}`});continue;
+        }
+        steps.push({leg:line.replace(/\s*[｜|]\s*/g,'｜').replace(/約\s*(\d+)\s*分鐘/g,'約$1分')});
       }
+      if(pendingTransfer)steps.push({leg:`站內轉乘${pendingTransfer?'｜'+pendingTransfer:''}`});
+      if(total.hidden&&legacyTimed){const minutesText=String(Math.round(legacyTotal*10)/10);total.textContent=legacyMissing?`已填路段合計約 ${minutesText} 分鐘（${legacyMissing} 段未填時間）`:`全程約 ${minutesText} 分鐘`;total.hidden=false;}
     }
     if(total.hidden){const match=source.match(/(?:^|\n)\s*(?:全程|總時間|參考總時間)\s*[：:]?\s*(?:約\s*)?(\d+(?:\.\d+)?\s*(?:小時|分鐘)(?:\s*\d+\s*分鐘)?)/);if(match){total.textContent=`全程約 ${match[1].replace(/\s+/g,' ').trim()}`;total.hidden=false;}}
     if(route&&(route.total_duration||route.total_time||route.duration)){const duration=String(route.total_duration||route.total_time||route.duration);total.textContent=/全程/.test(duration)?duration:`全程約 ${duration}${/分鐘|小時/.test(duration)?'':' 分鐘'}`;total.hidden=false;}

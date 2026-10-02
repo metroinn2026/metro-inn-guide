@@ -1295,3 +1295,25 @@ body:has(.editor-picks) .home-journey .mag-feature-copy h2{margin:0 0 24px!impor
  .home-events-more{margin-top:18px}
 }
 
+
+/* 主標置中，僅左側線；線長依標題實際字寬自動計算。 */
+body:has(.editor-picks) .home-events .home-events-head,
+body:has(.editor-picks) .home-news .home-news-heading,
+body:has(.editor-picks) .picks-heading{display:block!important;width:100%;margin:0 0 24px!important;text-align:center!important}
+body:has(.editor-picks) .home-events .home-events-head>div:first-child,
+body:has(.editor-picks) .home-news .home-news-heading>div:first-child,
+body:has(.editor-picks) .picks-heading>div:first-child{display:block!important;width:100%!important}
+body:has(.editor-picks) .home-section-title,
+body:has(.editor-picks) .home-news .home-news-heading h2{position:relative!important;display:block!important;width:100%!important;margin:0!important;padding:0!important;text-align:center!important;}
+body:has(.editor-picks) .home-section-title::before,
+body:has(.editor-picks) .home-news .home-news-heading h2::before{position:absolute;left:0;top:50%;display:block!important;width:max(0px,calc((100% - var(--home-title-text-width,160px))/2 - 24px))!important;height:1px!important;flex:none!important;transform:translateY(-50%);background:#4D4D4D!important;content:""}
+body:has(.editor-picks) .home-section-title::after,
+body:has(.editor-picks) .home-news .home-news-heading h2::after{display:none!important;content:none!important}
+body:has(.editor-picks) .home-events .home-events-head .section-link,
+body:has(.editor-picks) .home-news .home-news-heading .section-link,
+body:has(.editor-picks) .picks-destinations{position:static!important;display:flex!important;width:max-content!important;transform:none!important;margin:14px 0 0 auto!important}
+body:has(.editor-picks) .home-journey .mag-feature-copy h2{position:relative!important;display:block!important;width:100%!important;text-align:center!important;margin:0 0 24px!important}
+@media(max-width:760px){
+ body:has(.editor-picks) .home-section-title,body:has(.editor-picks) .home-news .home-news-heading h2{font-size:24px!important}
+ body:has(.editor-picks) .home-events .home-events-head,body:has(.editor-picks) .home-news .home-news-heading,body:has(.editor-picks) .picks-heading{margin-bottom:18px!important}
+}

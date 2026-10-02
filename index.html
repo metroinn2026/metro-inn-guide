@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css?v=20261002-2235"><script src="data.js?v=20261002-2122"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro Inn Guide｜北投旅圖</title><link rel="stylesheet" href="style.css?v=20261002-2245"><script src="data.js?v=20261002-2122"></script><script src="supabase-config.js"></script></head><body><div id="header"></div>
 <main id="top">
 <section class="home-banner-section" id="homeBannerSection">
   <div class="home-banner-carousel" id="homeBannerCarousel">
@@ -316,4 +316,7 @@ function initHomeEventCarousel(){
  let settleTimer;grid.addEventListener('scroll',()=>{update();clearTimeout(settleTimer);settleTimer=setTimeout(activateNearest,140);},{passive:true});window.addEventListener('resize',()=>{const card=centeredCard();if(card)centerCard(card,'auto');update();});
 }
 document.addEventListener('DOMContentLoaded',initHomeEventCarousel);if(document.readyState!=='loading')initHomeEventCarousel();
+function updateHomeTitleLines(){document.querySelectorAll('.home-section-title,.home-news .home-news-heading h2').forEach(title=>{const range=document.createRange();range.selectNodeContents(title);const rect=range.getBoundingClientRect();title.style.setProperty('--home-title-text-width',`${Math.ceil(rect.width)}px`);});}
+function initHomeTitleLines(){updateHomeTitleLines();window.addEventListener('resize',updateHomeTitleLines,{passive:true});if(document.fonts?.ready)document.fonts.ready.then(updateHomeTitleLines);const observer=new MutationObserver(updateHomeTitleLines);document.querySelectorAll('.home-section-title,.home-news .home-news-heading h2').forEach(title=>observer.observe(title,{attributes:true,attributeFilter:['style','class']}));}
+document.addEventListener('DOMContentLoaded',initHomeTitleLines);if(document.readyState!=='loading')initHomeTitleLines();
 </script></body></html>

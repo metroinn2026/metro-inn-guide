@@ -1317,3 +1317,40 @@ body:has(.editor-picks) .home-journey .mag-feature-copy h2{position:relative!imp
  body:has(.editor-picks) .home-section-title,body:has(.editor-picks) .home-news .home-news-heading h2{font-size:24px!important}
  body:has(.editor-picks) .home-events .home-events-head,body:has(.editor-picks) .home-news .home-news-heading,body:has(.editor-picks) .picks-heading{margin-bottom:18px!important}
 }
+
+/* 標題文字置中，左線自動延伸並在文字前留出固定空隙。 */
+body:has(.editor-picks) .home-section-title,
+body:has(.editor-picks) .home-news .home-news-heading h2{position:relative!important;display:block!important;width:100%!important;text-align:center!important;white-space:nowrap!important;}
+body:has(.editor-picks) .home-section-title .home-title-text,
+body:has(.editor-picks) .home-news .home-news-heading h2 .home-title-text{position:relative;z-index:1;display:inline-block;white-space:nowrap;background:transparent}
+body:has(.editor-picks) .home-section-title::before,
+body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!important;right:auto!important;width:max(0px,calc((100% - var(--home-title-text-width,160px))/2 - 28px))!important;z-index:0}
+.home-events .home-events-more-link,.home-events .home-events-more-link span{color:#fff!important;font-size:16px!important;line-height:1.4!important;visibility:visible!important;opacity:1!important}
+.home-events .home-events-more-link .home-events-more-arrow{font-size:23px!important}
+
+/* 首頁推薦行程：使用已上架行程精選建立橫向卡片輪播。 */
+.home-trip-section{max-width:1240px}
+.home-trip-section>.home-section-title{margin:0 0 28px!important}
+.home-trip-carousel{position:relative}
+.home-trip-grid{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:4px 2px 12px}
+.home-trip-grid::-webkit-scrollbar{display:none}
+.home-trip-card{display:flex;flex:0 0 calc((100% - 40px)/3);min-width:0;flex-direction:column;overflow:hidden;background:#fff;border:1px solid #e6e2d9;color:#4D4D4D;text-decoration:none;scroll-snap-align:start;transition:border-color .18s ease}
+.home-trip-card:hover,.home-trip-card:focus-visible{border-color:#F3653B;outline:none}
+.home-trip-photo{width:100%;aspect-ratio:1.6;overflow:hidden;background:#e8e8e3}
+.home-trip-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .25s ease}
+.home-trip-card:hover .home-trip-photo img,.home-trip-card:focus-visible .home-trip-photo img{transform:scale(1.03)}
+.home-trip-copy{display:flex;flex:1;flex-direction:column;padding:16px 18px 18px}
+.home-trip-type{font-size:11px;letter-spacing:.06em;color:#8a7656}
+.home-trip-copy h3{margin:7px 0 4px;font-size:20px;line-height:1.4;color:#4D4D4D}
+.home-trip-copy p{margin:0;color:#70777a;font-size:14px;line-height:1.7}
+.home-trip-more{margin-top:auto;padding-top:12px;color:#F3653B;font-size:13px;font-weight:700}
+.home-trip-arrow{position:absolute;z-index:2;top:42%;display:grid;place-items:center;width:42px;height:42px;border:0;background:#fff;color:#4D4D4D;font-size:27px;line-height:1;cursor:pointer}
+.home-trip-arrow:hover{color:#F3653B}
+.home-trip-arrow.prev{left:-20px}.home-trip-arrow.next{right:-20px}
+.home-trip-arrow[hidden]{display:none!important}
+.home-trip-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px;color:#767676;font-size:13px}
+.home-trip-controls .home-journey-link{color:#F3653B;font-size:14px;font-weight:700;text-decoration:none}
+.home-trip-controls .home-journey-link:hover{text-decoration:underline;text-underline-offset:4px}
+.home-trip-empty{padding:26px 2px;color:#70777a}
+@media(max-width:900px){.home-trip-card{flex-basis:calc((100% - 20px)/2)}}
+@media(max-width:760px){.home-trip-grid{gap:12px}.home-trip-card{flex:0 0 84%}.home-trip-copy{padding:13px 14px 15px}.home-trip-copy h3{font-size:18px}.home-trip-arrow{width:36px;height:36px}.home-trip-arrow.prev{left:-10px}.home-trip-arrow.next{right:-10px}.home-trip-controls{margin-top:6px}}

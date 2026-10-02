@@ -1199,3 +1199,11 @@ body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px
 #siteHeaderActions #metro-font-controls.metro-font-dropdown .metro-font-trigger{display:inline-flex;align-items:center;justify-content:center;width:auto!important;min-width:0!important;height:auto!important;padding:0!important;line-height:1!important;font-size:16px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#4d4d4d!important;font-weight:700!important;cursor:pointer}
 #siteHeaderActions #metro-font-controls.metro-font-dropdown .metro-font-trigger:hover,#siteHeaderActions #metro-font-controls.metro-font-dropdown .metro-font-trigger:focus-visible{color:#F3653B!important;background:transparent!important;border:0!important;outline:none}
 @media(max-width:760px){.header-utility-row .utility-inner{gap:12px}.header-utility-row .header-utility-links{gap:14px}.header-utility-row .utility-actions#siteHeaderActions{gap:14px!important}}
+
+/* 少於三筆活動時顯示實際卡片一次，不複製輪播；隱藏輪播箭頭與頁數，卡片置中呈現。 */
+.home-events.is-static .home-event-controls,.home-events.is-static .picks-arrow{display:none!important}
+.home-events.is-static .home-event-grid{justify-content:center;overflow-x:visible;scroll-snap-type:none}
+.home-events.is-static .home-event-slide{flex:0 1 calc((100% - 20px)/3)}
+.home-events.is-static .home-event-slide:only-child{flex-basis:min(100%,420px)}
+@media(max-width:900px){.home-events.is-static .home-event-slide{flex-basis:calc((100% - 20px)/2)}}
+@media(max-width:760px){.home-events.is-static .home-event-grid{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory}.home-events.is-static .home-event-slide,.home-events.is-static .home-event-slide:only-child{flex:0 0 84%;max-width:none}}

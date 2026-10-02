@@ -181,4 +181,4 @@ async function loadSiteSettings(){
 document.addEventListener('DOMContentLoaded', () => setTimeout(loadSiteSettings, 0));
 
 /* Public reading font-size controls: shared across all pages loading data.js. */
-(function(){if(typeof document!=="undefined"&&!document.querySelector("script[data-reading-controls]")){var s=document.createElement("script");s.src="font-size-controls.js?v=20261002-2107";s.defer=true;s.dataset.readingControls="";document.head.appendChild(s);}})();
+(function(){if(typeof document!=="undefined"&&!document.querySelector("script[data-reading-controls]")){var s=document.createElement("script");s.src="font-size-controls.js?v=20261002-2115";s.defer=true;s.dataset.readingControls="";document.head.appendChild(s);}})();

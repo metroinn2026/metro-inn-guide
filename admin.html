@@ -4421,7 +4421,10 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
       }
 
       async function deleteItem(id) {
-        if (!confirm("確定要刪除這筆資料嗎？")) return;
+        const deleteMessage = currentTable === "featured_picks"
+          ? "確定刪除此筆首頁精選設定？只會移除精選內容，不會刪除原本的景點、美食或行程資料。"
+          : "確定要刪除這筆資料嗎？";
+        if (!confirm(deleteMessage)) return;
         if (bulkTables.has(currentTable)) {
           try {
             const result = await secureBulkDelete(

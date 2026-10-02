@@ -1172,3 +1172,18 @@ body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px
  .home-events .picks-arrow.prev{left:-9px}.home-events .picks-arrow.next{right:-9px}
  .home-events .home-event-controls{margin-top:4px}
 }
+
+
+/* 頁首字級選單可跨出工具列顯示，並保留其上層點擊順序。 */
+.header-utility-row{position:relative;z-index:10;overflow:visible}
+.header-primary-row{position:relative;z-index:1}
+#metro-font-controls.metro-font-dropdown .metro-font-menu{z-index:10020}
+/* 首頁搜尋結果留在放大鏡彈出面板內，使用文字列方便快速辨識。 */
+.home-search-results{margin-top:12px;max-height:min(55vh,430px);overflow:auto;border-top:1px solid #e5e5e5}
+.home-search-results[hidden]{display:none!important}
+.home-search-status{margin:0;padding:11px 2px;color:#666;font-size:13px;line-height:1.6}
+.home-search-result{display:grid;grid-template-columns:1fr;gap:3px;padding:10px 2px;border-bottom:1px solid #e8e8e8;text-decoration:none}
+.home-search-result:hover strong,.home-search-result:focus-visible strong{color:#F3653B}
+.home-search-result-type{color:#8a7656;font-size:11px;line-height:1.4}
+.home-search-result strong{color:#4D4D4D;font-size:14px;line-height:1.5}
+.home-search-result-summary{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:#777;font-size:12px;line-height:1.5}

@@ -1081,3 +1081,20 @@ body:has(.editor-picks) .home-news .news-line .news-kind{display:inline-block;ju
  body:has(.editor-picks) .home-news .news-line{grid-template-columns:72px 48px minmax(0,1fr) 16px;gap:7px}
  body:has(.editor-picks) .home-news .news-line .news-kind{min-width:42px;padding:3px 5px;font-size:10px}
 }
+
+/* 將搜尋與字級控制放到次要資訊列，主導覽保留旅遊分類。 */
+.header-utility-row{max-height:40px}
+.header-utility-row .utility-inner{height:40px;gap:14px}
+.header-utility-row .header-utility-links{gap:18px}
+.header-utility-row .utility-actions{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto}
+.header-utility-row .site-search-toggle{width:32px;height:32px}
+.header-utility-row #metro-font-controls.metro-font-dropdown{margin:0!important}
+.header-utility-row #metro-font-controls.metro-font-dropdown .metro-font-trigger{width:32px!important;height:32px!important;min-width:32px!important}
+@media(max-width:1120px){
+ .header-utility-row{display:contents;max-height:none;overflow:visible;background:transparent;border:0;opacity:1;visibility:visible}
+ .header-utility-row .utility-inner{position:absolute;top:16px;right:72px;width:auto;height:auto;margin:0;z-index:4}
+ .header-utility-row .header-utility-links{display:none}
+ #header.is-scrolled .header-utility-row{max-height:none;opacity:1;visibility:visible}
+}
+
+body:has(.editor-picks) #siteSearchPanel.is-open{top:112px}

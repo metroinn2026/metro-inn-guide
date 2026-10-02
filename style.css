@@ -1061,3 +1061,15 @@ body.activity-detail-page .activity-detail-note{margin-top:24px}
  body.activity-detail-page .activity-info-card .map-embed{height:280px}
  body.activity-detail-page .activity-detail-content{font-size:15px}
 }
+
+/* 最新消息分類：日期／分類／標題採固定層級，避免將【公告】等分類塞入標題。 */
+.news-directory-list .news-line{grid-template-columns:140px 74px minmax(0,1fr) 28px}
+.news-directory-list .news-kind{justify-self:start;min-width:58px;padding:3px 8px;border:1px solid #8EA996;background:#F3F5EF;color:#4D4D4D;text-align:center;font-size:11px;line-height:1.35;font-weight:800;white-space:nowrap}
+.home-news .news-line .news-kind{background:#F3F5EF;color:#4D4D4D;border:1px solid #8EA996}
+@media(max-width:600px){
+ .news-directory-list .news-line{grid-template-columns:auto 1fr 20px;column-gap:9px;row-gap:7px}
+ .news-directory-list .news-line time{grid-column:1;font-size:12px}
+ .news-directory-list .news-line .news-kind{grid-column:2;justify-self:start}
+ .news-directory-list .news-line strong{grid-column:1 / span 2;font-size:15px}
+ .news-directory-list .news-chevron{grid-column:3;grid-row:1 / span 2;align-self:center}
+}

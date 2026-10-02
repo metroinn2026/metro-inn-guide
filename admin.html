@@ -1828,6 +1828,7 @@
             ["sort_order", "排序數字", "number"],
             ["slug", "網址代稱 slug", "text"],
             ["title", "標題", "text", "required"],
+            ["category", "消息分類", "newsCategory", "required"],
             ["summary", "摘要（選填，顯示於目錄與內頁標題下方）", "textarea"],
             ["content", "內頁圖文內容", "newsBlocks"],
             [
@@ -1839,14 +1840,15 @@
             ["publish_date", "發布日期", "date"],
             ["is_published", "狀態", "boolean"],
           ],
-          columns: ["title", "publish_date", "is_published"],
+          columns: ["title", "category", "publish_date", "is_published"],
           subtitle: (x) => x.publish_date || x.event_date || "-",
           statusKey: "is_published",
           typeOptions: [
-            ["all", "全部類別"],
-            ["親子", "親子"],
-            ["住宿", "住宿"],
-            ["北投", "北投"],
+            ["all", "全部分類"],
+            ["活動", "活動"],
+            ["優惠", "優惠"],
+            ["公告", "公告"],
+            ["旅遊情報", "旅遊情報"],
           ],
           order: "sort_order",
           idPrefix: "news",
@@ -3434,6 +3436,8 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               return featuredContentTemplate(name, label);
             if (type === "featuredTopics")
               return featuredTopicsTemplate(name, label);
+            if (type === "newsCategory")
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}" required><option value="活動">活動</option><option value="優惠">優惠</option><option value="公告">公告</option><option value="旅遊情報">旅遊情報</option></select><div class="help">分類會顯示於首頁、最新消息列表與消息內頁；標題不需再手動加入【公告】等分類文字。</div></div>`;
             if (type === "eventCategory")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="其他">其他</option><option value="展覽">展覽</option><option value="節慶">節慶</option><option value="市集">市集</option><option value="親子">親子</option><option value="表演">表演</option></select></div>`;
             if (type === "eventEndBehavior")

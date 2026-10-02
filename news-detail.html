@@ -21,7 +21,7 @@
 
   <main class="container article-wrap">
     <article>
-      <div class="meta detail-eyebrow">NEWS</div>
+      <div id="newsEyebrow" class="meta detail-eyebrow">NEWS</div>
       <h1 id="articleTitle" class="news-article-title">最新消息</h1>
       <time id="publishDate" class="news-publish-date">發布日期</time>
       <p id="leadText" class="lead">消息資料載入中...</p>
@@ -131,6 +131,7 @@
 
         document.title = `${news.title || '最新消息'}｜Metro Inn Guide 北投旅圖`;
         setText('articleTitle', news.title);
+        setText('newsEyebrow', `NEWS · ${news.category || '旅遊情報'}`);
         setText('publishDate', news.publish_date || '日期未設定');
         const dateEl=document.getElementById('publishDate');
         if(news.publish_date)dateEl.dateTime=news.publish_date;

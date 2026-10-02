@@ -67,13 +67,16 @@
           const time = document.createElement("time");
           time.textContent = item.publish_date || "日期未設定";
           if (item.publish_date) time.dateTime = item.publish_date;
+          const category = document.createElement("span");
+          category.className = "news-kind";
+          category.textContent = item.category || "旅遊情報";
           const title = document.createElement("strong");
           title.textContent = item.title || "未命名消息";
           const arrow = document.createElement("span");
           arrow.className = "news-chevron";
           arrow.setAttribute("aria-hidden", "true");
           arrow.textContent = "›";
-          link.append(time, title, arrow);
+          link.append(time, category, title, arrow);
           gridEl.appendChild(link);
         });
       }

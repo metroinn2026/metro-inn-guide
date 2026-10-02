@@ -1385,3 +1385,38 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
  .home-trip-card{flex-basis:84%!important}
 }
 @media(max-width:900px) and (min-width:761px){.picks-card,.picks-card.is-featured{flex-basis:calc((100% - 20px)/2)!important}}
+
+/* 首頁各區塊的延伸入口統一放在內容下方置中。 */
+.home-section-more{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:26px auto 0}
+.home-section-more a,
+.home-trip-more .home-journey-link{
+ display:inline-flex!important;align-items:center;justify-content:center;min-width:230px;min-height:50px;padding:12px 24px;
+ border:1px solid #a9aaa5!important;border-radius:3px;background:transparent!important;color:#666963!important;
+ font-size:15px!important;font-weight:700!important;line-height:1.4;text-align:center;text-decoration:none!important;
+ transition:background-color .22s ease,color .22s ease,border-color .22s ease!important
+}
+.home-section-more a:hover,.home-section-more a:focus-visible,
+.home-trip-more .home-journey-link:hover,.home-trip-more .home-journey-link:focus-visible{
+ border-color:#82927f!important;background:#82927f!important;color:#fff!important;outline:none
+}
+.home-news .home-news-more{margin-top:24px}
+.home-news .home-news-more a{margin:0 auto}
+.home-events .home-events-more{margin-top:24px}
+.picks-destinations{margin:24px auto 0!important;justify-content:center!important}
+.home-trip-controls{justify-content:center!important;margin-top:16px}
+.home-trip-more{display:flex;justify-content:center;margin:8px auto 0}
+.home-trip-more .home-journey-link{color:#666963!important}
+.picks-track{scroll-behavior:smooth}
+.picks-track.is-repositioning{scroll-behavior:auto!important;scroll-snap-type:none!important}
+@media(max-width:760px){
+ .home-section-more{gap:10px;margin-top:20px}
+ .home-section-more a,.home-trip-more .home-journey-link{width:min(100%,300px);min-width:0;min-height:46px;font-size:14px!important}
+ .picks-destinations{width:100%!important;flex-direction:column;align-items:center}
+ .home-trip-controls{margin-top:12px}
+}
+/* 提高區塊 CTA 的覆寫優先度，確保灰色預設與鼠尾草綠 hover 不受舊樣式蓋回。 */
+.home-events .home-events-more-link,.home-news .home-news-more a,.picks-destinations a,.home-trip-more .home-journey-link{border:1px solid #a9aaa5!important;background:transparent!important;color:#666963!important}
+.home-events .home-events-more-link:hover,.home-events .home-events-more-link:focus-visible,
+.home-news .home-news-more a:hover,.home-news .home-news-more a:focus-visible,
+body:has(.editor-picks) .picks-destinations a:hover,body:has(.editor-picks) .picks-destinations a:focus-visible,
+.home-trip-more .home-journey-link:hover,.home-trip-more .home-journey-link:focus-visible{border-color:#82927f!important;background:#82927f!important;color:#fff!important}

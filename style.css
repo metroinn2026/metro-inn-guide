@@ -1106,3 +1106,30 @@ body:has(.editor-picks) .home-event-grid:has(.home-event-card:nth-child(3)) .hom
  .home-event-card:first-child{grid-column:auto}
  .home-event-photo,.home-event-card:first-child .home-event-photo,.home-event-card:not(:first-child) .home-event-photo{height:auto!important;aspect-ratio:3/2}
 }
+
+
+/* 首頁活動改為真正的橫向卡片輪播，兩筆活動時並排呈現，更多活動可左右切換。 */
+.home-events .home-event-grid,
+body:has(.editor-picks) .home-events .home-event-grid{display:flex!important;grid-template-columns:none!important;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:0 0 4px;align-items:stretch}
+.home-events .home-event-grid::-webkit-scrollbar{display:none}
+.home-events .home-event-card,
+body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px)/3);min-width:0;min-height:0;scroll-snap-align:start;display:flex;grid-column:auto}
+.home-events .home-event-grid:has(.home-event-card:nth-child(2)):not(:has(.home-event-card:nth-child(3))) .home-event-card{flex-basis:calc((100% - 18px)/2)}
+.home-events .home-event-photo{height:auto!important;aspect-ratio:3/2;min-height:0}
+.home-events .home-event-photo.is-placeholder{display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#E9EFE7,#F5EBDD 55%,#F4DDD3);color:#536657;font-size:15px;font-weight:700;letter-spacing:.08em;text-align:center}
+@media(max-width:900px){.home-events .home-event-card,body:has(.editor-picks) .home-events .home-event-card{flex-basis:calc((100% - 18px)/2)}}
+@media(max-width:760px){
+ .home-events .home-event-grid,body:has(.editor-picks) .home-events .home-event-grid{gap:12px}
+ .home-events .home-event-card,body:has(.editor-picks) .home-events .home-event-card{flex-basis:84%;min-width:84%}
+ .home-events .home-event-grid:has(.home-event-card:nth-child(2)):not(:has(.home-event-card:nth-child(3))) .home-event-card{flex-basis:84%}
+}
+
+/* 頁首維持單列主選單，hover 只顯示橘色底線。 */
+@media(min-width:1121px){
+ .header-primary-row .container.nav{display:flex;flex-wrap:nowrap;align-items:center;gap:12px}
+ .header-primary-row .brand{flex:0 0 auto;white-space:nowrap}
+ body:has(.editor-picks) .topbar .header-primary-row .menu,body:not(:has(.editor-picks)) .topbar .header-primary-row .menu{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;flex:0 1 clamp(460px,48vw,620px)!important;width:auto;min-width:0;margin-left:auto;gap:0!important;white-space:nowrap}
+ .header-primary-row .menu>a{display:flex;align-items:center;justify-content:center;height:50px;min-width:0;padding:0 8px!important;box-sizing:border-box;white-space:nowrap;border-bottom:3px solid transparent;background:transparent!important;transition:color .15s ease,border-color .15s ease}
+ .header-primary-row .menu>a:hover,.header-primary-row .menu>a:focus-visible{color:#F3653B!important;background:transparent!important;border-bottom-color:#F3653B!important}
+ .header-primary-row .nav-book{flex:0 0 auto;white-space:nowrap}
+}

@@ -22,7 +22,7 @@ const definitions={
       ["official_url", "官方網站／活動資訊連結", "text"],
       ["cover_image", "封面圖片", "image"],
       ["cover_image_source", "圖片來源", "text"],
-      ["is_home_featured", "加入首頁精選活動", "eventFeatured"],
+      ["is_home_featured", "首頁優先推薦", "eventFeatured"],
       ["end_behavior", "活動結束後", "eventEndBehavior"],
       ["is_published", "發布狀態", "boolean"]
     ],

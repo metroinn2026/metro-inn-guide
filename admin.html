@@ -1786,7 +1786,7 @@
           kicker: "EVENTS",
           table: "events",
           preview: "activity.html?id=",
-          hint: "管理北投及周邊展覽、節慶、市集等活動。活動狀態依起訖日期自動判斷；可選擇結束後顯示「已結束」或自動隱藏。首頁精選勾選後最多顯示 6 筆，請選有封面圖的活動。",
+          hint: "管理北投及周邊展覽、節慶、市集等活動。活動狀態依起訖日期自動判斷；可選擇結束後顯示「已結束」或自動隱藏。已上架且尚未結束的活動會自動出現在首頁輪播；勾選首頁優先推薦後會排在前面，首頁最多顯示 6 筆。",
           fields: [
             ["id", "活動編號", "text", "auto"],
             ["sort_order", "排序數字", "number"],
@@ -1805,7 +1805,7 @@
             ["admission", "費用／入場方式", "text"],
             ["google_map", "Google 地圖連結", "text"],
             ["official_url", "主辦單位活動資訊連結", "text"],
-            ["is_home_featured", "加入首頁精選活動", "eventFeatured"],
+            ["is_home_featured", "首頁優先推薦", "eventFeatured"],
             ["end_behavior", "活動結束後", "eventEndBehavior"],
             ["is_published", "上架狀態", "boolean"],
           ],
@@ -1815,7 +1815,7 @@
           typeOptions: [["all", "全部類型"], ["展覽", "展覽"], ["節慶", "節慶"], ["市集", "市集"], ["親子", "親子"], ["表演", "表演"], ["其他", "其他"]],
           order: "sort_order",
           idPrefix: "event",
-          tips: `<ul class="tip-list"><li>請填寫活動起訖日期、地點與交通方式，前台會自動顯示「即將開始／活動中／活動已結束」。</li><li>活動結束後可選擇保留「已結束」標籤，或自動從前台隱藏；資料仍會保留在後台。</li><li>勾選「加入首頁精選活動」會在首頁最多顯示 6 筆，依排序數字排列。</li><li>上架前請確認日期、交通、主辦單位連結及圖片來源。</li></ul>`,
+          tips: `<ul class="tip-list"><li>請填寫活動起訖日期、地點與交通方式，前台會自動顯示「即將開始／活動中／活動已結束」。</li><li>活動結束後可選擇保留「已結束」標籤，或自動從前台隱藏；資料仍會保留在後台。</li><li>已上架活動會自動進入首頁輪播；勾選「首頁優先推薦」會優先顯示，若活動超過 6 筆，再依排序數字排列。</li><li>上架前請確認日期、交通、主辦單位連結及圖片來源。</li></ul>`,
         },
         news: {
           label: "最新消息",
@@ -3443,7 +3443,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             if (type === "eventEndBehavior")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="hide_after_end">結束後自動隱藏</option><option value="show_ended">保留並顯示「活動已結束」</option></select><div class="help">隱藏只影響前台，活動資料仍保留在後台。</div></div>`;
             if (type === "eventFeatured")
-              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="false">否，僅顯示於活動列表</option><option value="true">是，推薦在首頁</option></select><div class="help">首頁最多顯示 6 筆精選活動，依排序數字排列。</div></div>`;
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="false">否，依排序數字顯示</option><option value="true">是，優先推薦於首頁</option></select><div class="help">已上架活動會自動進入首頁輪播；首頁最多顯示 6 筆，勾選推薦者優先排列。</div></div>`;
             if (type === "image") return imageFieldTemplate(name, label);
             if (type === "textarea")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
@@ -4261,14 +4261,14 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             return;
           }
           if (payload.is_home_featured && !payload.cover_image) {
-            msg.textContent = "加入首頁精選前，請先設定活動封面圖片。";
+            msg.textContent = "加入首頁優先推薦前，請先設定活動封面圖片。";
             return;
           }
           if (
             payload.is_home_featured &&
             cache.filter((x) => x.is_home_featured && String(x.id) !== String(payload.id)).length >= 6
           ) {
-            msg.textContent = "首頁精選活動最多 6 筆，請先取消其他活動的首頁精選。";
+            msg.textContent = "首頁優先推薦最多 6 筆，請先取消其他活動的首頁推薦。";
             return;
           }
         }

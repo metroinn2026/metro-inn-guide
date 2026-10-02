@@ -1073,3 +1073,11 @@ body.activity-detail-page .activity-detail-note{margin-top:24px}
  .news-directory-list .news-line strong{grid-column:1 / span 2;font-size:15px}
  .news-directory-list .news-chevron{grid-column:3;grid-row:1 / span 2;align-self:center}
 }
+
+/* 修正：首頁最新消息在新版首頁（含 editor-picks）仍顯示消息分類標籤。 */
+body:has(.editor-picks) .home-news .news-line{grid-template-columns:100px 64px minmax(0,1fr) 20px;gap:14px}
+body:has(.editor-picks) .home-news .news-line .news-kind{display:inline-block;justify-self:start;min-width:54px;padding:3px 8px;border:1px solid #8EA996;background:#F3F5EF;color:#4D4D4D;text-align:center;font-size:11px;line-height:1.35;font-weight:800;white-space:nowrap}
+@media(max-width:600px){
+ body:has(.editor-picks) .home-news .news-line{grid-template-columns:72px 48px minmax(0,1fr) 16px;gap:7px}
+ body:has(.editor-picks) .home-news .news-line .news-kind{min-width:42px;padding:3px 5px;font-size:10px}
+}

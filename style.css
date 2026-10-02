@@ -1451,3 +1451,11 @@ body:has(.editor-picks) .home-trip-section>.home-section-title{margin-bottom:52p
  body:has(.editor-picks) .home-trip-section>.home-section-title{margin-bottom:38px!important}
  .home-events .home-event-photo .home-event-category{top:9px;right:9px;padding:5px 9px;font-size:11px}
 }
+
+/* 首頁精選與近期活動輪播指示器：以可點選圓點取代橫向進度線。 */
+.picks-controls .picks-dots{display:flex;flex:1 1 auto;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:20px}
+.picks-controls .picks-dot{appearance:none;display:block;width:8px;height:8px;flex:0 0 8px;margin:0;padding:0;border:0;border-radius:50%;background:#c8cbc5;cursor:pointer;transition:background-color .18s ease,transform .18s ease}
+.picks-controls .picks-dot:hover,.picks-controls .picks-dot:focus-visible{background:#82927f;outline:none}
+.picks-controls .picks-dot.is-active{background:#82927f;transform:scale(1.2)}
+.home-event-controls .picks-dots{gap:9px}
+@media(max-width:760px){.picks-controls{gap:14px}.picks-controls .picks-dots{gap:8px}.picks-controls .picks-dot{width:7px;height:7px;flex-basis:7px}}

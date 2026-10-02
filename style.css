@@ -1213,3 +1213,9 @@ body:has(.editor-picks) .home-events .home-event-card{flex:0 0 calc((100% - 36px
 
 /* 活動卡片不以底部色線標示 hover/焦點，圖片微幅放大並變更標題色即可。 */
 .home-events .home-event-slide,.home-events .home-event-slide.is-featured{border-bottom:1px solid #e9e9e6!important}
+
+/* 首頁近期活動標題：細線向左延伸，標題靠右收尾。 */
+.home-events .home-events-head>div:first-child{flex:1;min-width:0}
+.home-events .home-events-head h2{display:flex;align-items:center;gap:24px;width:100%}
+.home-events .home-events-head h2::before{content:"";display:block;flex:1 1 auto;height:1px;background:#4D4D4D}
+@media(max-width:760px){.home-events .home-events-head h2{gap:16px}}

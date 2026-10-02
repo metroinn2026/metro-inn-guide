@@ -1098,3 +1098,12 @@ body:has(.editor-picks) .home-news .news-line .news-kind{display:inline-block;ju
 }
 
 body:has(.editor-picks) #siteSearchPanel.is-open{top:112px}
+
+/* 主導覽 hover 改用橘色底線，避免整個按鈕染色。 */
+@media(min-width:1121px){
+ .header-primary-row .menu>a{border-bottom:3px solid transparent;transition:color .15s ease,border-color .15s ease}
+ .header-primary-row .menu>a:hover,.header-primary-row .menu>a:focus-visible{background:transparent!important;color:#F3653B!important;border-bottom-color:#F3653B!important}
+}
+@media(max-width:1120px){
+ .header-primary-row .menu.is-open>a:hover,.header-primary-row .menu.is-open>a:focus-visible{background:transparent!important;color:#F3653B!important;border-bottom-color:#F3653B!important}
+}

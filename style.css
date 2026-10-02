@@ -891,7 +891,7 @@ body:has(.editor-picks) .home-events .section-head h2{font-size:var(--home-secti
 .header-primary-row .nav-book{flex:0 0 auto}
 @media(min-width:1121px){
  body:not(:has(.editor-picks)) .topbar .header-primary-row .menu,
- body:has(.editor-picks) .topbar .header-primary-row .menu{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));align-self:stretch;align-items:stretch;flex:1;min-width:0;gap:0!important;justify-content:stretch!important}
+ body:has(.editor-picks) .topbar .header-primary-row .menu{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));align-self:stretch;align-items:stretch;flex:1;min-width:0;gap:0!important;justify-content:stretch!important}
  .header-primary-row .menu>a,.header-primary-row .menu>.nav-dropdown{display:flex;align-items:center;justify-content:center;min-width:0;width:100%;max-width:100%;height:50px;align-self:center}
  .header-primary-row .menu>.nav-dropdown{position:relative}
  .header-primary-row .menu>a,.header-primary-row .menu>.nav-dropdown>.nav-dropdown-toggle{height:50px;min-height:50px;padding:0 10px!important;box-sizing:border-box}

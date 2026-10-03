@@ -74,7 +74,6 @@
         <div id="infoNoteRow" class="info-row" hidden><span class="info-label">備註</span><span id="infoNote"></span></div>
 
         <div class="info-actions multi">
-          <a id="mapButton" class="button" href="#" target="_blank" rel="noopener">Google Map</a>
           <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
         </div>
 
@@ -84,13 +83,6 @@
 
     <aside class="sticky-panel">
 <div id="spotTransportGuide"></div>
-
-      <div class="sidebox compact dark">
-        <div class="kicker" style="color:white">STAY NEARBY</div>
-        <h3>入住北捷行旅</h3>
-        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
-        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
-      </div>
     </aside>
   </main>
 
@@ -240,7 +232,6 @@
         document.getElementById('tagListTop').innerHTML = tagHtml;
 
         const mapUrl = spot.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
-        document.getElementById('mapButton').href = mapUrl;
 
         if (spot.official_website) {
           document.getElementById('officialButton').href = spot.official_website;

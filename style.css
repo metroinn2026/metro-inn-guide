@@ -1420,6 +1420,18 @@ body:has(.editor-picks) .editor-picks .picks-destinations{display:flex!important
  .home-trip-controls{margin-top:12px}
 }
 
+/* 最新消息主標與更多按鈕，以插畫＋消息列表的整體欄寬置中。 */
+@media(min-width:761px){
+ body:has(.editor-picks) .home-news .home-news-heading,
+ body:has(.editor-picks) .home-news .home-news-more{
+  position:relative!important;left:calc(-10.5% - 17px)!important
+ }
+}
+@media(max-width:760px){
+ body:has(.editor-picks) .home-news .home-news-heading,
+ body:has(.editor-picks) .home-news .home-news-more{position:static!important;left:auto!important}
+}
+
 /* 首頁主標置中，移除標題左右裝飾線。 */
 body:has(.editor-picks) .home-section-title,
 body:has(.editor-picks) .home-news .home-news-heading h2{

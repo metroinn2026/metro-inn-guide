@@ -45,8 +45,9 @@ function mount(root,type,record,options={}){
     if(section.show_image===undefined)section.show_image=true;
     const card=document.createElement('fieldset');card.style.cssText='border:1px solid #ccc;padding:12px;margin:10px 0;min-width:0';
     const legend=document.createElement('legend');legend.textContent='第 '+(index+1)+' 段';card.append(legend);
-    for(const [field,title,multiline] of [['time','時間',false],['title','段落標題',false],['text','段落說明',true],['image','圖片網址',false],['image_source','圖片來源',false]]){
-      const labelEl=document.createElement('label');labelEl.textContent=title+' ';const el=document.createElement(multiline?'textarea':'input');if(multiline)el.rows=4;else el.type='text';el.value=section[field]??(field==='text'?section.description??'':'');el.oninput=()=>{section[field]=el.value;commit();};labelEl.append(el);card.append(labelEl);
+    for(const [field,title,multiline] of [['time','時間',false],['title','段落標題',false],['route_summary',"行程簡介（顯示於 TODAY'S ROUTE）",true],['text','詳細介紹（顯示於下方完整行程）',true],['image','圖片網址',false],['image_source','圖片來源',false]]){
+      const labelEl=document.createElement('label');labelEl.textContent=title+' ';const el=document.createElement(multiline?'textarea':'input');if(multiline)el.rows=field==='route_summary'?2:4;else el.type='text';el.value=section[field]??(field==='route_summary'?section.preview??'':field==='text'?section.description??'':'');if(field==='route_summary'){el.maxLength=80;el.placeholder='建議 25～45 字，簡短說明這一站要做什麼';}el.oninput=()=>{section[field]=el.value;commit();};labelEl.append(el);card.append(labelEl);
+      if(field==='route_summary'){const hint=document.createElement('small');hint.textContent="只顯示在頁面上方 TODAY'S ROUTE；留空時前台會暫時擷取詳細介紹。";hint.style.cssText='display:block;color:#64748b;font-size:12px;margin:4px 0 8px';card.append(hint);}
     }
     const imageToggle=document.createElement('label');imageToggle.className='trip-section-image-toggle';const imageToggleText=document.createElement('span');imageToggleText.textContent='顯示此段圖片';imageToggle.append(imageToggleText);
     const imageToggleInput=document.createElement('input');imageToggleInput.type='checkbox';imageToggleInput.checked=section.show_image!==false;imageToggleInput.onchange=()=>{section.show_image=imageToggleInput.checked;commit();};imageToggle.prepend(imageToggleInput);card.append(imageToggle);
@@ -59,7 +60,7 @@ function mount(root,type,record,options={}){
     const remove=document.createElement('button');remove.type='button';remove.textContent='刪除此段';remove.onclick=()=>{if(!confirm('確定刪除此行程段落？'))return;record[key].splice(index,1);commit();render();};actions.append(remove);card.append(actions);list.append(card);
   });}
   if(!Array.isArray(record[key])){record[key]=[];}
-  const add=document.createElement('button');add.type='button';add.textContent='＋新增行程段落';add.onclick=()=>{record[key].push({time:'',title:'',text:'',image:'',image_source:'',show_image:false,order:record[key].length+1});commit();render();};wrap.append(add);render();return wrap;
+  const add=document.createElement('button');add.type='button';add.textContent='＋新增行程段落';add.onclick=()=>{record[key].push({time:'',title:'',route_summary:'',text:'',image:'',image_source:'',show_image:false,order:record[key].length+1});commit();render();};wrap.append(add);render();return wrap;
  }
  function makeGoogleMap(key,label){
   const wrap=document.createElement('div');wrap.className='cms-google-map-helper';

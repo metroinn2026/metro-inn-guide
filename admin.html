@@ -2292,7 +2292,7 @@
           relatedSelection.length +
           "/" +
           relatedLimit() +
-          "（依此順序顯示）</strong>" +
+          "（延伸閱讀優先採用前 3 篇；行程沿線內容依此順序顯示）</strong>" +
           (selected.length
             ? selected
                 .map(
@@ -2300,7 +2300,7 @@
                     `<div class="related-picker-row"><span>${i + 1}. ${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><span><button type="button" onclick="moveRelated(${i},-1)" ${i === 0 ? "disabled" : ""}>↑</button><button type="button" onclick="moveRelated(${i},1)" ${i === selected.length - 1 ? "disabled" : ""}>↓</button><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')">移除</button></span></div>`,
                 )
                 .join("")
-            : "<p>尚未選取；不選擇時前台不顯示延伸閱讀。</p>");
+            : "<p>尚未選取；前台將依地區與標籤自動推薦 3 篇延伸閱讀。</p>");
         const options = available
           .filter(
             (x) =>

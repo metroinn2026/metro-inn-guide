@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>最新消息｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261003-auto-reading">
   <script src="data.js"></script>
+  <script src="related-reading.js?v=20261003-auto-reading"></script>
   <script src="supabase-config.js"></script>
 </head>
 
@@ -30,6 +31,7 @@
     </article>
   </main>
 
+  <section id="related" class="section related" hidden></section>
   <div id="footer"></div>
 
   <script>
@@ -139,6 +141,7 @@
         setText('leadText', news.summary, '');
         document.getElementById('leadText').hidden=!String(news.summary||'').trim();
         renderContentBlocks(news);
+        renderRelatedReading(news,document.getElementById('related'),'news');
 
       } catch (error) {
         console.error(error);

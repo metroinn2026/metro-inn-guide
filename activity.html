@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>活動資訊｜北投旅圖</title>
-  <link rel="stylesheet" href="style.css?v=20261003-transit-white-gray-final">
+  <link rel="stylesheet" href="style.css?v=20261003-auto-reading">
   <script src="data.js"></script>
+  <script src="related-reading.js?v=20261003-auto-reading"></script>
   <script src="supabase-config.js"></script>
   <script src="transit-duration.js"></script>
   <script src="transport-guide.js?v=20261003-station-parser-fix"></script>
@@ -51,6 +52,7 @@
     </article>
     <aside class="sticky-panel activity-sticky-panel"><div id="activityTransportGuide"></div></aside>
   </main>
+  <section id="related" class="section related" hidden></section>
   <div id="footer"></div>
   <script>
     document.getElementById('header').innerHTML = header();
@@ -100,6 +102,7 @@
       if(query){$('activityMap').src=mapsEmbedUrl(query);$('activityMapFrame').hidden=false;}
       const official=safeUrl(item.official_url);if(official){$('activityOfficialButton').href=official;$('activityOfficialButton').hidden=false;}
       MetroTransportGuide.render($('activityTransportGuide'),item,{destination:[item.title,item.venue_name,item.address].filter(Boolean).join(' ')});
+      renderRelatedReading(item,document.getElementById('related'),'events');
       $('activityShare').addEventListener('click',async()=>{const payload={title:item.title||'北投近期活動',url:location.href};try{if(navigator.share)await navigator.share(payload);else{await navigator.clipboard.writeText(location.href);alert('活動連結已複製');}}catch(_){}});
     }
     async function load(){

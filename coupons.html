@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>優惠目錄｜Metro Inn Guide 北投旅圖</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20261003-coupons-three" />
     <script src="data.js"></script>
     <script src="supabase-config.js"></script>
   </head>
@@ -93,7 +93,6 @@
             <h3>${coupon.title || "未命名優惠"}</h3>
             <p>${summary}</p>
             ${dateText ? `<div class="hours-line">活動期間：${dateText}</div>` : ""}
-            <span class="arrow">→</span>
           </div>
         `;
           gridEl.appendChild(card);

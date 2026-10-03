@@ -37,6 +37,7 @@ function clean(type,records){if(!Array.isArray(records)||!records.length||record
  else if(kind==='eventFeatured'){if(raw===''||raw===null||raw===undefined)continue;const value=str(raw).toLowerCase();if(!['true','false','是','否','1','0'].includes(value))throw Error(id+' 的首頁優先推薦請填 true／false 或 是／否');item[key]=['true','是','1'].includes(value);}
  else if(kind==='eventCategory'){if(!str(raw))continue;if(!['其他','展覽','節慶','市集','親子','表演'].includes(str(raw)))throw Error(id+' 的活動類型無效');item[key]=str(raw);}
  else if(kind==='eventEndBehavior'){if(!str(raw))continue;const values={'結束後自動隱藏':'hide_after_end','保留並顯示「活動已結束」':'show_ended'};const value=values[str(raw)]||str(raw);if(!['hide_after_end','show_ended'].includes(value))throw Error(id+' 的活動結束後設定無效');item[key]=value;}
+ else if(kind==='eventImageFit'){const value={'完整顯示':'contain','填滿裁切':'cover'}[str(raw)]||str(raw)||'contain';if(!['contain','cover'].includes(value))throw Error(id+' 的圖片顯示方式請填 contain 或 cover');item[key]=value;}
  else if(kind==='date'){const value=str(raw);if(!value){item[key]=null;continue;}if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!Number.isFinite(Date.parse(value))||new Date(value).toISOString().slice(0,10)!==value)throw Error(id+' 的 '+key+' 請填有效日期 YYYY-MM-DD');item[key]=value;}
  else if(kind==='boolean'){}else item[key]=raw===null?null:safeText(raw);}
  if(type==='events'&&item.start_date&&item.end_date&&item.end_date<item.start_date)throw Error(id+' 結束日期不得早於開始日期');

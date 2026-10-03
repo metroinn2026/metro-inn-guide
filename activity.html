@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>活動資訊｜北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261003-event-images">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script src="transit-duration.js"></script>
@@ -74,8 +74,18 @@
     function mapsUrl(query){const u=new URL('https://www.google.com/maps');u.searchParams.set('q',query);return u.href;}
     function mapsEmbedUrl(query){const u=new URL('https://www.google.com/maps');u.searchParams.set('q',query);u.searchParams.set('z','17');u.searchParams.set('output','embed');return u.href;}
     function setInfo(id,value){$(id).textContent=value||'尚未提供';}
+    let imageDialog;
+    function openActivityImage(src,alt){
+      if(!imageDialog){
+        imageDialog=document.createElement('dialog');imageDialog.className='activity-image-dialog';imageDialog.setAttribute('aria-label','活動圖片放大檢視');
+        const close=document.createElement('button');close.type='button';close.className='activity-image-close';close.textContent='關閉';close.onclick=()=>imageDialog.close();
+        const picture=document.createElement('img');imageDialog.append(close,picture);document.body.append(imageDialog);
+        imageDialog.onclick=event=>{if(event.target!==imageDialog)return;const r=imageDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)imageDialog.close();};
+      }
+      const picture=imageDialog.querySelector('img');picture.src=src;picture.alt=alt;imageDialog.showModal();
+    }
     function addStory(item){
-      if(item.cover_image){const figure=document.createElement('figure');figure.className='story-img activity-story-img';const img=document.createElement('img');img.src=safeUrl(item.cover_image);img.alt=item.title||'活動圖片';img.loading='lazy';figure.append(img);story.append(figure);if(item.cover_image_source){const cap=document.createElement('p');cap.className='image-source-caption';cap.textContent='圖片來源：'+item.cover_image_source;story.append(cap);}}
+      if(item.cover_image){const figure=document.createElement('figure');figure.className='story-img activity-story-img';figure.dataset.imageFit=item.cover_image_fit==='cover'?'cover':'contain';const img=document.createElement('img');img.src=safeUrl(item.cover_image);img.alt=item.title||'活動圖片';img.loading='lazy';const enlarge=document.createElement('button');enlarge.type='button';enlarge.className='activity-image-enlarge';enlarge.setAttribute('aria-label','放大活動圖片：'+(item.title||''));enlarge.append(img);enlarge.onclick=()=>openActivityImage(img.src,img.alt);figure.append(enlarge);story.append(figure);if(item.cover_image_source){const cap=document.createElement('p');cap.className='image-source-caption';cap.textContent='圖片來源：'+item.cover_image_source;story.append(cap);}}
       if(item.content){const content=document.createElement('div');content.className='detail-prose activity-detail-content';content.textContent=item.content;story.append(content);}
       if(!item.cover_image&&!item.content)story.hidden=true;
     }

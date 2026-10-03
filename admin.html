@@ -1602,14 +1602,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="secure-delete.js?v=20261003-events-delete"></script>
-      <script src="cms-schema.js?v=20261001-unified-event-editor"></script>
+      <script src="cms-schema.js?v=20261003-event-images"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script src="bulk-data.js?v=20261003-events-import"></script>
+    <script src="bulk-data.js?v=20261003-event-images"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-search-connection-fix"></script>
+      <script src="cms-editor.js?v=20261003-event-images"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
-      <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
+      <script src="cms-preview.js?v=20261003-event-images"></script>
     <script>
       const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       window.MetroAdminDb = db;
@@ -1795,7 +1795,8 @@
             ["category", "活動類型", "eventCategory"],
             ["summary", "活動簡介", "textarea"],
             ["content", "活動補充說明", "textarea"],
-            ["cover_image", "活動封面圖（建議 1200×800）", "image"],
+            ["cover_image", "活動圖片（支援直式海報及橫幅）", "image"],
+            ["cover_image_fit", "圖片顯示方式", "eventImageFit"],
             ["cover_image_source", "圖片來源", "text"],
             ["start_date", "活動開始日期", "date"],
             ["end_date", "活動結束日期", "date"],
@@ -3467,6 +3468,8 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               return featuredTopicsTemplate(name, label);
             if (type === "newsCategory")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}" required><option value="活動">活動</option><option value="優惠">優惠</option><option value="公告">公告</option><option value="旅遊情報">旅遊情報</option></select><div class="help">分類會顯示於首頁、最新消息列表與消息內頁；標題不需再手動加入【公告】等分類文字。</div></div>`;
+            if (type === "eventImageFit")
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="contain">完整顯示（海報／橫幅）</option><option value="cover">填滿裁切（一般照片）</option></select></div>`;
             if (type === "eventCategory")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="其他">其他</option><option value="展覽">展覽</option><option value="節慶">節慶</option><option value="市集">市集</option><option value="親子">親子</option><option value="表演">表演</option></select></div>`;
             if (type === "eventEndBehavior")
@@ -3649,6 +3652,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           if (!el) return;
           if (name === "id") el.value = nextId();
           else if (name === "role") el.value = "admin";
+          else if (type === "eventImageFit") el.value = "contain";
           else if (name === "password") el.value = "";
           else if (name === "sort_order")
             el.value = String(
@@ -4021,6 +4025,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           if (!el) return;
           if (type === "boolean" || type === "booleanActive" || type === "eventFeatured")
             el.value = item[name] ? "true" : "false";
+          else if (type === "eventImageFit") el.value = item[name] === "cover" ? "cover" : "contain";
           else if (name === "password") el.value = "";
           else if (name === "transport_routes") {
             // JSONB must be serialized as JSON, not the implicit '[object Object]'.
@@ -4301,6 +4306,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             return;
           }
         }
+        if (currentTable === "events" && !["contain", "cover"].includes(payload.cover_image_fit)) payload.cover_image_fit = "contain";
         // Existing records use UPDATE rather than UPSERT: UPDATE-only RLS does not imply INSERT permission.
         // Draft updates must not rewrite review/publish fields, even with stale cache values.
         const contentTable = ["spots", "foods", "trips", "events"].includes(currentTable);

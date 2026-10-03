@@ -22,6 +22,7 @@ const definitions={
       ["official_url", "官方網站／活動資訊連結", "text"],
       ["cover_image", "封面圖片", "image"],
       ["cover_image_source", "圖片來源", "text"],
+      ["cover_image_fit", "圖片顯示方式", "eventImageFit"],
       ["is_home_featured", "首頁優先推薦", "eventFeatured"],
       ["end_behavior", "活動結束後", "eventEndBehavior"],
       ["is_published", "發布狀態", "boolean"]
@@ -30,7 +31,7 @@ const definitions={
       "basic": ["id", "title", "category", "summary", "start_date", "end_date", "hours", "venue_name", "address", "admission", "official_url"],
       "detail": ["content"],
       "transport": ["transport", "google_map"],
-      "images": ["cover_image", "cover_image_source"],
+      "images": ["cover_image", "cover_image_fit", "cover_image_source"],
       "settings": ["sort_order", "is_home_featured", "end_behavior", "is_published"]
     }
   },

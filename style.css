@@ -1513,3 +1513,8 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 .auto-reading-grid .rel:hover h3,.auto-reading-grid .rel:focus-visible h3{color:#F3653B}
 @media(max-width:980px){.auto-reading-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.auto-reading-grid{grid-template-columns:1fr}}
+
+/* 優惠目錄：桌面每列三張卡片。 */
+#couponsGrid.directory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:980px){#couponsGrid.directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#couponsGrid.directory-grid{grid-template-columns:minmax(0,1fr)}}

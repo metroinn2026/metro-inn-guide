@@ -1604,7 +1604,7 @@
     <script src="secure-delete.js"></script>
       <script src="cms-schema.js?v=20261001-unified-event-editor"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script src="bulk-data.js"></script>
+    <script src="bulk-data.js?v=20261003-events-import"></script>
     <script src="transit-duration.js"></script>
       <script src="cms-editor.js?v=20261003-transport-draft-helper"></script>
     <script src="route-timeline.js"></script>
@@ -2698,7 +2698,7 @@
         document.getElementById("categoryExportBtn").disabled = busy;
       }
       function openCategoryImport() {
-        if (bulkDataBusy || !["spots", "foods", "trips"].includes(currentTable))
+        if (bulkDataBusy || !["spots", "foods", "trips", "events"].includes(currentTable))
           return;
         bulkInput.value = "";
         bulkInput.click();
@@ -2769,7 +2769,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         }
       });
       async function exportCategoryExcel() {
-        if (bulkDataBusy || !["spots", "foods", "trips"].includes(currentTable))
+        if (bulkDataBusy || !["spots", "foods", "trips", "events"].includes(currentTable))
           return;
         const table = currentTable;
         setBulkBusy(true);
@@ -3139,7 +3139,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           "coupons",
           "news",
         ].includes(table);
-        const categoryWorkflow = ["spots", "foods", "trips"].includes(table);
+        const categoryWorkflow = ["spots", "foods", "trips", "events"].includes(table);
         document.getElementById("directorySettingsBtn").hidden =
           !directoryWorkflow;
         document.getElementById("categoryImportBtn").hidden = !categoryWorkflow;
@@ -3185,7 +3185,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             currentUserRole !== "super_admin")
             ? "none"
             : "inline-flex";
-        const manual = ["spots", "foods", "trips"].includes(currentTable);
+        const manual = ["spots", "foods", "trips", "events"].includes(currentTable);
         document
           .querySelectorAll(".normal-save")
           .forEach((b) => (b.style.display = manual ? "none" : ""));
@@ -3450,7 +3450,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             if (type === "json")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="8" spellcheck="false" oninput="updateImagePreview()"></textarea><div class="help">請輸入合法 JSON 物件；格式錯誤時無法儲存。</div></div>`;
             if (type === "boolean")
-              return `<div class="form-row" ${["spots", "foods", "trips"].includes(currentTable) && name === "is_published" ? 'style="display:none"' : ""}><label>${label}</label><select id="f_${name}"><option value="true">${name === "show_trip_main_image" ? "顯示" : "已上架"}</option><option value="false">${name === "show_trip_main_image" ? "不顯示" : "草稿 / 下架"}</option></select></div>`;
+              return `<div class="form-row" ${["spots", "foods", "trips", "events"].includes(currentTable) && name === "is_published" ? 'style="display:none"' : ""}><label>${label}</label><select id="f_${name}"><option value="true">${name === "show_trip_main_image" ? "顯示" : "已上架"}</option><option value="false">${name === "show_trip_main_image" ? "不顯示" : "草稿 / 下架"}</option></select></div>`;
             if (type === "booleanActive")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
             return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag === "auto" || flag === "fixed1" ? "readonly" : ""} oninput="updateImagePreview()"></div>`;
@@ -4274,7 +4274,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         }
         // Existing records use UPDATE rather than UPSERT: UPDATE-only RLS does not imply INSERT permission.
         // Draft updates must not rewrite review/publish fields, even with stale cache values.
-        const contentTable = ["spots", "foods", "trips"].includes(currentTable);
+        const contentTable = ["spots", "foods", "trips", "events"].includes(currentTable);
         const original = contentTable
           ? cache.find((x) => String(x.id) === String(payload.id))
           : null;

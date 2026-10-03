@@ -1346,16 +1346,16 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
 .home-trip-copy h3{margin:7px 0 4px;font-size:20px;line-height:1.4;color:#4D4D4D}
 .home-trip-copy p{margin:0;color:#70777a;font-size:14px;line-height:1.7}
 .home-trip-more{margin-top:auto;padding-top:12px;color:#F3653B;font-size:13px;font-weight:700}
-.home-trip-arrow{position:absolute;z-index:2;top:42%;display:grid;place-items:center;width:42px;height:42px;border:0;background:#fff;color:#4D4D4D;font-size:27px;line-height:1;cursor:pointer}
+.home-trip-arrow{position:absolute;z-index:2;top:42%;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 18px #0002;color:#4D4D4D;font-size:32px;line-height:1;cursor:pointer}
 .home-trip-arrow:hover{color:#F3653B}
-.home-trip-arrow.prev{left:-20px}.home-trip-arrow.next{right:-20px}
+.home-trip-arrow.prev{left:-23px}.home-trip-arrow.next{right:-23px}
 .home-trip-arrow[hidden]{display:none!important}
 .home-trip-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px;color:#767676;font-size:13px}
 .home-trip-controls .home-journey-link{color:#F3653B;font-size:14px;font-weight:700;text-decoration:none}
 .home-trip-controls .home-journey-link:hover{text-decoration:underline;text-underline-offset:4px}
 .home-trip-empty{padding:26px 2px;color:#70777a}
 @media(max-width:900px){.home-trip-card{flex-basis:calc((100% - 20px)/2)}}
-@media(max-width:760px){.home-trip-grid{gap:12px}.home-trip-card{flex:0 0 84%}.home-trip-copy{padding:13px 14px 15px}.home-trip-copy h3{font-size:18px}.home-trip-arrow{width:36px;height:36px}.home-trip-arrow.prev{left:-10px}.home-trip-arrow.next{right:-10px}.home-trip-controls{margin-top:6px}}
+@media(max-width:760px){.home-trip-grid{gap:12px}.home-trip-card{flex:0 0 84%}.home-trip-copy{padding:13px 14px 15px}.home-trip-copy h3{font-size:18px}.home-trip-arrow{width:36px;height:36px;font-size:24px}.home-trip-arrow.prev{left:-10px}.home-trip-arrow.next{right:-10px}.home-trip-controls{margin-top:6px}}
 
 /* 活動卡片：桌機三張一列、每六秒向右切換一張；平板兩張、手機滑動瀏覽。 */
 .home-events .home-event-grid{gap:16px!important}

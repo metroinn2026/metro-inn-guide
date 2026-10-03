@@ -1,6 +1,6 @@
 /* Batch deletion: never trust client-side role checks. SQL RPC enforces permissions. */
 async function secureBulkDelete(db, table, ids, description) {
-  if (!['spots','foods','trips','coupons','news','travel_submissions'].includes(table)) throw Error('不支援的資料類型');
+  if (!['spots','foods','trips','coupons','news','travel_submissions','events'].includes(table)) throw Error('不支援的資料類型');
   if (!ids.length || ids.length > 100) throw Error('單次只能刪除 1～100 筆');
   const {data:{user},error:userError}=await db.auth.getUser();
   if(userError || !user?.email) throw Error('請重新登入');
@@ -22,7 +22,7 @@ async function secureBulkDelete(db, table, ids, description) {
     if(authError || auth?.user?.id!==user.id) throw Error('密碼驗證未通過，請確認目前登入帳號與密碼');
     const {data:current,error:sessionError}=await db.auth.getUser();
     if(sessionError || current?.user?.id!==user.id) throw Error('後台登入狀態已變更，請重新登入');
-    const {data,error}=await verificationClient.rpc('admin_secure_bulk_delete',{p_table:table,p_ids:ids.map(String)});
+    const {data,error}=await verificationClient.rpc(table==='events'?'admin_secure_bulk_delete_events':'admin_secure_bulk_delete',table==='events'?{p_ids:ids.map(String)}:{p_table:table,p_ids:ids.map(String)});
     if(error) throw Error('資料庫刪除失敗：'+error.message+'（請確認已依部署說明安裝刪除 SQL）');
     if(!data || data.deleted!==ids.length) throw Error('資料庫回報筆數不一致，請重新讀取確認');
     return data;

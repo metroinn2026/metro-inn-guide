@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>美食目錄｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261003-directory-cards">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
 </head>
@@ -116,7 +116,7 @@
             <div class="tag-list small">
               ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
-            <span class="arrow">→</span>
+            
           </div>
         `;
         gridEl.appendChild(card);

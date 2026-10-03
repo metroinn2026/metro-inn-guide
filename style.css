@@ -459,7 +459,8 @@ body:has(.editor-picks) .search-tags a:hover{border-color:#F3653B;color:#F3653B}
 .home-event-grid:has(.home-event-card:nth-child(3)) .home-event-card:nth-child(3n + 1) .home-event-photo{height:218px;min-height:0}
 .home-event-card:not(:nth-child(3n + 1)) .home-event-photo{height:218px}
 .activity-list-card{display:flex;min-width:0;flex-direction:column;background:#fff;color:#4D4D4D;text-decoration:none;border-bottom:2px solid transparent}
-.activity-list-card:hover,.activity-list-card:focus-visible{border-bottom-color:#F3653B}
+.activity-list-card:hover,.activity-list-card:focus-visible{border-bottom-color:transparent}
+.activity-list-card:hover .activity-list-copy h2,.activity-list-card:focus-visible .activity-list-copy h2{color:#F3653B}
 .activity-list-photo{width:100%;height:220px;object-fit:cover;background:#eee}
 .activity-list-copy{display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:18px 20px 20px}
 .activity-list-meta{margin-bottom:10px}
@@ -1488,3 +1489,8 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 .activity-image-dialog img{width:auto;max-width:100%;height:auto;object-fit:contain;margin:0 auto}
 .activity-image-close{position:absolute;top:8px;right:12px;padding:7px 14px;cursor:pointer}
 
+
+/* 行程目錄：桌面每列三張，平板兩張、手機一張。 */
+#tripsGrid.directory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:980px){#tripsGrid.directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#tripsGrid.directory-grid{grid-template-columns:minmax(0,1fr)}}

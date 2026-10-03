@@ -1606,7 +1606,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="bulk-data.js?v=20261003-events-import"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-transport-draft-helper"></script>
+      <script src="cms-editor.js?v=20261003-events-transport-save"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
       <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
@@ -4296,12 +4296,15 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               delete payload.review_status;
             } else {
               payload.is_published = false;
-              payload.review_status = "pending";
+              if (currentTable !== "events") payload.review_status = "pending";
             }
           } else {
             payload.is_published = true;
-            payload.review_status = "approved";
+            if (currentTable !== "events") payload.review_status = "approved";
           }
+        }
+        if (currentTable === "events") {
+          for (const key of ["review_status", "review_note", "reviewed_at", "reviewed_by"]) delete payload[key];
         }
         // Capture the destination before awaiting: switching modules must not redirect
         // the completion callback into another table or overwrite its editor.

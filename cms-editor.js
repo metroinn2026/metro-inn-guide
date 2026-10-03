@@ -66,7 +66,13 @@ function mount(root,type,record,options={}){
    const remove=document.createElement('button');remove.type='button';remove.textContent='移除此路段';remove.onclick=()=>{segments.splice(segments.indexOf(segment),1);box.remove();};box.append(remove);draftBox.append(box);
   }
   addSegment();const addLeg=document.createElement('button');addLeg.type='button';addLeg.textContent='＋新增交通／步行路段';addLeg.onclick=addSegment;
-  const buildDraft=document.createElement('button');buildDraft.type='button';buildDraft.textContent='產生交通文字草稿';buildDraft.style.marginTop='10px';const draftNotice=document.createElement('p');draftNotice.style.cssText='font-size:12px;line-height:1.6;color:#64748b;margin:8px 0 0';draftNotice.textContent='系統會只帶入已確認的固定起點步行資料；捷運、公車站名、方向、時間與距離請先從地圖查詢後填入，避免產生未核實資訊。';helper.append(helperTitle,helperText,helperActions,draftBox,addLeg,buildDraft,draftNotice);wrap.append(helper);
+  const buildDraft=document.createElement('button');buildDraft.type='button';buildDraft.textContent='產生交通文字草稿';buildDraft.style.marginTop='10px';const draftNotice=document.createElement('p');draftNotice.style.cssText='font-size:12px;line-height:1.6;color:#64748b;margin:8px 0 0';draftNotice.textContent='系統會只帶入已確認的固定起點步行資料；捷運、公車站名、方向、時間與距離請先從地圖查詢後填入，避免產生未核實資訊。';helper.append(helperTitle,helperText,helperActions,draftBox,addLeg,buildDraft,draftNotice);const toolbar=document.createElement('div');toolbar.className='image-field-actions';toolbar.style.cssText='margin:8px 0 12px';
+  const openHelper=document.createElement('button');openHelper.type='button';openHelper.textContent='開啟交通填寫小幫手';openHelper.setAttribute('aria-haspopup','dialog');toolbar.append(insertStart,openHelper);wrap.append(toolbar);
+  const dialog=document.createElement('dialog');dialog.className='cms-transport-helper-dialog';dialog.setAttribute('aria-label','交通填寫小幫手');dialog.style.cssText='width:min(760px,calc(100vw - 32px));max-height:85vh;box-sizing:border-box;overflow:auto;border:1px solid #dbe4ef;border-radius:12px;padding:16px;background:#fff;color:#1e293b';
+  const dialogStyle=document.createElement('style');dialogStyle.textContent='.cms-transport-helper-dialog::backdrop{background:rgba(15,23,42,.45)}';wrap.append(dialogStyle);
+  const dialogBar=document.createElement('div');dialogBar.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:-16px;background:#fff;padding:8px 0;z-index:1';
+  const dialogTitle=document.createElement('strong');dialogTitle.textContent='交通填寫小幫手';const closeHelper=document.createElement('button');closeHelper.type='button';closeHelper.textContent='關閉';dialogBar.append(dialogTitle,closeHelper);helperTitle.remove();helper.style.margin='0';dialog.append(dialogBar,helper);wrap.append(dialog);
+  openHelper.onclick=()=>dialog.showModal();closeHelper.onclick=()=>dialog.close();dialog.onclose=()=>openHelper.focus();dialog.onclick=event=>{if(event.target!==dialog)return;const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close();};
   const modes=new Set(['步行','捷運','公車','轉乘','自行車','候車','接駁']);
   function stringify(routes){if(!Array.isArray(routes))return '';
    const route=routes.find(r=>r&&r.enabled!==false&&Array.isArray(r.steps));if(!route)return '';
@@ -108,9 +114,9 @@ function mount(root,type,record,options={}){
    if(!count){window.alert('請先查詢路線並填寫至少一個路段。');return;}
    if(lines[lines.length-1]!==destination)lines.push(destination);
    if(editor.value.trim()&&!window.confirm('以這份交通文字草稿取代目前內容？'))return;
-   editor.value=lines.join('\n');editor.dispatchEvent(new Event('input',{bubbles:true}));draftNotice.textContent='已產生可串接大眾運輸指南的逐行文字。請核對路線後儲存。';
+   editor.value=lines.join('\n');editor.dispatchEvent(new Event('input',{bubbles:true}));draftNotice.textContent='已產生可串接大眾運輸指南的逐行文字。請核對路線後儲存。';if(!invalid.has(key))dialog.close();
   };
-  helperActions.append(insertStart,makeDirections);
+  helperActions.append(makeDirections);
   if(type==='events'&&key==='transport'){
    navigationLabel.remove();navigationHint.remove();
    editor.dataset.field=key;editor.value=typeof options.fieldValue==='function'?options.fieldValue(key)??record[key]??'':record[key]||'';inputs.set(key,editor);

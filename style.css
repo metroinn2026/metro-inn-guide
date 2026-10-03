@@ -1518,3 +1518,7 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 #couponsGrid.directory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:980px){#couponsGrid.directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){#couponsGrid.directory-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* 延伸閱讀照片與文字留白。 */
+.related .rel-img{margin-bottom:16px}
+.related .rel h3{margin-top:10px}

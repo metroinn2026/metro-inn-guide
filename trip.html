@@ -242,6 +242,7 @@
           title: item.title || `第 ${index + 1} 段`,
           text,
           route_summary: item.route_summary || item.preview || "",
+          route_overview: Array.isArray(item.route_overview) ? item.route_overview : [],
           image,
           image_source,
           show_image: item.show_image !== false,
@@ -510,17 +511,22 @@
             `◷　建議停留 ${trip.duration || "依行程安排"}`,
           );
 
-          document.getElementById("routeGrid").innerHTML = steps
-            .slice(0, 4)
-            .map(
-              (step) => `
+          const routeOverview = steps.find((step) => Array.isArray(step.route_overview) && step.route_overview.length)?.route_overview || [];
+          const routeCards = routeOverview.length
+            ? routeOverview.slice(0, 4)
+            : steps.slice(0, 4).map((step) => ({
+                time: step.time,
+                title: step.title,
+                text: step.route_summary || (step.text ? step.text.replace(/\s+/g, " ").trim().slice(0, 52) + (step.text.replace(/\s+/g, " ").trim().length > 52 ? "…" : "") : ""),
+              }));
+          document.getElementById("routeGrid").innerHTML = routeCards
+            .map((step) => `
           <div>
-            <small>${step.time}</small>
-            <strong>${step.title}</strong>
-            <p>${step.route_summary || (step.text ? step.text.replace(/\s+/g, " ").trim().slice(0, 52) + (step.text.replace(/\s+/g, " ").trim().length > 52 ? "…" : "") : "")}</p>
+            <small>${step.time || ""}</small>
+            <strong>${step.title || ""}</strong>
+            <p>${step.text || ""}</p>
           </div>
-        `,
-            )
+        `)
             .join("");
 
           document.getElementById("storySections").innerHTML = steps

@@ -799,6 +799,12 @@
       #sharedAdminEditor .cms-editor-section > .cms-sections {
         margin-top: 12px;
       }
+      .trip-editor-tabs { display:flex; gap:0; margin:12px 0 16px; border-bottom:1px solid #d9e1ea; }
+      .trip-editor-tabs button { border:0; background:transparent; padding:10px 16px; color:#64748b; font-weight:700; cursor:pointer; border-bottom:3px solid transparent; }
+      .trip-editor-tabs button.active { color:#d96b35; border-bottom-color:#d96b35; }
+      .trip-editor-tab-panel[hidden] { display:none !important; }
+      .trip-editor-tab-panel fieldset > label { display:block; margin:10px 0; font-weight:600; color:#475569; }
+      .trip-editor-tab-panel fieldset input, .trip-editor-tab-panel fieldset textarea { display:block; width:100%; box-sizing:border-box; margin-top:6px; }
       #sharedAdminEditor .cms-editor-advanced {
         margin: 0 0 16px;
         font-size: 13px;
@@ -1606,7 +1612,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="bulk-data.js"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-trip-route-summary"></script>
+      <script src="cms-editor.js?v=20261003-trip-tabs"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
       <script src="cms-preview.js?v=20261001-unified-event-editor"></script>

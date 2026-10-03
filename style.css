@@ -635,7 +635,7 @@ body.spot-detail-page .single-point .story-img,body.food-detail-page .single-poi
 .news-directory-list{border-top:1px solid var(--line)}.news-directory-list .news-line{grid-template-columns:140px minmax(0,1fr) 28px}.news-directory-list .news-line time{white-space:nowrap}.news-directory-list .news-line strong{font-size:16px}.news-directory-list .news-chevron{text-align:right;color:var(--orange);font-size:20px}
 @media(max-width:600px){.news-directory-list .news-line{grid-template-columns:1fr 20px}.news-directory-list .news-line time{grid-column:1;font-size:12px}.news-directory-list .news-line strong{grid-column:1;font-size:15px}.news-directory-list .news-chevron{grid-column:2;grid-row:1 / span 2;align-self:center}}
 .detail-side-title{font-size:18px!important;line-height:1.4;margin:0 0 18px!important;color:#4D4D4D}
-body.food-detail-page .sticky-panel>.sidebox.compact:first-child,body.trip-detail-page .sticky-panel .sidebox.compact:first-child{background:#fff!important;border:1px solid #e5e5e5!important}
+body.food-detail-page .sticky-panel>.sidebox.compact:first-child,body.trip-detail-page .sticky-panel .sidebox.compact:first-child{background:#F5F5F5!important;border:1px solid #e5e5e5!important}
 body.trip-detail-page .route{margin-top:32px}
 .travel-story-entry{border-bottom:1px solid #e5e5e5;padding:28px 0}
 .travel-story-entry h2{margin:0 0 10px;font-size:clamp(21px,2.5vw,27px);color:#303030}
@@ -1497,3 +1497,6 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 
 /* 沒有交通指南的內頁移除側欄後，主內容收回空白欄。 */
 .article-wrap.detail-no-sidebar{grid-template-columns:minmax(0,1fr)}
+
+/* 各類別內頁交通指南統一淺灰底，避免行程舊版首張卡樣式覆蓋。 */
+body .sticky-panel .sidebox.metro-transit.compact-transit{background:#F5F5F5!important;border-color:#E5E5E5!important}

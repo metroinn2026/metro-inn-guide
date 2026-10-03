@@ -52,14 +52,14 @@
         const line=lines[index];
         if(/^(全程|總時間|參考總時間)/.test(line)){total.textContent=line.replace(/^(參考)?總時間[：:]?/,'全程');total.hidden=false;continue;}
         const parts=line.split(/[｜|]/).map(value=>value.trim()).filter(Boolean);const mode=parts[0];
-        if(!/^(步行|捷運|轉乘|公車|搭乘|騎乘|接駁|候車)/.test(mode)){if(pendingTransfer){steps.push({leg:`站內轉乘${pendingTransfer?'｜'+pendingTransfer:''}`});pendingTransfer='';}steps.push({station:line});continue;}
+        if(!['步行','捷運','轉乘','公車','搭乘','騎乘','接駁','候車','自行車'].includes(mode)){if(pendingTransfer){steps.push({leg:`站內轉乘${pendingTransfer?'｜'+pendingTransfer:''}`});pendingTransfer='';}steps.push({station:line});continue;}
         const duration=durationOf(line);legacyTimed++;
         if(duration===null)legacyMissing++;else legacyTotal+=duration;
         const distance=parts.find(value=>/公尺|公里|km|m$/i.test(value))||'';
         const stationCount=parts.find(value=>/\d+\s*站/.test(value))?.replace(/\s+/g,'')||'';
         const routeParts=parts.slice(1).filter(value=>durationOf(value)===null&&!/\d+\s*站/.test(value)&&!/公尺|公里|km|m$/i.test(value));
         const routeName=routeParts.shift()||'';const directionPart=routeParts.find(value=>/^(往|.*方向$)/.test(value))||'';
-        const direction=directionPart.replace(/^往/,'').replace(/方向$/,'').replace(/[（）()]/g,'').trim();
+        const direction=directionPart.replace(/^往/,'').replace(/方向$/,'').trim();
         const durationText=duration===null?'':`約${duration}分`;
         const detail=[stationCount,durationText].filter(Boolean).join('・');
         if(mode==='步行'||mode==='騎乘'||mode==='候車'){
@@ -72,7 +72,7 @@
         }
         if(mode==='捷運'||mode==='公車'||mode==='轉乘'){
           const name=routeName||mode;const dir=direction?`（${direction}方向）`:'';
-          steps.push({leg:`${mode==='公車'?'公車':''}${name}${dir}${detail?'｜'+detail:''}`});continue;
+          steps.push({leg:`${name}${mode==='公車'?'公車':''}${dir}${detail?'｜'+detail:''}`});continue;
         }
         steps.push({leg:line.replace(/\s*[｜|]\s*/g,'｜').replace(/約\s*(\d+)\s*分鐘/g,'約$1分')});
       }

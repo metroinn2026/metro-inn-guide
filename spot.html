@@ -74,7 +74,6 @@
         <div class="info-row"><span class="info-label">備註</span><span id="infoNote">實際開放時間、票價與活動資訊，請以官方公告為準。</span></div>
 
         <div class="info-actions multi">
-          <a id="mapButton" class="button" href="#" target="_blank" rel="noopener">Google Map</a>
           <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
         </div>
 
@@ -228,7 +227,6 @@
         document.getElementById('tagListTop').innerHTML = tagHtml;
 
         const mapUrl = spot.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
-        document.getElementById('mapButton').href = mapUrl;
 
         if (spot.official_website) {
           document.getElementById('officialButton').href = spot.official_website;

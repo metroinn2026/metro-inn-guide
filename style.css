@@ -1522,3 +1522,8 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 /* 延伸閱讀照片與文字留白。 */
 .related .rel-img{margin-bottom:16px}
 .related .rel h3{margin-top:10px}
+
+/* 行程段落時間：獨立標示，避免與介紹文字混在一起。 */
+.numbered-story .trip-section-time{display:table;margin:0 0 16px;padding:7px 13px;border-radius:6px;background:#fff2ec;color:#b83b16;font-size:18px;font-weight:700;line-height:1.5;letter-spacing:.02em}
+.numbered-story .trip-section-time+p{margin-top:0}
+@media(max-width:760px){.numbered-story .trip-section-time{font-size:16px;margin-bottom:12px}}

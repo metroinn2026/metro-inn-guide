@@ -1334,8 +1334,8 @@ body:has(.editor-picks) .home-news .home-news-heading h2::before{left:0!importan
 .home-trip-carousel{position:relative}
 .home-trip-grid{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:4px 2px 12px}
 .home-trip-grid::-webkit-scrollbar{display:none}
-.home-trip-card{display:flex;flex:0 0 calc((100% - 40px)/3);min-width:0;flex-direction:column;overflow:hidden;background:#fff;border:1px solid #e6e2d9;color:#4D4D4D;text-decoration:none;scroll-snap-align:start;border-radius:12px;transition:none}
-.home-trip-card:hover,.home-trip-card:focus-visible{border-color:#e6e2d9;outline:none}
+.home-trip-card{display:flex;flex:0 0 calc((100% - 40px)/3);min-width:0;flex-direction:column;overflow:hidden;background:#fff;border:0;color:#4D4D4D;text-decoration:none;scroll-snap-align:start;border-radius:12px;transition:none}
+.home-trip-card:hover,.home-trip-card:focus-visible{border:0;outline:none}
 .home-trip-card:hover .home-trip-copy h3,.home-trip-card:focus-visible .home-trip-copy h3{color:#F3653B}
 .home-trip-photo{width:100%;aspect-ratio:1.6;overflow:hidden;border-radius:12px;background:#e8e8e3}
 .home-trip-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .25s ease}

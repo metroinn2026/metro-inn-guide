@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>優惠介紹｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261003-detail-transit-only">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
 </head>
@@ -34,7 +34,7 @@
     </div>
   </section>
 
-  <main class="container article-wrap single-point">
+  <main class="container article-wrap single-point detail-no-sidebar">
     <article>
       <div id="storyMeta" class="meta detail-eyebrow">OFFER</div>
       <h1 id="articleTitle" class="spot-article-title">優惠名稱</h1>
@@ -76,27 +76,7 @@
       </section>
     </article>
 
-    <aside class="sticky-panel">
-      <div class="sidebox compact">
-        <div class="kicker">OFFER INFO</div>
-        <h3 id="sideTitle">優惠介紹</h3>
-        <p id="sideDate">活動期間載入中</p>
-        <p>使用前請確認最新公告。</p>
-      </div>
-
-      <div class="sidebox compact fill">
-        <div class="kicker">PLAN YOUR TRIP</div>
-        <h3>搭配行程一起看</h3>
-        <p>可回到景點、美食或行程頁，安排更完整的北投旅程。</p>
-      </div>
-
-      <div class="sidebox compact dark">
-        <div class="kicker" style="color:white">STAY NEARBY</div>
-        <h3>入住北捷行旅</h3>
-        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
-        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
-      </div>
-    </aside>
+    
   </main>
 
   <div id="footer"></div>
@@ -195,8 +175,8 @@
         setText('infoEnd', coupon.end_date);
         setText('infoSummary', summary);
 
-        setText('sideTitle', title);
-        setText('sideDate', `活動期間：${range}`);
+
+
 
         document.getElementById('officialButton').href = coupon.official_website || 'coupons.html';
 

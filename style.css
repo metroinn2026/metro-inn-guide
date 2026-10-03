@@ -1494,3 +1494,6 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 #tripsGrid.directory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:980px){#tripsGrid.directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){#tripsGrid.directory-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* 沒有交通指南的內頁移除側欄後，主內容收回空白欄。 */
+.article-wrap.detail-no-sidebar{grid-template-columns:minmax(0,1fr)}

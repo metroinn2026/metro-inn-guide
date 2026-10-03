@@ -73,6 +73,35 @@ function mount(root,type,record,options={}){
   const dialogBar=document.createElement('div');dialogBar.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:-16px;background:#fff;padding:8px 0;z-index:1';
   const dialogTitle=document.createElement('strong');dialogTitle.textContent='交通填寫小幫手';const closeHelper=document.createElement('button');closeHelper.type='button';closeHelper.textContent='關閉';dialogBar.append(dialogTitle,closeHelper);helperTitle.remove();helper.style.margin='0';dialog.append(dialogBar,helper);wrap.append(dialog);
   openHelper.onclick=()=>dialog.showModal();closeHelper.onclick=()=>dialog.close();dialog.onclose=()=>openHelper.focus();dialog.onclick=event=>{if(event.target!==dialog)return;const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close();};
+  const savedSearch=document.createElement('section');savedSearch.style.cssText='background:#fff;border:1px solid #dbe4ef;padding:12px;margin:0 0 16px';
+  const searchTitle=document.createElement('strong');searchTitle.textContent='搜尋已儲存交通指南';
+  const searchHint=document.createElement('p');searchHint.textContent='輸入名稱、地址或路線站點，搜尋景點、美食、行程及活動。預覽後可帶入目前欄位；來源資料不會變動。';searchHint.style.cssText='font-size:13px;line-height:1.7';
+  const searchInput=document.createElement('input');searchInput.type='search';searchInput.placeholder='例如：北投文物館';searchInput.setAttribute('aria-label','交通指南搜尋關鍵字');searchInput.style.cssText='width:100%;box-sizing:border-box';
+  const searchButton=document.createElement('button');searchButton.type='button';searchButton.textContent='搜尋交通指南';searchButton.style.marginTop='8px';
+  const searchStatus=document.createElement('p');searchStatus.setAttribute('aria-live','polite');searchStatus.style.cssText='font-size:13px;white-space:pre-wrap';const searchResults=document.createElement('div');
+  savedSearch.append(searchTitle,searchHint,searchInput,searchButton,searchStatus,searchResults);helper.prepend(savedSearch);
+  searchButton.onclick=async()=>{
+   const keyword=searchInput.value.trim();if(!keyword){searchStatus.textContent='請輸入搜尋關鍵字。';return;}
+   searchButton.disabled=true;searchResults.replaceChildren();searchStatus.textContent='搜尋中…';
+   try{
+    if(typeof options.searchTransportGuides!=='function')throw Error('尚未連接搜尋服務，請一併更新 admin.html。');
+    const result=await options.searchTransportGuides(keyword);let count=0;
+    for(const item of result.items||[]){
+     let routes=item.transport_routes;if(typeof routes==='string'){try{routes=JSON.parse(routes);}catch{routes=[];}}if(routes&&!Array.isArray(routes))routes=routes.routes||[];
+     const candidates=item.sourceType==='events'?[{text:String(item.transport||'').trim(),title:''}]:
+      (Array.isArray(routes)?routes:[]).filter(route=>route&&route.enabled!==false&&Array.isArray(route.steps)&&route.steps.length).map(route=>({text:stringify([route]),title:route.title||''}));
+     for(const candidate of candidates){if(!candidate.text)continue;count++;
+      const card=document.createElement('article');card.style.cssText='border-top:1px solid #ddd;padding:12px 0';const title=document.createElement('strong');title.textContent=[item.sourceLabel,item.title||item.id,candidate.title].filter(Boolean).join(' · ');
+      const place=document.createElement('p');place.textContent=[item.venue_name,item.address].filter(Boolean).join(' · ');place.style.cssText='font-size:12px;margin:4px 0';
+      const preview=document.createElement('pre');preview.textContent=candidate.text;preview.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:13px;line-height:1.8;background:#f8fafc;padding:10px';
+      const use=document.createElement('button');use.type='button';use.textContent='帶入這份交通指南';use.onclick=()=>{if(editor.value.trim()&&!window.confirm('以這份已儲存交通指南取代目前內容？'))return;editor.value=candidate.text;editor.dispatchEvent(new Event('input',{bubbles:true}));if(!invalid.has(key)){dialog.close();status.textContent='已帶入「'+(item.title||item.id)+'」交通指南，請確認目的地後儲存。';}};
+      card.append(title,place,preview,use);searchResults.append(card);
+     }
+    }
+    searchStatus.textContent=(count?'找到 '+count+' 份交通指南。':'沒有找到符合關鍵字且已有交通指南的資料。')+((result.errors||[]).length?'\n部分資料未能讀取：'+result.errors.join('；'):'');
+   }catch(error){searchStatus.textContent='搜尋失敗：'+error.message;}finally{searchButton.disabled=false;}
+  };
+  searchInput.onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();if(!searchButton.disabled)searchButton.onclick();}};
   const modes=new Set(['步行','捷運','公車','轉乘','自行車','候車','接駁']);
   function stringify(routes){if(!Array.isArray(routes))return '';
    const route=routes.find(r=>r&&r.enabled!==false&&Array.isArray(r.steps));if(!route)return '';

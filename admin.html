@@ -1606,7 +1606,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="bulk-data.js?v=20261003-events-import"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-transport-helper-dialog"></script>
+      <script src="cms-editor.js?v=20261003-saved-transport-search"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
       <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
@@ -3289,6 +3289,33 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           document.getElementById("adminPreviewState").textContent = "待修正";
         }
       }
+      async function searchSavedTransportGuides(keyword) {
+        const needle = keyword.trim().toLocaleLowerCase();
+        if (!needle) return { items: [], errors: [] };
+        const sources = [
+          ["spots", "景點", "id,title,address,transport_routes"],
+          ["foods", "美食", "id,title,address,transport_routes"],
+          ["trips", "行程", "id,title,transport_routes"],
+          ["events", "活動", "id,title,venue_name,address,transport"],
+        ];
+        const results = await Promise.all(sources.map(async ([table, label, fields]) => {
+          const items = [];
+          try {
+            for (let offset = 0; ; offset += 500) {
+              const { data, error } = await db.from(table).select(fields).order("id").range(offset, offset + 499);
+              if (error) throw error;
+              for (const item of data || []) {
+                const text = [item.id, item.title, item.address, item.venue_name, item.transport,
+                  JSON.stringify(item.transport_routes || [])].filter(Boolean).join(" ").toLocaleLowerCase();
+                if (text.includes(needle)) items.push({ ...item, sourceLabel: label, sourceType: table });
+              }
+              if (!data || data.length < 500) break;
+            }
+            return { items, error: "" };
+          } catch (error) { return { items, error: label + "：" + (error.message || "讀取失敗") }; }
+        }));
+        return { items: results.flatMap(result => result.items), errors: results.map(result => result.error).filter(Boolean) };
+      }
       function syncAdminPreviewLayout() {
         const enabled = ["spots", "foods", "trips", "events"].includes(currentTable);
         document
@@ -3363,6 +3390,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         };
         adminSharedEditor = MetroCmsEditor.mount(mount, currentTable, record, {
           layout: "all",
+          searchTransportGuides: searchSavedTransportGuides,
           fieldValue: (key) => {
             const el = document.getElementById("f_" + key);
             if (!el) return record[key];

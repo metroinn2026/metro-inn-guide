@@ -11,22 +11,6 @@
 <body id="top" class="coupon-detail-page">
   <div id="header"></div>
 
-  <section class="hero">
-    <img id="heroImage" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85" alt="">
-    <div class="container">
-      <div class="hero-content">
-        <div class="kicker">OFFER DETAIL</div>
-        <h1 id="heroTitle">優惠介紹</h1>
-        <p id="heroSubtitle">優惠資料載入中...</p>
-        <div class="hero-icons">
-          <span id="heroDate">活動期間</span>
-          <span>出示頁面確認</span>
-          <span>實際內容依公告為準</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section class="crumb">
     <div class="container">
       <div id="breadcrumb">首頁 〉 優惠介紹</div>
@@ -120,7 +104,6 @@
       const id = getParam('id');
 
       if (!id) {
-        setText('heroSubtitle', '找不到優惠代碼，請回優惠目錄重新進入。');
         return;
       }
 
@@ -141,7 +124,6 @@
         const coupon = result[0];
 
         if (!coupon) {
-          setText('heroSubtitle', '找不到這筆優惠資料。');
           return;
         }
 
@@ -150,19 +132,13 @@
         const content = coupon.content || summary;
         const image = coupon.cover_image || fallbackImage;
         const imageSourceText = coupon.cover_image_source || coupon.image_source || '';
-        const range = dateRange(coupon);
 
         document.title = `${title}｜Metro Inn Guide 北投旅圖`;
 
-        document.getElementById('heroImage').src = image;
-        document.getElementById('heroImage').alt = title;
         document.getElementById('storyImage').src = image;
         renderImageCaption(imageSourceText);
         document.getElementById('storyImage').alt = title;
 
-        setText('heroTitle', title);
-        setText('heroSubtitle', summary);
-        setText('heroDate', `活動期間：${range}`);
         renderBreadcrumb('優惠介紹', 'coupons.html', title);
         setText('articleTitle', title);
         setText('leadText', summary);
@@ -182,7 +158,6 @@
 
       } catch (error) {
         console.error(error);
-        setText('heroSubtitle', '優惠資料暫時無法載入，請稍後再試。');
         setText('leadText', '優惠資料暫時無法載入，請稍後再試。');
       }
     }

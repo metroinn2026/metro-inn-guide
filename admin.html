@@ -4491,6 +4491,13 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             title: s.title || "",
             text: s.text || s.description || "",
             route_summary: s.route_summary || s.preview || "",
+            route_overview: Array.isArray(s.route_overview)
+              ? s.route_overview.slice(0, 4).map((item) => ({
+                  time: item?.time || "",
+                  title: item?.title || "",
+                  text: item?.text || item?.summary || "",
+                }))
+              : [],
             image: s.image || s.image_url || "",
             image_source: s.image_source || s.source || "",
             show_image: s.show_image !== false,
@@ -4567,6 +4574,18 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
 
       function collectTripSections() {
         const cards = [...document.querySelectorAll(".trip-section-card")];
+        // TODAY'S ROUTE is edited in the shared editor, while this legacy form is
+        // still the canonical save source. Preserve route_overview from the hidden
+        // JSON so collecting the visible detail cards does not silently discard it.
+        let preserved = [];
+        try {
+          const hiddenValue = document.getElementById("f_trip_sections")?.value || "[]";
+          const parsed = JSON.parse(hiddenValue);
+          if (Array.isArray(parsed)) preserved = parsed;
+        } catch {}
+        const sharedOverview = preserved.find((item) =>
+          Array.isArray(item?.route_overview) && item.route_overview.length
+        )?.route_overview || [];
         return cards
           .map((card, index) => ({
             time: card.querySelector('[data-field="time"]')?.value.trim() || "",
@@ -4575,6 +4594,11 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             text: card.querySelector('[data-field="text"]')?.value.trim() || "",
             route_summary:
               card.querySelector('[data-field="route_summary"]')?.value.trim() || "",
+            route_overview: sharedOverview.map((item) => ({
+              time: item?.time || "",
+              title: item?.title || "",
+              text: item?.text || item?.summary || "",
+            })).slice(0, 4),
             image:
               card.querySelector('[data-field="image"]')?.value.trim() || "",
             image_source:

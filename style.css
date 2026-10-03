@@ -1498,5 +1498,8 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 /* 沒有交通指南的內頁移除側欄後，主內容收回空白欄。 */
 .article-wrap.detail-no-sidebar{grid-template-columns:minmax(0,1fr)}
 
-/* 各類別內頁交通指南：白底搭配左側橘色框線。 */
-body .sticky-panel .sidebox.metro-transit.compact-transit{background:#fff!important;border:1px solid #E5E5E5!important;border-left:3px solid #F3653B!important}
+/* 各類別交通指南統一白底灰框，直接指定容器以覆蓋行程首張卡舊樣式。 */
+#spotTransportGuide>.compact-transit,
+#foodTransportGuide>.compact-transit,
+#tripTransportGuide>.compact-transit,
+#activityTransportGuide>.compact-transit{background:#fff!important;border:1px solid #E5E5E5!important}

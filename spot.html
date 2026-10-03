@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>景點介紹｜Metro Inn Guide 北投旅圖</title>
-  <link rel="stylesheet" href="style.css?v=20261003-reading-spacing">
+  <link rel="stylesheet" href="style.css">
   <script src="data.js"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="transit-duration.js"></script>
-  <script src="transport-guide.js?v=20261003-station-parser-fix"></script>
-  <script src="related-reading.js?v=20261003-auto-reading"></script>
+  <script src="transport-guide.js?v=20261002-shared-all-details"></script>
+  <script src="related-reading.js"></script>
 </head>
 
 <body id="top" class="spot-detail-page">
@@ -71,9 +71,10 @@
         <div class="info-row"><span class="info-label">最近捷運站</span><span id="infoStation">尚未提供</span></div>
         <div class="info-row"><span class="info-label">建議停留</span><span id="infoStayTime">尚未提供</span></div>
         <div class="info-row"><span class="info-label">景點標籤</span><span id="infoTags">尚未提供</span></div>
-        <div class="info-row"><span class="info-label">備註</span><span id="infoNote">實際開放時間、票價與活動資訊，請以官方公告為準。</span></div>
+        <div id="infoNoteRow" class="info-row" hidden><span class="info-label">備註</span><span id="infoNote"></span></div>
 
         <div class="info-actions multi">
+          <a id="mapButton" class="button" href="#" target="_blank" rel="noopener">Google Map</a>
           <a id="officialButton" class="button outline" href="#" target="_blank" rel="noopener">官方網站</a>
         </div>
 
@@ -81,7 +82,16 @@
       </section>
     </article>
 
-    <aside class="sticky-panel"><div id="spotTransportGuide"></div></aside>
+    <aside class="sticky-panel">
+<div id="spotTransportGuide"></div>
+
+      <div class="sidebox compact dark">
+        <div class="kicker" style="color:white">STAY NEARBY</div>
+        <h3>入住北捷行旅</h3>
+        <p>把北投排進旅程，從一晚舒服的停留開始。</p>
+        <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank" rel="noopener">立即訂房 ↗</a>
+      </div>
+    </aside>
   </main>
 
   <section id="related" class="section related" hidden></section>
@@ -215,7 +225,10 @@
         setText('infoStation', spot.station ? `${spot.station}附近` : '');
         setText('infoStayTime', spot.stay_time);
         setText('infoTags', tags.join('、'));
-        setText('infoNote', spot.notes, '實際開放時間、票價與活動資訊，請以官方公告為準。');
+        const noteRow = document.getElementById('infoNoteRow');
+        const noteText = String(spot.notes || '').trim();
+        if (noteRow) noteRow.hidden = !noteText;
+        setText('infoNote', noteText, '');
 
         renderRelatedReading(spot, document.getElementById('related'));
         MetroTransportGuide.render(document.getElementById('spotTransportGuide'), spot, {destination:[spot.title, spot.address].filter(Boolean).join(' ')});
@@ -227,6 +240,7 @@
         document.getElementById('tagListTop').innerHTML = tagHtml;
 
         const mapUrl = spot.google_map || `https://www.google.com/maps/search/${encodeURIComponent(title)}`;
+        document.getElementById('mapButton').href = mapUrl;
 
         if (spot.official_website) {
           document.getElementById('officialButton').href = spot.official_website;

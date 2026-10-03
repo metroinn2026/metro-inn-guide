@@ -1601,18 +1601,17 @@
     </dialog>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="secure-delete.js?v=20261003-events-delete"></script>
-      <script src="cms-schema.js?v=20261003-event-images"></script>
+    <script src="secure-delete.js"></script>
+      <script src="cms-schema.js?v=20261001-unified-event-editor"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script src="bulk-data.js?v=20261003-event-images"></script>
+    <script src="bulk-data.js"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-event-images"></script>
+      <script src="cms-editor.js?v=20261002-traffic-helper"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
-      <script src="cms-preview.js?v=20261003-event-detail-full-width"></script>
+      <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
     <script>
       const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      window.MetroAdminDb = db;
 
       const imageTipsDefault = `
       <ul class="tip-list">
@@ -1787,7 +1786,7 @@
           kicker: "EVENTS",
           table: "events",
           preview: "activity.html?id=",
-          hint: "管理北投及周邊展覽、節慶、市集等活動。活動狀態依起訖日期自動判斷；可選擇結束後顯示「已結束」或自動隱藏。已上架且尚未結束的活動會自動出現在首頁輪播；勾選首頁優先推薦後會排在前面，首頁最多顯示 6 筆。",
+          hint: "管理北投及周邊展覽、節慶、市集等活動。活動狀態依起訖日期自動判斷；可選擇結束後顯示「已結束」或自動隱藏。首頁精選勾選後最多顯示 6 筆，請選有封面圖的活動。",
           fields: [
             ["id", "活動編號", "text", "auto"],
             ["sort_order", "排序數字", "number"],
@@ -1795,8 +1794,7 @@
             ["category", "活動類型", "eventCategory"],
             ["summary", "活動簡介", "textarea"],
             ["content", "活動補充說明", "textarea"],
-            ["cover_image", "活動圖片（支援直式海報及橫幅）", "image"],
-            ["cover_image_fit", "圖片顯示方式", "eventImageFit"],
+            ["cover_image", "活動封面圖（建議 1200×800）", "image"],
             ["cover_image_source", "圖片來源", "text"],
             ["start_date", "活動開始日期", "date"],
             ["end_date", "活動結束日期", "date"],
@@ -1807,7 +1805,7 @@
             ["admission", "費用／入場方式", "text"],
             ["google_map", "Google 地圖連結", "text"],
             ["official_url", "主辦單位活動資訊連結", "text"],
-            ["is_home_featured", "首頁優先推薦", "eventFeatured"],
+            ["is_home_featured", "加入首頁精選活動", "eventFeatured"],
             ["end_behavior", "活動結束後", "eventEndBehavior"],
             ["is_published", "上架狀態", "boolean"],
           ],
@@ -1817,7 +1815,7 @@
           typeOptions: [["all", "全部類型"], ["展覽", "展覽"], ["節慶", "節慶"], ["市集", "市集"], ["親子", "親子"], ["表演", "表演"], ["其他", "其他"]],
           order: "sort_order",
           idPrefix: "event",
-          tips: `<ul class="tip-list"><li>請填寫活動起訖日期、地點與交通方式，前台會自動顯示「即將開始／活動中／活動已結束」。</li><li>活動結束後可選擇保留「已結束」標籤，或自動從前台隱藏；資料仍會保留在後台。</li><li>已上架活動會自動進入首頁輪播；勾選「首頁優先推薦」會優先顯示，若活動超過 6 筆，再依排序數字排列。</li><li>上架前請確認日期、交通、主辦單位連結及圖片來源。</li></ul>`,
+          tips: `<ul class="tip-list"><li>請填寫活動起訖日期、地點與交通方式，前台會自動顯示「即將開始／活動中／活動已結束」。</li><li>活動結束後可選擇保留「已結束」標籤，或自動從前台隱藏；資料仍會保留在後台。</li><li>勾選「加入首頁精選活動」會在首頁最多顯示 6 筆，依排序數字排列。</li><li>上架前請確認日期、交通、主辦單位連結及圖片來源。</li></ul>`,
         },
         news: {
           label: "最新消息",
@@ -2292,7 +2290,7 @@
           relatedSelection.length +
           "/" +
           relatedLimit() +
-          "（延伸閱讀優先採用前 3 篇；行程沿線內容依此順序顯示）</strong>" +
+          "（依此順序顯示）</strong>" +
           (selected.length
             ? selected
                 .map(
@@ -2300,7 +2298,7 @@
                     `<div class="related-picker-row"><span>${i + 1}. ${relatedEsc(x.title)} <small>${relatedEsc(x.typeLabel)}</small></span><span><button type="button" onclick="moveRelated(${i},-1)" ${i === 0 ? "disabled" : ""}>↑</button><button type="button" onclick="moveRelated(${i},1)" ${i === selected.length - 1 ? "disabled" : ""}>↓</button><button type="button" onclick="toggleRelated('${relatedEsc(relatedKey(x))}')">移除</button></span></div>`,
                 )
                 .join("")
-            : "<p>尚未選取；前台將依地區與標籤自動推薦 3 篇延伸閱讀。</p>");
+            : "<p>尚未選取；不選擇時前台不顯示延伸閱讀。</p>");
         const options = available
           .filter(
             (x) =>
@@ -2700,7 +2698,7 @@
         document.getElementById("categoryExportBtn").disabled = busy;
       }
       function openCategoryImport() {
-        if (bulkDataBusy || !["spots", "foods", "trips", "events"].includes(currentTable))
+        if (bulkDataBusy || !["spots", "foods", "trips"].includes(currentTable))
           return;
         bulkInput.value = "";
         bulkInput.click();
@@ -2771,7 +2769,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         }
       });
       async function exportCategoryExcel() {
-        if (bulkDataBusy || !["spots", "foods", "trips", "events"].includes(currentTable))
+        if (bulkDataBusy || !["spots", "foods", "trips"].includes(currentTable))
           return;
         const table = currentTable;
         setBulkBusy(true);
@@ -3141,7 +3139,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           "coupons",
           "news",
         ].includes(table);
-        const categoryWorkflow = ["spots", "foods", "trips", "events"].includes(table);
+        const categoryWorkflow = ["spots", "foods", "trips"].includes(table);
         document.getElementById("directorySettingsBtn").hidden =
           !directoryWorkflow;
         document.getElementById("categoryImportBtn").hidden = !categoryWorkflow;
@@ -3187,7 +3185,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             currentUserRole !== "super_admin")
             ? "none"
             : "inline-flex";
-        const manual = ["spots", "foods", "trips", "events"].includes(currentTable);
+        const manual = ["spots", "foods", "trips"].includes(currentTable);
         document
           .querySelectorAll(".normal-save")
           .forEach((b) => (b.style.display = manual ? "none" : ""));
@@ -3291,33 +3289,6 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           document.getElementById("adminPreviewState").textContent = "待修正";
         }
       }
-      async function searchSavedTransportGuides(keyword) {
-        const needle = keyword.trim().toLocaleLowerCase();
-        if (!needle) return { items: [], errors: [] };
-        const sources = [
-          ["spots", "景點", "id,title,address,transport_routes"],
-          ["foods", "美食", "id,title,address,transport_routes"],
-          ["trips", "行程", "id,title,transport_routes"],
-          ["events", "活動", "id,title,venue_name,address,transport"],
-        ];
-        const results = await Promise.all(sources.map(async ([table, label, fields]) => {
-          const items = [];
-          try {
-            for (let offset = 0; ; offset += 500) {
-              const { data, error } = await db.from(table).select(fields).order("id").range(offset, offset + 499);
-              if (error) throw error;
-              for (const item of data || []) {
-                const text = [item.id, item.title, item.address, item.venue_name, item.transport,
-                  JSON.stringify(item.transport_routes || [])].filter(Boolean).join(" ").toLocaleLowerCase();
-                if (text.includes(needle)) items.push({ ...item, sourceLabel: label, sourceType: table });
-              }
-              if (!data || data.length < 500) break;
-            }
-            return { items, error: "" };
-          } catch (error) { return { items, error: label + "：" + (error.message || "讀取失敗") }; }
-        }));
-        return { items: results.flatMap(result => result.items), errors: results.map(result => result.error).filter(Boolean) };
-      }
       function syncAdminPreviewLayout() {
         const enabled = ["spots", "foods", "trips", "events"].includes(currentTable);
         document
@@ -3392,7 +3363,6 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
         };
         adminSharedEditor = MetroCmsEditor.mount(mount, currentTable, record, {
           layout: "all",
-          searchTransportGuides: searchSavedTransportGuides,
           fieldValue: (key) => {
             const el = document.getElementById("f_" + key);
             if (!el) return record[key];
@@ -3468,21 +3438,19 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               return featuredTopicsTemplate(name, label);
             if (type === "newsCategory")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}" required><option value="活動">活動</option><option value="優惠">優惠</option><option value="公告">公告</option><option value="旅遊情報">旅遊情報</option></select><div class="help">分類會顯示於首頁、最新消息列表與消息內頁；標題不需再手動加入【公告】等分類文字。</div></div>`;
-            if (type === "eventImageFit")
-              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="contain">完整顯示（海報／橫幅）</option><option value="cover">填滿裁切（一般照片）</option></select></div>`;
             if (type === "eventCategory")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="其他">其他</option><option value="展覽">展覽</option><option value="節慶">節慶</option><option value="市集">市集</option><option value="親子">親子</option><option value="表演">表演</option></select></div>`;
             if (type === "eventEndBehavior")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="hide_after_end">結束後自動隱藏</option><option value="show_ended">保留並顯示「活動已結束」</option></select><div class="help">隱藏只影響前台，活動資料仍保留在後台。</div></div>`;
             if (type === "eventFeatured")
-              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="false">否，依排序數字顯示</option><option value="true">是，優先推薦於首頁</option></select><div class="help">已上架活動會自動進入首頁輪播；首頁最多顯示 6 筆，勾選推薦者優先排列。</div></div>`;
+              return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="false">否，僅顯示於活動列表</option><option value="true">是，推薦在首頁</option></select><div class="help">首頁最多顯示 6 筆精選活動，依排序數字排列。</div></div>`;
             if (type === "image") return imageFieldTemplate(name, label);
             if (type === "textarea")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="5" oninput="updateImagePreview()"></textarea></div>`;
             if (type === "json")
               return `<div class="form-row"><label>${label}</label><textarea id="f_${name}" rows="8" spellcheck="false" oninput="updateImagePreview()"></textarea><div class="help">請輸入合法 JSON 物件；格式錯誤時無法儲存。</div></div>`;
             if (type === "boolean")
-              return `<div class="form-row" ${["spots", "foods", "trips", "events"].includes(currentTable) && name === "is_published" ? 'style="display:none"' : ""}><label>${label}</label><select id="f_${name}"><option value="true">${name === "show_trip_main_image" ? "顯示" : "已上架"}</option><option value="false">${name === "show_trip_main_image" ? "不顯示" : "草稿 / 下架"}</option></select></div>`;
+              return `<div class="form-row" ${["spots", "foods", "trips"].includes(currentTable) && name === "is_published" ? 'style="display:none"' : ""}><label>${label}</label><select id="f_${name}"><option value="true">${name === "show_trip_main_image" ? "顯示" : "已上架"}</option><option value="false">${name === "show_trip_main_image" ? "不顯示" : "草稿 / 下架"}</option></select></div>`;
             if (type === "booleanActive")
               return `<div class="form-row"><label>${label}</label><select id="f_${name}"><option value="true">啟用</option><option value="false">停用</option></select></div>`;
             return `<div class="form-row"><label>${label}</label><input id="f_${name}" type="${type}" ${flag === "auto" || flag === "fixed1" ? "readonly" : ""} oninput="updateImagePreview()"></div>`;
@@ -3652,7 +3620,6 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           if (!el) return;
           if (name === "id") el.value = nextId();
           else if (name === "role") el.value = "admin";
-          else if (type === "eventImageFit") el.value = "contain";
           else if (name === "password") el.value = "";
           else if (name === "sort_order")
             el.value = String(
@@ -4025,7 +3992,6 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           if (!el) return;
           if (type === "boolean" || type === "booleanActive" || type === "eventFeatured")
             el.value = item[name] ? "true" : "false";
-          else if (type === "eventImageFit") el.value = item[name] === "cover" ? "cover" : "contain";
           else if (name === "password") el.value = "";
           else if (name === "transport_routes") {
             // JSONB must be serialized as JSON, not the implicit '[object Object]'.
@@ -4295,21 +4261,20 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             return;
           }
           if (payload.is_home_featured && !payload.cover_image) {
-            msg.textContent = "加入首頁優先推薦前，請先設定活動封面圖片。";
+            msg.textContent = "加入首頁精選前，請先設定活動封面圖片。";
             return;
           }
           if (
             payload.is_home_featured &&
             cache.filter((x) => x.is_home_featured && String(x.id) !== String(payload.id)).length >= 6
           ) {
-            msg.textContent = "首頁優先推薦最多 6 筆，請先取消其他活動的首頁推薦。";
+            msg.textContent = "首頁精選活動最多 6 筆，請先取消其他活動的首頁精選。";
             return;
           }
         }
-        if (currentTable === "events" && !["contain", "cover"].includes(payload.cover_image_fit)) payload.cover_image_fit = "contain";
         // Existing records use UPDATE rather than UPSERT: UPDATE-only RLS does not imply INSERT permission.
         // Draft updates must not rewrite review/publish fields, even with stale cache values.
-        const contentTable = ["spots", "foods", "trips", "events"].includes(currentTable);
+        const contentTable = ["spots", "foods", "trips"].includes(currentTable);
         const original = contentTable
           ? cache.find((x) => String(x.id) === String(payload.id))
           : null;
@@ -4331,15 +4296,12 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               delete payload.review_status;
             } else {
               payload.is_published = false;
-              if (currentTable !== "events") payload.review_status = "pending";
+              payload.review_status = "pending";
             }
           } else {
             payload.is_published = true;
-            if (currentTable !== "events") payload.review_status = "approved";
+            payload.review_status = "approved";
           }
-        }
-        if (currentTable === "events") {
-          for (const key of ["review_status", "review_note", "reviewed_at", "reviewed_by"]) delete payload[key];
         }
         // Capture the destination before awaiting: switching modules must not redirect
         // the completion callback into another table or overwrite its editor.
@@ -4459,10 +4421,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
       }
 
       async function deleteItem(id) {
-        const deleteMessage = currentTable === "featured_picks"
-          ? "確定刪除此筆首頁精選設定？只會移除精選內容，不會刪除原本的景點、美食或行程資料。"
-          : "確定要刪除這筆資料嗎？";
-        if (!confirm(deleteMessage)) return;
+        if (!confirm("確定要刪除這筆資料嗎？")) return;
         if (bulkTables.has(currentTable)) {
           try {
             const result = await secureBulkDelete(
@@ -4525,6 +4484,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             time: s.time || "",
             title: s.title || "",
             text: s.text || s.description || "",
+            route_summary: s.route_summary || s.preview || "",
             image: s.image || s.image_url || "",
             image_source: s.image_source || s.source || "",
             show_image: s.show_image !== false,
@@ -4568,8 +4528,13 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             </div>
           </div>
           <div class="form-row">
-            <label>說明</label>
-            <textarea data-field="text" placeholder="這一站的介紹與注意事項" oninput="syncTripSections()">${escapeHtml(s.text)}</textarea>
+            <label>行程簡介（顯示於 TODAY'S ROUTE）</label>
+            <textarea data-field="route_summary" maxlength="80" placeholder="建議 25～45 字，簡短說明這一站要做什麼" oninput="syncTripSections()">${escapeHtml(s.route_summary || "")}</textarea>
+            <div class="help">只顯示在頁面上方 TODAY'S ROUTE；留空時會自動擷取下方詳細介紹。</div>
+          </div>
+          <div class="form-row">
+            <label>詳細介紹（顯示於下方完整行程）</label>
+            <textarea data-field="text" placeholder="用旅圖小編帶你走的方式，寫這一站的完整介紹" oninput="syncTripSections()">${escapeHtml(s.text)}</textarea>
           </div>
           <div class="trip-section-image-row">
             <div class="form-row">
@@ -4602,6 +4567,8 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
             title:
               card.querySelector('[data-field="title"]')?.value.trim() || "",
             text: card.querySelector('[data-field="text"]')?.value.trim() || "",
+            route_summary:
+              card.querySelector('[data-field="route_summary"]')?.value.trim() || "",
             image:
               card.querySelector('[data-field="image"]')?.value.trim() || "",
             image_source:
@@ -4612,7 +4579,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
               false,
             order: index + 1,
           }))
-          .filter((s) => s.time || s.title || s.text || s.image);
+          .filter((s) => s.time || s.title || s.text || s.route_summary || s.image);
       }
 
       function syncTripSections() {
@@ -4626,6 +4593,7 @@ ${warnings.length ? "略過欄位：" + warnings.slice(0, 6).join("；") + (warn
           time: "",
           title: "",
           text: "",
+          route_summary: "",
           image: "",
           image_source: "",
           show_image: false,

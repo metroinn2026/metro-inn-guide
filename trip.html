@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>行程介紹｜Metro Inn Guide 北投旅圖</title>
-    <link rel="stylesheet" href="style.css?v=20261003-reading-spacing" />
+    <link rel="stylesheet" href="style.css" />
     <script src="data.js"></script>
-    <script src="related-reading.js?v=20261003-auto-reading"></script>
+    <script src="related-reading.js"></script>
     <script src="supabase-config.js"></script>
     <script src="transit-duration.js"></script>
-    <script src="transport-guide.js?v=20261003-station-parser-fix"></script>
+    <script src="transport-guide.js?v=20261002-shared-all-details"></script>
   </head>
 
   <body id="top" class="trip-detail-page">
@@ -108,10 +108,39 @@
         </section>
       </article>
 
-      <aside class="sidebar"><div class="sticky-panel"><div id="tripTransportGuide"></div></div></aside>
+      <aside class="sidebar">
+        <div class="sticky-panel">
+          <div id="tripTransportGuide"></div>
+
+          <div class="sidebox compact dark">
+            <div class="kicker" style="color: white">STAY NEARBY</div>
+            <h3>如果還想再慢一點</h3>
+            <p>把一晚留給北投，讓散步、泡湯與晚風都不用趕著結束。</p>
+            <a href="https://rwd.ezhotel.cloud/btresort/1" target="_blank"
+              >立即訂房 ↗</a
+            >
+          </div>
+        </div>
+      </aside>
     </main>
 
     <section id="relatedReading" class="section related" hidden></section>
+
+    <section class="cta">
+      <div class="container">
+        <div class="kicker">PLAN YOUR STAY</div>
+        <h2>下一次出發，就從一晚舒服的停留開始</h2>
+        <p style="color: var(--muted)">
+          把步調交給城市，把休息留給自己。從北捷行旅出發，重新認識你以為熟悉的台北。
+        </p>
+        <a
+          class="button"
+          href="https://rwd.ezhotel.cloud/btresort/1"
+          target="_blank"
+          >立即訂房</a
+        >
+      </div>
+    </section>
 
     <div id="footer"></div>
 
@@ -212,6 +241,7 @@
           time: item.time || "",
           title: item.title || `第 ${index + 1} 段`,
           text,
+          route_summary: item.route_summary || item.preview || "",
           image,
           image_source,
           show_image: item.show_image !== false,
@@ -487,7 +517,7 @@
           <div>
             <small>${step.time}</small>
             <strong>${step.title}</strong>
-            <p>${step.text}</p>
+            <p>${step.route_summary || (step.text ? step.text.replace(/\s+/g, " ").trim().slice(0, 52) + (step.text.replace(/\s+/g, " ").trim().length > 52 ? "…" : "") : "")}</p>
           </div>
         `,
             )
@@ -520,7 +550,7 @@
 
           setupHotelRoutes(trip);
           // 行程關聯內容統一由上方「這趟旅程會經過」呈現，避免與延伸閱讀重複或數量不一致。
-          renderRelatedReading(trip,document.getElementById("relatedReading"),"trips");
+          document.getElementById("relatedReading").hidden = true;
           renderRelatedContent(trip);
         } catch (error) {
           console.error(error);

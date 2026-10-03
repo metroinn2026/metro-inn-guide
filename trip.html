@@ -522,7 +522,6 @@
           <section class="story numbered-story" id="s${index + 1}">
             <h2><span class="step-no">${String(index + 1).padStart(2, "0")}</span><span>${step.title}</span></h2>
             ${step.time ? `<div class="trip-section-time">${step.time}</div>` : ""}
-            <p>${step.text}</p>
             ${
               step.show_image !== false
                 ? `<div class="story-img">
@@ -531,6 +530,7 @@
             <p class="image-source-caption">${formatImageCaptionText(step.image_source || trip.cover_image_source || trip.image_source || "")}</p>`
                 : ""
             }
+            <p>${step.text}</p>
           </section>
         `,
             )

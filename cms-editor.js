@@ -2,6 +2,37 @@
 (function(global){'use strict';
 // 舊版交通文字欄位不再出現在共用編輯器；原始值仍保留於 record，避免覆寫既有資料。
 const excluded=new Set(['id','is_published','review_status','review_note','reviewed_at','reviewed_by','source_urls','transport_metro','transport_bus','transport_car']);
+function optionsClient(){return global.MetroAdminDb || global.db || (typeof db!=='undefined'?db:null);}
+async function searchSavedTransportGuides(keyword) {
+        const client = optionsClient();
+        if (!client) throw Error("尚未登入後台，請重新整理並登入後再搜尋。");
+        const needle = keyword.trim().toLocaleLowerCase();
+        if (!needle) return { items: [], errors: [] };
+        const sources = [
+          ["spots", "景點", "id,title,address,transport_routes"],
+          ["foods", "美食", "id,title,address,transport_routes"],
+          ["trips", "行程", "id,title,transport_routes"],
+          ["events", "活動", "id,title,venue_name,address,transport"],
+        ];
+        const results = await Promise.all(sources.map(async ([table, label, fields]) => {
+          const items = [];
+          try {
+            for (let offset = 0; ; offset += 500) {
+              const { data, error } = await client.from(table).select(fields).order("id").range(offset, offset + 499);
+              if (error) throw error;
+              for (const item of data || []) {
+                const text = [item.id, item.title, item.address, item.venue_name, item.transport,
+                  JSON.stringify(item.transport_routes || [])].filter(Boolean).join(" ").toLocaleLowerCase();
+                if (text.includes(needle)) items.push({ ...item, sourceLabel: label, sourceType: table });
+              }
+              if (!data || data.length < 500) break;
+            }
+            return { items, error: "" };
+          } catch (error) { return { items, error: label + "：" + (error.message || "讀取失敗") }; }
+        }));
+        return { items: results.flatMap(result => result.items), errors: results.map(result => result.error).filter(Boolean) };
+      }
+
 function mount(root,type,record,options={}){
  if(!global.MetroCmsSchema?.hasType(type))throw Error('不支援的內容類型');
  root.replaceChildren();const schema=global.MetroCmsSchema,groups=schema.groups(type),definitions=new Map(schema.fields(type).map(f=>[f[0],f]));const inputs=new Map();const invalid=new Set();const bar=document.createElement('div'),panel=document.createElement('div');bar.className='row';root.append(bar,panel);
@@ -84,8 +115,8 @@ function mount(root,type,record,options={}){
    const keyword=searchInput.value.trim();if(!keyword){searchStatus.textContent='請輸入搜尋關鍵字。';return;}
    searchButton.disabled=true;searchResults.replaceChildren();searchStatus.textContent='搜尋中…';
    try{
-    if(typeof options.searchTransportGuides!=='function')throw Error('尚未連接搜尋服務，請一併更新 admin.html。');
-    const result=await options.searchTransportGuides(keyword);let count=0;
+    const search=typeof options.searchTransportGuides==='function'?options.searchTransportGuides:searchSavedTransportGuides;
+    const result=await search(keyword);let count=0;
     for(const item of result.items||[]){
      let routes=item.transport_routes;if(typeof routes==='string'){try{routes=JSON.parse(routes);}catch{routes=[];}}if(routes&&!Array.isArray(routes))routes=routes.routes||[];
      const candidates=item.sourceType==='events'?[{text:String(item.transport||'').trim(),title:''}]:

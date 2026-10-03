@@ -1606,12 +1606,13 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="bulk-data.js?v=20261003-events-import"></script>
     <script src="transit-duration.js"></script>
-      <script src="cms-editor.js?v=20261003-saved-transport-search"></script>
+      <script src="cms-editor.js?v=20261003-search-connection-fix"></script>
     <script src="route-timeline.js"></script>
     <link rel="stylesheet" href="route-timeline.css" />
       <script src="cms-preview.js?v=20261001-unified-event-editor"></script>
     <script>
       const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      window.MetroAdminDb = db;
 
       const imageTipsDefault = `
       <ul class="tip-list">

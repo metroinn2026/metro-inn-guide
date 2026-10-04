@@ -182,3 +182,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(loadSiteSettings,
 
 /* Public reading font-size controls: shared across all pages loading data.js. */
 (function(){if(typeof document!=="undefined"&&!document.querySelector("script[data-reading-controls]")){var s=document.createElement("script");s.src="font-size-controls.js?v=20261002-2122";s.defer=true;s.dataset.readingControls="";document.head.appendChild(s);}})();
+
+// 手機版將原有搜尋與字級控制移入選單，桌面版還原。
+(function(){function placeMobileTools(){const actions=document.getElementById('siteHeaderActions'),nav=document.getElementById('mobile-site-menu'),desktop=document.querySelector('.utility-inner');if(!actions||!nav||!desktop)return;const target=window.matchMedia('(max-width:1120px)').matches?nav:desktop;if(actions.parentElement!==target)target.append(actions);}
+ document.addEventListener('DOMContentLoaded',placeMobileTools);window.addEventListener('resize',placeMobileTools);new MutationObserver(placeMobileTools).observe(document.documentElement,{childList:true,subtree:true});placeMobileTools();})();

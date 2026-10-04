@@ -1542,3 +1542,23 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 .home-banner-dots button.active,.picks-controls .picks-dot.is-active,.home-trip-dots .picks-dot.is-active{background:#777!important}
 .home-banner-dots button:hover,.picks-controls .picks-dot:hover,.home-trip-dots .picks-dot:hover{background:#999!important}
 .home-banner-dots button:focus-visible,.picks-controls .picks-dot:focus-visible,.home-trip-dots .picks-dot:focus-visible{outline:2px solid #777!important;outline-offset:4px}
+
+/* 手機選單與首頁分類按鈕，避免溢出裁切。 */
+@media(max-width:1120px){
+ .header-primary-row .container.nav{display:flex!important;flex-wrap:nowrap!important;position:relative}
+ .header-primary-row .mobile-nav-toggle{margin-left:auto!important;order:3;flex:0 0 44px!important;width:44px!important;height:44px!important;min-width:44px!important;padding:0!important;border-radius:0!important;display:flex!important;align-items:center;justify-content:center}
+ .mobile-nav-toggle .mobile-nav-label{display:none!important}
+ .header-primary-row .brand{min-width:0;flex:0 1 auto!important}
+ .header-primary-row .nav-book{display:none!important}
+ #mobile-site-menu.is-open{max-height:calc(100dvh - 80px);overflow-y:auto;overflow-x:visible}
+ #mobile-site-menu #siteHeaderActions{display:flex!important;gap:26px!important;align-items:center;padding:16px 18px!important;border-top:1px solid #ddd;min-height:56px}
+ #mobile-site-menu .site-search-toggle{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#4d4d4d;padding:0}
+ #mobile-site-menu .site-search-toggle:after{content:'關鍵字搜尋';font-size:14px}
+ #mobile-site-menu .site-search-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+ #mobile-site-menu #metro-font-controls .metro-font-menu{position:static!important;box-shadow:none!important}
+ #mobile-site-menu #metro-font-controls .metro-font-trigger:after{content:' 字級';font-size:14px}
+}
+@media(max-width:760px){
+ body:has(.editor-picks) .editor-picks .picks-destinations{box-sizing:border-box!important;max-width:100%!important;flex-wrap:wrap!important;margin:20px 0 0!important;padding:0!important}
+ #homeSpotsMoreLink,#homeFoodsMoreLink{box-sizing:border-box!important;flex:1 1 calc(50% - 5px)!important;width:auto!important;max-width:100%!important;white-space:normal!important;text-align:center}
+}

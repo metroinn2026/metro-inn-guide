@@ -12,8 +12,8 @@
     const directions=new URL('https://www.google.com/maps/dir/');
     directions.searchParams.set('api','1');directions.searchParams.set('origin',HOTEL_MAP_ORIGIN);directions.searchParams.set('destination',destination);directions.searchParams.set('travelmode','transit');
     const root=document.createElement('section');root.className='sidebox compact metro-transit compact-transit';root.setAttribute('aria-labelledby','transportGuideTitle');
-    const kicker=document.createElement('div');kicker.className='compact-transit-kicker';kicker.textContent='TRANSPORT GUIDE';
-    const head=document.createElement('div');head.className='compact-transit-head';const title=document.createElement('h2');title.id='transportGuideTitle';title.textContent='大眾運輸交通指南';const total=document.createElement('span');total.className='compact-transit-total';total.hidden=true;head.append(title,total);
+    const kicker=document.createElement('div');kicker.className='compact-transit-kicker';kicker.textContent='LOW-CARBON TRAVEL';
+    const head=document.createElement('div');head.className='compact-transit-head';const title=document.createElement('h2');title.id='transportGuideTitle';title.textContent='低碳交通指南';const total=document.createElement('span');total.className='compact-transit-total';total.hidden=true;head.append(title,total);
     const list=document.createElement('ol');list.className='compact-transit-steps';
     const note=document.createElement('p');note.className='compact-transit-note';note.textContent='路線、時間及距離請以現場與運輸業者資訊為準。';
     const map=document.createElement('a');map.className='compact-transit-map';map.href=directions.href;map.target='_blank';map.rel='noopener noreferrer';map.textContent='在 Google Maps 查看即時路線 ↗';

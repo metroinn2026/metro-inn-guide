@@ -1536,3 +1536,9 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 .home-trip-dots .picks-dot.is-active{background:#F3653B}
 .home-trip-dots .picks-dot:focus-visible{outline:2px solid #F3653B;outline-offset:4px}
 .home-trip-arrow:disabled{opacity:.4;cursor:default}
+
+/* 首頁輪播統一灰色圓點，深灰標示目前位置。 */
+.home-banner-dots button,.picks-controls .picks-dot,.home-trip-dots .picks-dot{width:8px!important;height:8px!important;min-width:0!important;flex:0 0 8px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#c8c8c8!important;transform:none!important}
+.home-banner-dots button.active,.picks-controls .picks-dot.is-active,.home-trip-dots .picks-dot.is-active{background:#777!important}
+.home-banner-dots button:hover,.picks-controls .picks-dot:hover,.home-trip-dots .picks-dot:hover{background:#999!important}
+.home-banner-dots button:focus-visible,.picks-controls .picks-dot:focus-visible,.home-trip-dots .picks-dot:focus-visible{outline:2px solid #777!important;outline-offset:4px}

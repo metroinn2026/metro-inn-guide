@@ -57,7 +57,7 @@
   <div class="picks-controls"><div class="picks-dots" id="picksDots" role="group" aria-label="選擇精選內容"></div></div>
   <div class="picks-destinations home-section-more"><a id="homeSpotsMoreLink" href="spots.html">查看全部景點</a><a id="homeFoodsMoreLink" href="foods.html">查看全部美食</a></div>
 </div></section>
-<section class="section home-journey"><div class="container home-trip-section"><h2 class="home-section-title"><span class="home-title-text">推薦行程</span></h2><div class="home-trip-carousel"><button class="home-trip-arrow prev" id="homeTripPrev" type="button" aria-label="上一個推薦行程">‹</button><div class="home-trip-grid" id="homeTripGrid" tabindex="0" aria-label="推薦行程，左右滑動瀏覽" aria-live="polite"><p class="home-trip-empty">目前沒有已上架的推薦行程。</p></div><button class="home-trip-arrow next" id="homeTripNext" type="button" aria-label="下一個推薦行程">›</button></div><div class="home-trip-actions home-section-more"><a id="homeTripMoreLink" class="home-journey-link" href="trips.html">查看全部行程</a></div></div></section>
+<section class="section home-journey"><div class="container home-trip-section"><h2 class="home-section-title"><span class="home-title-text">推薦行程</span></h2><div class="home-trip-carousel"><button class="home-trip-arrow prev" id="homeTripPrev" type="button" aria-label="上一個推薦行程">‹</button><div class="home-trip-grid" id="homeTripGrid" tabindex="0" aria-label="推薦行程，左右滑動瀏覽" aria-live="polite"><p class="home-trip-empty">目前沒有已上架的推薦行程。</p></div><button class="home-trip-arrow next" id="homeTripNext" type="button" aria-label="下一個推薦行程">›</button></div><div id="homeTripDots" class="home-trip-dots" aria-label="推薦行程頁次"></div><div class="home-trip-actions home-section-more"><a id="homeTripMoreLink" class="home-journey-link" href="trips.html">查看全部行程</a></div></div></section>
 
 </main><div id="footer"></div><script>
 
@@ -82,9 +82,9 @@ function renderHomeTripCarousel(){
  if(!grid)return;
  const trips=homeTripItems||pickItems.filter(item=>String(item.type||'').startsWith('行程')&&item.title&&item.href).map(item=>({id:(item.href.match(/[?&]id=([^&]+)/)||[])[1],title:item.title,summary:item.desc,cover_image:item.img,duration:item.type.replace(/^行程[・·]?/,''),href:item.href}));
  grid.replaceChildren();
- if(!trips.length){const empty=document.createElement('p');empty.className='home-trip-empty';empty.textContent='目前沒有已上架的推薦行程。';grid.append(empty);if(prev)prev.hidden=true;if(next)next.hidden=true;return;}
+ if(!trips.length){const empty=document.createElement('p');empty.className='home-trip-empty';empty.textContent='目前沒有已上架的推薦行程。';grid.append(empty);if(prev)prev.hidden=true;if(next)next.hidden=true;document.getElementById('homeTripDots')?.replaceChildren();return;}
  trips.forEach(item=>{const card=document.createElement('a');card.className='home-trip-card';card.href=item.href||`trip.html?id=${encodeURIComponent(item.id||'')}`;const photo=document.createElement('div');photo.className='home-trip-photo';if(item.cover_image){const img=document.createElement('img');img.src=item.cover_image;img.alt='';img.loading='lazy';photo.append(img);}const body=document.createElement('div');body.className='home-trip-copy';const type=document.createElement('span');type.className='home-trip-type';type.textContent=item.duration||'行程';const title=document.createElement('h3');title.textContent=item.title;const summary=document.createElement('p');summary.textContent=item.summary||'';body.append(type,title,summary);card.append(photo,body);grid.append(card);});
- if(prev)prev.hidden=trips.length<2;if(next)next.hidden=trips.length<2;
+ updateHomeTripPages();
 }
 async function loadHomeTrips(){
  if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_ANON_KEY==='undefined')return;
@@ -92,10 +92,18 @@ async function loadHomeTrips(){
  catch(error){console.warn('首頁推薦行程尚未載入，暫用預設內容。',error);}
 }
 document.addEventListener('DOMContentLoaded',loadHomeTrips);if(document.readyState!=='loading')loadHomeTrips();
+function getHomeTripPages(grid){
+ const cards=[...grid.querySelectorAll('.home-trip-card')];if(!cards.length)return [0];
+ const gap=parseFloat(getComputedStyle(grid).gap)||0,stride=cards[0].getBoundingClientRect().width+gap;
+ const visible=Math.max(1,Math.round((grid.clientWidth+gap)/stride)),max=Math.max(0,grid.scrollWidth-grid.clientWidth),pages=[0];
+ for(let i=visible;i<cards.length;i+=visible){const left=Math.min(i*stride,max);if(left>pages[pages.length-1]+1)pages.push(left);}return pages;
+}
+function nearestHomeTripPage(grid,pages){return pages.reduce((best,left,i)=>Math.abs(left-grid.scrollLeft)<Math.abs(pages[best]-grid.scrollLeft)?i:best,0);}
+function updateHomeTripPages(){const grid=document.getElementById('homeTripGrid'),dots=document.getElementById('homeTripDots');if(!grid||!dots)return;const pages=getHomeTripPages(grid),current=nearestHomeTripPage(grid,pages);updateCarouselDots(dots,pages.length,current,i=>grid.scrollTo({left:pages[i],behavior:'smooth'}),'頁推薦行程');dots.hidden=pages.length<2;for(const id of ['homeTripPrev','homeTripNext']){const button=document.getElementById(id);if(button){button.hidden=pages.length<2;button.disabled=id==='homeTripPrev'?current===0:current===pages.length-1;}}}
 function initHomeTripCarousel(){
  const grid=document.getElementById('homeTripGrid');if(!grid||grid.dataset.controlsReady)return;grid.dataset.controlsReady='true';
- const move=direction=>{const card=grid.querySelector('.home-trip-card');if(!card)return;const gap=parseFloat(getComputedStyle(grid).gap)||0;grid.scrollBy({left:direction*(card.getBoundingClientRect().width+gap),behavior:'smooth'});};
- document.getElementById('homeTripPrev')?.addEventListener('click',()=>move(-1));document.getElementById('homeTripNext')?.addEventListener('click',()=>move(1));renderHomeTripCarousel();
+ const move=direction=>{const pages=getHomeTripPages(grid);const current=nearestHomeTripPage(grid,pages);grid.scrollTo({left:pages[Math.max(0,Math.min(pages.length-1,current+direction))],behavior:'smooth'});};
+ document.getElementById('homeTripPrev')?.addEventListener('click',()=>move(-1));document.getElementById('homeTripNext')?.addEventListener('click',()=>move(1));grid.addEventListener('scroll',updateHomeTripPages,{passive:true});window.addEventListener('resize',updateHomeTripPages);renderHomeTripCarousel();
 }
 
 function updateCarouselDots(container,total,current,onSelect,label){if(!container)return;const count=Math.max(0,Number(total)||0);if(Number(container.dataset.dotCount||-1)!==count){container.replaceChildren();container.dataset.dotCount=String(count);for(let i=0;i<count;i++){const dot=document.createElement('button');dot.type='button';dot.className='picks-dot';dot.setAttribute('aria-label',`第 ${i+1} 個${label}`);dot.addEventListener('click',()=>onSelect(i));container.append(dot);}}[...container.querySelectorAll('.picks-dot')].forEach((dot,index)=>{const active=index===current;dot.classList.toggle('is-active',active);dot.setAttribute('aria-pressed',String(active));if(active)dot.setAttribute('aria-current','true');else dot.removeAttribute('aria-current');});}

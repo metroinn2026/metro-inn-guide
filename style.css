@@ -1527,3 +1527,12 @@ body.activity-detail-page .activity-story-img .activity-image-enlarge{height:aut
 .numbered-story .trip-section-time{display:table;margin:0 0 16px;padding:7px 13px;border-radius:6px;background:#fff2ec;color:#b83b16;font-size:18px;font-weight:700;line-height:1.5;letter-spacing:.02em}
 .numbered-story .trip-section-time+p{margin-top:0}
 @media(max-width:760px){.numbered-story .trip-section-time{font-size:16px;margin-bottom:12px}}
+
+/* 首頁行程：桌面三張卡片與分頁圓點。 */
+@media(min-width:901px){.home-trip-grid>.home-trip-card{flex:0 0 calc((100% - 40px)/3)!important}}
+.home-trip-dots{display:flex;justify-content:center;align-items:center;gap:10px;margin:16px 0 0}
+.home-trip-dots[hidden]{display:none}
+.home-trip-dots .picks-dot{appearance:none;width:9px;height:9px;flex:0 0 9px;padding:0;border:0;border-radius:50%;background:#c8cbc5;cursor:pointer}
+.home-trip-dots .picks-dot.is-active{background:#F3653B}
+.home-trip-dots .picks-dot:focus-visible{outline:2px solid #F3653B;outline-offset:4px}
+.home-trip-arrow:disabled{opacity:.4;cursor:default}
